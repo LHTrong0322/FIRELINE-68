@@ -40,6 +40,8 @@ Bot thứ hai (chạy riêng với bot đồ hoạ) chuyên ổn định game v�
 7. Ghi `docs/dev-log.md`: ngày, lỗi tìm thấy (kèm cách tái hiện), cách sửa, nâng cấp đã làm, kết quả test, backlog mới.
 
 ## Lưu ý kỹ thuật
+- Từ v4.0: chế độ `base` (bản đồ nới rộng bằng `baseGrid()`, xe chỉ huy `hqs`), `bunker` (bản đồ có `bunker:true`, điểm `1 2 3`), `rescue`. Kiểm tra thêm bằng `python3 tools/featuretest.py` và `tools/modetest.py`. Test chờ theo `state.time` (thời gian trong game) vì SwiftShader rất chậm.
+- Sảnh online: worker trả danh sách phòng ở `/rooms` (Durable Object tên `__lobby__`). Đừng phá.
 - Môi trường test dùng SwiftShader (CPU), FPS rất thấp: hoạt ảnh theo thời gian có thể chưa xong khi chụp. Đừng nhầm với lỗi.
 - Card đồ hoạ thật dùng bộ đệm HalfFloat: mọi giá trị sáng > 65504 thành vô cực và gây đốm đen sau bloom. Đã có `SanitizeShader`, đừng gỡ.
 - Hạt (`Particles`) dùng màu RGBA, độ mờ nằm ở kênh alpha. Đừng đổi lại kiểu làm tối dần màu (từng gây lỗi chấm đen).

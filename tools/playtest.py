@@ -47,10 +47,16 @@ async def run():
         # 3) online 2 players
         a=await new_page(b, errs, 'online-A', viewport={'width':480,'height':270}, q='low'); c=await new_page(b, errs, 'online-B', viewport={'width':480,'height':270}, q='low')
         for pg in (a,c):
-            await pg.evaluate("document.getElementById('mOnline').click()"); await pg.wait_for_timeout(4000)
+            await pg.evaluate("document.getElementById('mOnline').click()"); await pg.wait_for_timeout(3000)
             await pg.wait_for_function("!document.getElementById('mJoin').disabled && document.getElementById('netStatus').textContent.includes('Sẵn sàng')", timeout=60000)
-            await pg.fill('#roomCode','qa-test'); await pg.evaluate("document.getElementById('mJoin').click()")
-            await pg.wait_for_function("window.__game.state.mode==='online'", timeout=60000)
+        # A tạo phòng, B thấy phòng trong danh sách và bấm vào (không nhập mã)
+        await a.fill('#roomCode','QA Kiểm thử'); await a.evaluate("document.getElementById('mJoin').click()")
+        await a.wait_for_function("window.__game.state.mode==='online'", timeout=60000)
+        await c.wait_for_function("[...document.querySelectorAll('#roomList .roomc')].some(b=>b.textContent.includes('QA Kiểm thử'))", timeout=60000)
+        report['room_list']=await c.evaluate("[...document.querySelectorAll('#roomList .roomc b')].map(b=>b.textContent)")
+        await c.screenshot(path=f'{shots}/playtest_roomlist.png')
+        await c.evaluate("[...document.querySelectorAll('#roomList .roomc')].find(b=>b.textContent.includes('QA Kiểm thử')).click()")
+        await c.wait_for_function("window.__game.state.mode==='online'", timeout=60000)
         for _ in range(30):  # SwiftShader rất chậm: chờ tối đa ~60s
             await a.wait_for_timeout(2000)
             report['online_peers_A']=await a.evaluate("window.__game.net.remotes.size")

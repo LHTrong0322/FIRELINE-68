@@ -43,3 +43,9 @@
 - Bài học: IK có pole target trong Blender bị kẹt khi mục tiêu gần vai → bỏ pole, solver tự gập khuỷu ra ngoài và đạt đúng vị trí.
 - Kiểm tra: check.py low/high ĐẠT, playtest ĐẠT, ảnh cận cảnh `tools/closeup.py`.
 - Backlog: nướng ánh sáng (lightmap) bằng Blender; thêm ngón tay/khuôn mặt dựng bằng Blender; quân phục có nếp gấp (normal map riêng); hoạt ảnh nạp đạn, ném lựu đạn, cúi người.
+
+## 2026-11-13 — Ánh sáng tính sẵn + bóng nắng theo người chơi (v4.0)
+- `bakeLighting()`: mỗi lần dựng bản đồ tính một ảnh ánh sáng (4 điểm ảnh/ô lưới): độ che khuất góc tường (AO) và ánh sáng của mọi đèn/đống lửa có kiểm tra bị tường che. Shader `addMacro` cộng ánh sáng này vào tường/sàn/hào → đèn ở xa vẫn toả ánh ấm, góc tường tối tự nhiên (trước đây chỉ vài đèn gần nhất có ánh sáng).
+- Bóng mặt trời giờ đi theo người chơi (`followSun`, khung 96 m, bám lưới 4 m để không rung) → bóng nét hơn trên bản đồ rộng.
+- Trời hoàng hôn mới (Him Lam) với mặt trời thấp, bầu trời cam.
+- Backlog: dựng lại khuôn mặt bằng Blender; nếp gấp quân phục; ánh sáng tính sẵn cho cả trần hầm và vật thể.
