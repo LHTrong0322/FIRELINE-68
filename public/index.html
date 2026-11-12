@@ -1677,8 +1677,10 @@ function enemyShoot(e,eye,dist,D){
 const KILL_LIMIT=15;
 const net = {
   lobby:null, room:null, my:null, remotes:new Map(), presT:0, sh:0, rk:null, rkSeq:0, dmg:{}, seenDmg:{}, k:0, d:0, kb:null, rd:0, code:'',
-  async probe(){
-    let tries=0; while(!(window.claude&&window.claude.use) && tries<20){ await new Promise(r=>setTimeout(r,100)); tries++; }
+  async probe(){ if(this._probeP) return this._probeP; this._probeP=this._probe(); return this._probeP; },
+  async _probe(){
+    const selfHosted=/^https?:$/.test(location.protocol) && !/claude/i.test(location.hostname) && !(window.claude&&window.claude.use);
+    const until=performance.now()+(selfHosted?0:2500); while(!(window.claude&&window.claude.use) && performance.now()<until){ await new Promise(r=>setTimeout(r,100)); }
     if(!(window.claude&&window.claude.use)){
       // self-hosted (Cloudflare Worker): WebSocket relay on same origin
       if(/^https?:$/.test(location.protocol)){ this.lobby=wsLobby(); this.kind='ws'; return this.lobby; }

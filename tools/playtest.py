@@ -13,7 +13,7 @@ AIMBOT="""(()=>{const g=window.__game,p=g.player; if(!p.alive) return 'dead'; co
  if(e){ const dx=e.pos.x-p.pos.x, dz=e.pos.z-p.pos.z, dy=(e.pos.y+1.2)-(p.pos.y+p.eye); p.yaw=Math.atan2(-dx,-dz); p.pitch=Math.atan2(dy,Math.hypot(dx,dz)); p.fireHeld=true; } else p.fireHeld=false;
  return JSON.stringify({hp:Math.round(p.hp),wave:g.state.wave,kills:g.state.kills,alive:g.enemies.filter(e=>e.alive).length}); })()"""
 async def new_page(b, errs, tag, **kw):
-    ctx=await b.new_context(**kw); await ctx.add_init_script("try{localStorage.setItem('tl_quality2', JSON.stringify('med'))}catch(e){}")
+    q=kw.pop('q','med'); ctx=await b.new_context(**kw); await ctx.add_init_script("try{localStorage.setItem('tl_quality2', JSON.stringify('%s'))}catch(e){}" % q)
     pg=await ctx.new_page(); pg.set_default_timeout(300000)
     pg.on('pageerror', lambda e: errs.append(f'[{tag}] pageerror: {e}'))
     pg.on('console', lambda m: errs.append(f'[{tag}] console: {m.text}') if m.type=='error' and '404' not in m.text else None)
@@ -45,13 +45,17 @@ async def run():
         report['mobile_touch_ui']=await pg.evaluate("!document.getElementById('touch').classList.contains('hidden')")
         await pg.context.close()
         # 3) online 2 players
-        a=await new_page(b, errs, 'online-A', viewport={'width':800,'height':450}); c=await new_page(b, errs, 'online-B', viewport={'width':800,'height':450})
+        a=await new_page(b, errs, 'online-A', viewport={'width':480,'height':270}, q='low'); c=await new_page(b, errs, 'online-B', viewport={'width':480,'height':270}, q='low')
         for pg in (a,c):
             await pg.evaluate("document.getElementById('mOnline').click()"); await pg.wait_for_timeout(4000)
+            await pg.wait_for_function("!document.getElementById('mJoin').disabled && document.getElementById('netStatus').textContent.includes('Sẵn sàng')", timeout=60000)
             await pg.fill('#roomCode','qa-test'); await pg.evaluate("document.getElementById('mJoin').click()")
-        await a.wait_for_timeout(8000)
-        report['online_peers_A']=await a.evaluate("window.__game.net.remotes.size")
-        report['online_peers_B']=await c.evaluate("window.__game.net.remotes.size")
+            await pg.wait_for_function("window.__game.state.mode==='online'", timeout=60000)
+        for _ in range(30):  # SwiftShader rất chậm: chờ tối đa ~60s
+            await a.wait_for_timeout(2000)
+            report['online_peers_A']=await a.evaluate("window.__game.net.remotes.size")
+            report['online_peers_B']=await c.evaluate("window.__game.net.remotes.size")
+            if report['online_peers_A']>=1 and report['online_peers_B']>=1: break
         await a.screenshot(path=f'{shots}/playtest_online.png')
         if report['online_peers_A']<1 or report['online_peers_B']<1: errs.append('online: 2 người chơi không thấy nhau')
         await b.close()

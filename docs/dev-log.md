@@ -4,6 +4,7 @@
 - LỖI: đốm đen mờ che màn hình khi địch bắn trúng quanh người chơi. Nguyên nhân: hạt bụi/khói/máu mờ dần bằng cách làm tối màu (NormalBlending) thay vì giảm alpha. ĐÃ SỬA: màu RGBA, alpha mờ dần.
 - LỖI tiềm ẩn: điểm phản chiếu đèn trên vũng nước vượt giới hạn HalfFloat thành Inf/NaN và bị bloom loang thành ô đen. ĐÃ SỬA: `SanitizeShader` trước GTAO và bloom; độ nhám vũng nước tối thiểu 0.12.
 - Ẩn tâm ngắm khi hy sinh (trước đó đè lên chữ ở màn hình kết thúc).
+- LỖI: nút VÀO PHÒNG không hoạt động trên máy chậm, bước kiểm tra kết nối đếm số lần chờ thay vì thời gian thật (có thể treo hàng chục giây). ĐÃ SỬA: chờ theo thời gian thật, vào thẳng máy chủ WebSocket khi chạy trên Cloudflare, chống gọi kiểm tra 2 lần song song.
 - Thêm `tools/playtest.py` (giao tranh, mobile, online 2 người).
 
 ## Backlog
