@@ -31,3 +31,7 @@
 - Chất liệu thật thêm: excavated_soil_wall, red_brick, red_laterite_soil_stones, brown_mud_02, metal_grate_rusty, burned_ground_01.
 - Phe địch theo lịch sử: quân viễn chinh Pháp (1954: MAS-36, MAT-49, mũ M1 trơn) và lính Mỹ (1968).
 - Tối ưu: gộp mảnh nhân vật (mergeGeometries, ~4x ít draw call), chuột thô (unadjustedMovement), nội suy vị trí người chơi online, gửi trạng thái 20Hz.
+
+## 2026-11-12 – v3.3
+- Cỏ tranh instanced (2 thẻ chéo, alpha test) lay theo gió trong vertex shader; dày ở Khe Sanh, thưa/khô ở Đồi A1.
+- Mưa đêm Điện Biên Phủ (line streaks theo camera) + bề mặt ướt (giảm độ nhám nền/hào/tường) phản chiếu lửa và pháo sáng + tiếng mưa.

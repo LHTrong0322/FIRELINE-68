@@ -74,6 +74,11 @@ button{font-family:inherit;cursor:pointer}
 #joy i{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px;border-radius:50%;background:rgba(226,178,60,.45);border:2px solid rgba(255,255,255,.4)}
 #joyHint{position:absolute;left:calc(70px + env(safe-area-inset-left));bottom:calc(120px + env(safe-area-inset-bottom));width:110px;height:110px;border-radius:50%;border:2px dashed rgba(255,255,255,.18)}
 .tb{position:absolute;border-radius:50%;background:rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.3);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px;letter-spacing:.5px;text-align:center;line-height:1.05}
+.tb svg{width:52%;height:52%;pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+#bFire svg{width:46%;height:46%}
+#bUse{width:92px;height:92px;left:50%;top:auto;bottom:calc(120px + env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(87,224,138,.32);border-color:#57e08a;color:#dfffe9;animation:pulse 1.2s infinite}
+#bUse .ring{position:absolute;inset:-6px;border-radius:50%;border:3px solid transparent;border-top-color:#57e08a;transform:rotate(calc(var(--p,0)*360deg))}
+@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(87,224,138,.15)}}
 .tb.on,.tb:active{background:rgba(226,178,60,.45);border-color:var(--acc)}
 #bFire{width:88px;height:88px;right:calc(28px + env(safe-area-inset-right));bottom:calc(95px + env(safe-area-inset-bottom));background:rgba(200,48,42,.4);border-color:rgba(255,120,100,.6);font-size:15px}
 #bFire2{width:62px;height:62px;left:calc(200px + env(safe-area-inset-left));bottom:calc(210px + env(safe-area-inset-bottom));background:rgba(200,48,42,.3);border-color:rgba(255,120,100,.5)}
@@ -184,20 +189,20 @@ button{font-family:inherit;cursor:pointer}
   <div id="touch" class="hidden">
     <div id="joyHint"></div>
     <div id="joy"><i></i></div>
-    <div class="tb" id="bFire">BẮN</div>
-    <div class="tb" id="bFire2">BẮN</div>
-    <div class="tb" id="bJump">NHẢY</div>
-    <div class="tb" id="bCrouch">NGỒI</div>
-    <div class="tb" id="bReload">NẠP</div>
-    <div class="tb" id="bSwap">ĐỔI<br>SÚNG</div>
-    <div class="tb" id="bLight">ĐÈN</div>
-    <div class="tb" id="bAim">NGẮM</div>
-    <div class="tb hidden" id="bUse" style="width:76px;height:76px;right:calc(130px + env(safe-area-inset-right));bottom:calc(290px + env(safe-area-inset-bottom));background:rgba(87,224,138,.35);border-color:#57e08a">GIỮ<br>CỨU</div>
-    <div class="tb net-only" id="bChat">CHAT</div>
-    <div class="tb net-only" id="bMic">MIC</div>
+    <div class="tb" id="bFire" aria-label="BẮN"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21V11l3-7 3 7v10z"/><path d="M9 17h6"/></svg></div>
+    <div class="tb" id="bFire2" aria-label="BẮN"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21V11l3-7 3 7v10z"/><path d="M9 17h6"/></svg></div>
+    <div class="tb" id="bJump" aria-label="NHẢY"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18V5M6 11l6-6 6 6"/><path d="M4 21h16"/></svg></div>
+    <div class="tb" id="bCrouch" aria-label="NGỒI"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v11M6 9l6 6 6-6"/><path d="M4 20h16"/></svg></div>
+    <div class="tb" id="bReload" aria-label="NẠP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 3v5h-5"/><rect x="10" y="9" width="4" height="7" rx="1"/></svg></div>
+    <div class="tb" id="bSwap" aria-label="ĐỔI SÚNG"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h14l-3-3"/><path d="M20 16H6l3 3"/></svg></div>
+    <div class="tb" id="bLight" aria-label="ĐÈN"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h7l4-3v12l-4-3H3z"/><path d="M17 8l3-2M17 12h4M17 16l3 2"/></svg></div>
+    <div class="tb" id="bAim" aria-label="NGẮM"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></div>
+    <div class="tb hidden" id="bUse" aria-label="Giải cứu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.6-1.8"/><circle cx="12" cy="16" r="1.4" fill="currentColor"/></svg><i class="ring"></i></div>
+    <div class="tb net-only" id="bChat" aria-label="Chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/></svg></div>
+    <div class="tb net-only" id="bMic" aria-label="Mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
   </div>
-  <div class="tb hidden" id="bBoard">BẢNG</div>
-  <div class="tb" id="bPause">❚❚</div>
+  <div class="tb hidden" id="bBoard" aria-label="Bảng điểm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg></div>
+  <div class="tb" id="bPause" aria-label="Tạm dừng"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg></div>
   <div id="dead" class="hidden"><h1 id="deadT">HY SINH</h1><p id="deadP"></p><div id="deadBtns" style="width:280px"></div></div>
 </div>
 
@@ -208,7 +213,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Năm 1968, một căn cứ ngầm bị bao vây. Bạn là chiến sĩ bộ đội cuối cùng giữ hầm chỉ huy. Hãy đẩy lui 8 đợt tấn công, hoặc vào chế độ online để đấu với đồng đội.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v3.2</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v3.3</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -1027,7 +1032,7 @@ function coneMaterial(){
 }
 function disposeLevel(){
   level.traverse(o=>{ if(o.geometry && !o.userData.sharedGeo) o.geometry.dispose(); });
-  level.clear(); lamps.length=0; props.length=0; coneMats.length=0; genFan=null;
+  level.clear(); lamps.length=0; props.length=0; coneMats.length=0; genFan=null; rain=null;
   if(dust){ scene.remove(dust); dust.geometry.dispose(); dust=null; }
 }
 function buildLevel(){
@@ -1188,7 +1193,44 @@ function buildHowitzer(x,z){
   for(const s of [-1,1]){ A(new THREE.CylinderGeometry(0.45,0.45,0.18,24).rotateZ(Math.PI/2),M.rubber,s*0.75,0.45,0.1); A(new RoundedBoxGeometry(0.12,0.12,2.4,2,0.03),M.genMetal,s*0.35,0.35,-1.3,0.12,s*0.18,0); }
   props.push({x,z,r:1.1,h:1.4}); return g;
 }
+// cỏ tranh lay theo gió (thẻ cỏ alpha, gió tính trong vertex shader)
+let grassMat=null; const windU={value:0};
+function grassTexture(){ const c=document.createElement('canvas'); c.width=256; c.height=256; const x=c.getContext('2d');
+  for(let i=0;i<70;i++){ const bx=rand(8,248), h=rand(110,250), lean=rand(-30,30), w=rand(2,5); const g=x.createLinearGradient(0,256,0,256-h);
+    const dry=Math.random(); g.addColorStop(0, dry<.5?'#3d4a22':'#4a4426'); g.addColorStop(1, dry<.35?'#9aa05a':(dry<.7?'#7d8a3e':'#b0a060'));
+    x.fillStyle=g; x.beginPath(); x.moveTo(bx-w,256); x.quadraticCurveTo(bx+lean*0.4,256-h*0.6,bx+lean,256-h); x.quadraticCurveTo(bx+lean*0.4+1,256-h*0.6,bx+w,256); x.fill(); }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=maxAniso; return t; }
+function buildGrass(){
+  if(!grassMat){ grassMat=new THREE.MeshStandardMaterial({map:grassTexture(), alphaTest:0.45, side:THREE.DoubleSide, roughness:0.85, metalness:0});
+    grassMat.onBeforeCompile=sh=>{ sh.uniforms.uWind=windU; sh.vertexShader='uniform float uWind;\n'+sh.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+      { vec4 wp=instanceMatrix*vec4(position,1.0); float k=uv.y*uv.y; transformed.x+=sin(uWind*1.7+wp.x*0.35+wp.z*0.2)*0.12*k; transformed.z+=cos(uWind*1.3+wp.z*0.3)*0.08*k; }`); };
+    grassMat.customProgramCacheKey=()=>'grass'; }
+  const dense = MAPID==='khesanh' ? 7 : 3, lowK = settings.quality==='low'?0.5:1;
+  const cells=[]; for(let z=1;z<ROWS-1;z++) for(let x=1;x<COLS-1;x++){ if(grid[z*COLS+x]) continue; const ch=chAt(x,z); if(ch==='R'||ch==='O'||ch==='L'||ch==='Z') continue; cells.push([x,z]); }
+  const n=Math.floor(cells.length*dense*lowK); if(!n) return;
+  const g1=new THREE.PlaneGeometry(1.1,0.85); g1.translate(0,0.425,0); const g2=g1.clone(); g2.rotateY(Math.PI/2); const geo=mergeGeometries([g1,g2]);
+  const im=new THREE.InstancedMesh(geo, grassMat, n); const d=new THREE.Object3D();
+  for(let i=0;i<n;i++){ const [x,z]=cells[i%cells.length]; const px=x*CELL+rand(0.2,CELL-0.2), pz=z*CELL+rand(0.2,CELL-0.2);
+    const s=rand(0.6,1.25)*(MAPID==='a1'?0.7:1); d.position.set(px,0,pz); d.rotation.set(0,rand(0,6.28),0); d.scale.set(s,s*rand(0.8,1.3),s); d.updateMatrix(); im.setMatrixAt(i,d.matrix); }
+  im.receiveShadow=true; im.userData.noAO=true; level.add(im);
+  if(MAPID==='a1') grassMat.color.setHex(0x6f6a50); else grassMat.color.setHex(0xffffff);
+}
+// mưa đêm Điện Biên Phủ
+let rain=null;
+function buildRain(){
+  const N = settings.quality==='low'?700:1800; const pos=new Float32Array(N*6);
+  const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const mat=new THREE.LineBasicMaterial({color:0x9fb0c8, transparent:true, opacity:0.35, depthWrite:false});
+  const ls=new THREE.LineSegments(geo,mat); ls.frustumCulled=false; ls.userData.noAO=true; level.add(ls);
+  const drops=[]; for(let i=0;i<N;i++) drops.push([rand(-18,18),rand(0,16),rand(-18,18),rand(14,19)]);
+  rain={ls,drops,pos,N};
+}
+function updateRain(dt){ if(!rain) return; const c=camera.position, P=rain.pos;
+  for(let i=0;i<rain.N;i++){ const d=rain.drops[i]; d[1]-=d[3]*dt; if(d[1]<0){ d[1]=rand(10,16); d[0]=rand(-18,18); d[2]=rand(-18,18); }
+    const x=c.x+d[0], z=c.z+d[2], y=d[1]; const k=i*6; P[k]=x; P[k+1]=y; P[k+2]=z; P[k+3]=x+0.02; P[k+4]=y-0.45; P[k+5]=z+0.04; }
+  rain.ls.geometry.attributes.position.needsUpdate=true; }
 function buildOutdoorSurroundings(){
+  buildGrass(); rain=null; if(MAPDEF.night) buildRain();
   const W=COLS*CELL, D=ROWS*CELL, cx=W/2, cz=D/2;
   // outer ground
   const og=new THREE.Mesh(new THREE.PlaneGeometry(900,900), new THREE.MeshStandardMaterial({color: MAPDEF.night?0x241c16:0x6a3b26, roughness:1}));
@@ -1255,6 +1297,9 @@ function applyMapEnv(){
     sun.color.setHex(0xfff0d8); sun.intensity=1.7; sun.position.set(cx-60,55,cz+35); sun.target.position.set(cx,0,cz);
     scene.environment = makeEnv('fog',0xc4c8c6,0x6a4a38,[[-8,5,6,'#fff6e0',2.5]]);
   }
+  const wet = !!(D_.outdoor && D_.night);
+  M.floor.roughness = wet?0.42:1; M.trench.roughness = wet?0.62:1; M.concrete.roughness = wet?0.7:1; M.planks.roughness = wet?0.75:1; M.sandbag.roughness = wet?0.8:1;
+  AU.rain && AU.rain(wet);
   if(sun.castShadow) renderer.shadowMap.needsUpdate=true;
 }
 // pháo sáng (Điện Biên Phủ ban đêm)
@@ -1362,7 +1407,11 @@ const AU = {
       case 'win': [523,659,784,1046].forEach((f,i)=>this.tone(o,'triangle',f,f,.5,.18,i*.15)); break;
     }
   },
+  rainNode:null,
+  rain(on){ if(!this.ctx){ this._wantRain=on; return; } if(on && !this.rainNode){ const c=this.ctx, s=c.createBufferSource(); s.buffer=this.nb; s.loop=true; const f=c.createBiquadFilter(); f.type='highpass'; f.frequency.value=900; const f2=c.createBiquadFilter(); f2.type='lowpass'; f2.frequency.value=6000; const g=c.createGain(); g.gain.value=0.09; s.connect(f); f.connect(f2); f2.connect(g); g.connect(this.master); s.start(); this.rainNode={s,g}; }
+    else if(!on && this.rainNode){ try{ this.rainNode.s.stop(); }catch(e){} this.rainNode=null; } },
   ambient(){
+    if(this._wantRain) setTimeout(()=>this.rain(true),100);
     const c=this.ctx, s=c.createBufferSource(); s.buffer=this.nb; s.loop=true; const f=c.createBiquadFilter(); f.type='lowpass'; f.frequency.value=140;
     const g=c.createGain(); g.gain.value=0.12; s.connect(f); f.connect(g); g.connect(this.master); s.start();
     const hum=c.createOscillator(); hum.frequency.value=50; const hg=c.createGain(); hg.gain.value=0.012; hum.connect(hg); hg.connect(this.master); hum.start();
@@ -1691,7 +1740,7 @@ const FACTIONS = {
 };
 const DIFF = [{dmg:0.6,acc:1.4,hp:0.85},{dmg:1,acc:1,hp:1},{dmg:1.45,acc:0.75,hp:1.15}];
 const allies=[], hostages=[];
-const ALLY_NAMES=['Tuấn','Hùng','Dũng','Minh','Sơn','Thắng','Hải','Long','Bình','Toàn','Quang','Nam'];
+const ALLY_NAMES=['Tuấn','Hùng','Dũng','Minh','Sơn','Thắng','Hải','Long','Bình','Toàn','Quang','Nam','Phúc','Kiên','Lâm','Vinh'];
 const noise={pos:new V3(), t:0};
 function makeNoise(p, r=28){ noise.pos.copy(p); noise.t=0.25; noise.r=r; }
 
@@ -1713,7 +1762,7 @@ function removeEnemy(e){ scene.remove(e.model.group); e.model.mats.forEach(m=>m.
 function spawnAlly(i){
   const s=spawnP[(i+1)%spawnP.length]||spawnP[0]; const old=MAPDEF.year==='1954';
   const model=buildSoldier({side:'vn', uniform:old?0x6d6a4c:0x56603a, gear:0x6f5a3a, accent:0xc8302a, gun:old?'mas36':'ak', leaves:old});
-  const a={kind:'ally', name:ALLY_NAMES[(i*5+Math.floor(Math.random()*3))%ALLY_NAMES.length], model, pos:new V3(s.x+rand(-1,1),0,s.z+rand(-1,1)), vel:new V3(), yaw:0, hp:150, alive:true, deadT:0,
+  const a={kind:'ally', name:ALLY_NAMES[i%ALLY_NAMES.length], model, pos:new V3(s.x+rand(-1,1),0,s.z+rand(-1,1)), vel:new V3(), yaw:0, hp:150, alive:true, deadT:0,
     target:null, tT:rand(0,.3), cool:rand(.4,1), burst:0, brT:0, slot:i, speed:0, fallDir:Math.random()<0.5?-1:1, aimPitch:0, flash:0, strafe:1, strafeT:0};
   model.group.position.copy(a.pos); scene.add(model.group); allies.push(a);
 }
@@ -1855,7 +1904,7 @@ function allyShoot(a, e, dist){
   if(hit){ damageEnemy(e, Math.round(16*(head?2.2:1)), head, d, true); alertEnemy(e); bloodFx(end,d); }
   else if(w.t<150){ impactFx(end,w.n); }
 }
-const FOLLOW=[[-1.7,2.4],[1.7,2.4],[0,3.8],[-2.8,4.2],[2.8,4.2]];
+const FOLLOW=[]; for(let i=0;i<10;i++){ const r=Math.floor(i/2); FOLLOW.push([(i%2?1:-1)*(1.5+(r%2)*0.6), 2.2+r*1.7]); }
 function updateAllies(dt){
   const sy=Math.sin(player.yaw), cy=Math.cos(player.yaw);
   for(let i=allies.length-1;i>=0;i--){ const a=allies[i], m=a.model;
@@ -1895,9 +1944,10 @@ function updateHostages(dt){
   }
   // giải cứu: giữ E / nút CỨU
   const holding = near && (keys.KeyE || touch.use);
-  if(near){ $('usePrompt').classList.remove('hidden'); $('bUse').classList.toggle('hidden',!IS_TOUCH); }
-  else { $('usePrompt').classList.add('hidden'); $('bUse').classList.add('hidden'); }
+  if(near){ $('usePrompt').classList.remove('hidden'); $('bUse').classList.toggle('hidden',!IS_TOUCH); $('usePrompt').firstElementChild.innerHTML = IS_TOUCH ? 'GIỮ NÚT 🔓 ĐỂ GIẢI CỨU' : 'GIỮ <kbd>E</kbd> ĐỂ GIẢI CỨU'; }
+  else { $('usePrompt').classList.add('hidden'); $('bUse').classList.add('hidden'); touch.use=false; }
   if(near && holding){ near.prog+=dt; $('useBar').style.width=Math.min(100,near.prog/1.6*100)+'%';
+    $('bUse').style.setProperty('--p', Math.min(1,near.prog/1.6));
     if(near.prog>=1.6){ near.state='follow'; poseCaptive(near.model,false); AU.play('pickup'); feed(`Đã giải cứu <b>${esc(near.name)}</b>`); state.freed=(state.freed||0)+1;
       showMsg('ĐÃ GIẢI CỨU CON TIN', state.freed<hostages.length?`Còn ${hostages.length-state.freed} con tin`:'Đưa con tin về điểm sơ tán (vòng xanh)',3);
       if(!state.reinf){ state.reinf=true; for(let i=0;i<4;i++) spawnEnemy(pick(['rifle','rifle','shotgun','mg'])); showMsg('ĐỊCH PHÁT HIỆN!', 'Quân tiếp viện đang tới — rút về điểm sơ tán',3); } } }
@@ -1935,7 +1985,7 @@ function updatePickups(dt,t){
 
 /* ================= INPUT ================= */
 const keys={}; let pointerLocked=false, lookFallback=false;
-const touch={jid:null, jx:0, jy:0, jox:0, joy:0, lid:null, lx:0, ly:0, fid:null, fx:0, fy:0, fire:false};
+const touch={use:false, jid:null, jx:0, jy:0, jox:0, joy:0, lid:null, lx:0, ly:0, fid:null, fx:0, fy:0, fire:false};
 let lookDX=0, lookDY=0, wheelSwap=0;
 addEventListener('keydown',e=>{
   if(document.activeElement && document.activeElement.tagName==='INPUT') return;
@@ -1985,6 +2035,9 @@ function tbtn(id, down){ const el=$(id); el.addEventListener('touchstart',e=>{ e
 for(const id of ['bFire','bFire2']) tbtn(id,(t,el)=>{ touch.fid=t.identifier; touch.fx=t.clientX; touch.fy=t.clientY; player.fireHeld=true; el.classList.add('on'); });
 tbtn('bJump',()=>jump());
 tbtn('bReload',()=>reload());
+{ const ub=$('bUse'); const on=e=>{ e.preventDefault(); e.stopPropagation(); touch.use=true; ub.classList.add('on'); }; const off=e=>{ e.preventDefault(); e.stopPropagation(); touch.use=false; ub.classList.remove('on'); };
+  ub.addEventListener('touchstart',on,{passive:false}); ub.addEventListener('touchend',off,{passive:false}); ub.addEventListener('touchcancel',off,{passive:false});
+  ub.addEventListener('mousedown',e=>{ touch.use=true; }); addEventListener('mouseup',()=>{ touch.use=false; }); }
 tbtn('bSwap',()=>switchWeapon(player.cur===WEAPONS.length-1?1:player.cur+1));
 tbtn('bCrouch',(t,el)=>{ player.crouch=!player.crouch; el.classList.toggle('on',player.crouch); });
 tbtn('bLight',(t,el)=>{ toggleFlash(); el.classList.toggle('on',player.flash); });
@@ -2192,7 +2245,7 @@ function showBoard(on){
 
 /* ================= CAMPAIGN ================= */
 const TOTAL_WAVES=8;
-function waveList(n){ const L=[]; for(let i=0;i<2+n*2;i++) L.push('rifle'); if(n>=2) for(let i=0;i<n-1;i++) L.push('shotgun'); if(n>=3) for(let i=0;i<Math.floor((n-1)/2);i++) L.push('mg');
+function waveList(n){ const L=[]; for(let i=0;i<4+n*3;i++) L.push('rifle'); if(n>=2) for(let i=0;i<n-1;i++) L.push('shotgun'); if(n>=3) for(let i=0;i<Math.floor((n-1)/2);i++) L.push('mg');
   for(let i=L.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [L[i],L[j]]=[L[j],L[i]]; } return L; }
 function updateRescue(dt){
   if(hostages.length && hostages.every(h=>!h.alive || h.state!=='captive') ){
@@ -2205,7 +2258,7 @@ function updateRescue(dt){
 function updateCampaign(dt){
   if(state.mission==='rescue') return updateRescue(dt);
   if(state.waveT>0){ state.waveT-=dt; if(state.waveT<=0){ state.wave++; state.queue=waveList(state.wave); state.spawnT=0.5; showMsg(`ĐỢT ${state.wave}`, state.wave===TOTAL_WAVES?'ĐỢT TẤN CÔNG CUỐI CÙNG!':'Địch đang tràn vào hầm!'); AU.play('wave'); } return; }
-  const maxAlive = settings.quality==='low'?6:9;
+  const maxAlive = settings.quality==='low'?8:14;
   if(state.queue.length){ state.spawnT-=dt; if(state.spawnT<=0 && enemies.filter(e=>e.alive).length<maxAlive){ spawnEnemy(state.queue.shift()); state.spawnT=rand(0.9,1.8); } }
   else if(!enemies.some(e=>e.alive)){
     if(state.wave>=TOTAL_WAVES){ state.phase='end'; setTimeout(()=>showEnd(true),800); AU.play('win'); return; }
@@ -2400,10 +2453,10 @@ async function startCampaign(){
   state.mode='campaign'; state.mission=mission; Object.assign(state,{wave:0,waveT:mission==='defend'?4:0,queue:[],score:0,kills:0,hs:0,shots:0,hits:0,roundEnd:0,freed:0,reinf:false,reinfT:30});
   resetWeapons(); Object.assign(player,{hp:100,armor:25,alive:true,cur:2,prev:1,crouch:false,flash:false,invuln:0});
   placePlayer(spawnP[0]); spawnPickups();
-  const nAllies = mission==='defend' ? 3 : 2; for(let i=0;i<nAllies;i++) spawnAlly(i);
+  const nAllies = settings.quality==='low' ? 5 : 8; for(let i=0;i<nAllies;i++) spawnAlly(i);
   if(mission==='rescue'){
     hostCells.forEach((c,i)=>spawnHostage(c,i)); buildZone();
-    const n=6+settings.diff*2+(MAPDEF.outdoor?2:0); const pts=[...spawnE];
+    const n=12+settings.diff*3+(MAPDEF.outdoor?3:0); const pts=[...spawnE];
     for(let i=0;i<n;i++){ const c=pts[i%pts.length]; spawnEnemy(pick(['rifle','rifle','rifle','shotgun','mg']), {x:c.x+rand(-1.2,1.2), z:c.z+rand(-1.2,1.2)}, false); }
     for(const hc of hostCells){ spawnEnemy('rifle',{x:hc.x+rand(-1.5,1.5),z:hc.z+rand(-1.5,1.5)},false); }
   }
@@ -2554,6 +2607,7 @@ function frame(now){
   for(const tr of tracers){ if(tr.userData.t>0){ tr.userData.t-=dt; tr.material.opacity=Math.max(0,tr.userData.t/0.07)*0.9; if(tr.userData.t<=0) tr.visible=false; } }
   for(const L of [fxLight,fxLight2]){ if(L.userData.t>0){ L.userData.t-=dt; if(L.userData.t<=0) L.intensity=0; else L.intensity*=Math.pow(0.02,dt); } }
   if(dust){ dust.rotation.y=Math.sin(t*0.05)*0.002; dust.position.y=Math.sin(t*0.3)*0.1; }
+  windU.value=t; if(rain) updateRain(dt);
   assignLights(dt,t);
   if(finalPass){ const u=finalPass.uniforms; u.time.value=t; u.ads.value=player.ads; u.hurt.value=state.phase==='playing'&&player.alive?clamp((40-player.hp)/40,0,1)*0.8:(player.alive?0:0.9); }
   drs(dt);

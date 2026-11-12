@@ -26,3 +26,8 @@
 - Lính gác có trạng thái cảnh giác: đứng canh, phát hiện theo góc nhìn/tiếng súng, báo động lan sang đồng bọn.
 - Nhiệm vụ giải cứu: giữ E / nút GIỮ CỨU 1,6 giây để cởi trói, con tin đi theo, đưa về vòng xanh sơ tán; quân tiếp viện địch tới sau khi giải cứu; con tin hy sinh = thất bại. Có chỉ dẫn mục tiêu trên màn hình + minimap.
 - Mobile: kiểm tra xoay màn hình liên tục, nút "Toàn màn hình + xoay ngang", "Vẫn chơi màn hình dọc", hướng dẫn cài PWA trên iPhone (manifest + icon), worker trả no-cache cho trang game, hiện số phiên bản ở menu.
+
+## 2026-11-12 – v3.3
+- LỖI: nút giải cứu trên điện thoại không hoạt động (nút chưa gắn sự kiện chạm, `touch.use` không bao giờ bật). ĐÃ SỬA: giữ nút ổ khoá to ở giữa màn hình, có vòng tiến trình.
+- Toàn bộ nút cảm ứng đổi sang biểu tượng hình (đạn, ống ngắm, mũi tên lên/xuống, băng đạn, đổi súng, đèn pin, ổ khoá, chat, mic).
+- Đồng đội nâng lên 1 tiểu đội: người chơi + 8 chiến sĩ (tier low: 5), đội hình 2 hàng dọc; tăng quân địch tương ứng.
