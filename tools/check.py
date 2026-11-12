@@ -41,7 +41,8 @@ async def run():
           ['rifle','mg','shotgun'].forEach(t=>g.spawnEnemy(t)); g.enemies.forEach((e,i)=>{ e.pos.set(13.5*3-1.4+i*1.4,0,8.5*3-3.2-i*0.6); e.react=99; e.cool=99; });})()""")
         await pg.wait_for_timeout(2500); await pg.screenshot(path=f'{shots}/enemies.png')
         await pg.evaluate("window.__game.player.fireHeld=true"); await pg.wait_for_timeout(400); await pg.screenshot(path=f'{shots}/fire.png')
-        lum=await pg.evaluate("""(()=>{const c=document.getElementById('c'); const t=document.createElement('canvas'); t.width=64; t.height=36; const x=t.getContext('2d'); x.drawImage(c,0,0,64,36); const d=x.getImageData(0,0,64,36).data; let s=0; for(let i=0;i<d.length;i+=4) s+=d[i]+d[i+1]+d[i+2]; return s/(d.length/4)/3;})()""")
+        from PIL import Image, ImageStat
+        lum=sum(ImageStat.Stat(Image.open(f'{shots}/{n}.png').convert('L')).mean[0] for n in ('play','enemies'))/2
         await b.close()
     return errs, lum
 if __name__=='__main__':
