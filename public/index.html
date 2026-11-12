@@ -256,6 +256,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 const V3 = THREE.Vector3;
 const $ = id => document.getElementById(id);
@@ -612,7 +613,7 @@ function stencilTex(){ const c=document.createElement('canvas'); c.width=c.heigh
   const t=new THREE.CanvasTexture(c); return t; }
 async function bakeAll(){
   const quad=new THREE.Mesh(new THREE.PlaneGeometry(2,2)); const bs=new THREE.Scene(); bs.add(quad); const bc=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-  const mask=stencilTex();
+  const mask=stencilTex(); TEX.stencilMask=mask;
   const names=Object.keys(SURF);
   const prevTM=renderer.toneMapping;
   for(let i=0;i<names.length;i++){
@@ -824,6 +825,9 @@ function buildMaterials(){
   setRepeat('floor', COLS/2, ROWS/2); M.floor = addMacro(pbr('floor',{envMapIntensity:0.55}),'FLOOR');
   setRepeat('ceil', COLS, ROWS); M.ceil = pbr('ceil',{envMapIntensity:0.1});
   M.beam = pbr('planks',{color:0x8a6a48, envMapIntensity:0.15});
+  M.post = pbr('planks',{color:0x8a6a48, envMapIntensity:0.15});
+  M.genMetal = pbr('paint',{envMapIntensity:0.5});
+  M.stencil = new THREE.MeshStandardMaterial({color:0xe6dcb4, roughness:0.8, transparent:true, opacity:0, alphaMap:TEX.stencilMask, depthWrite:false, polygonOffset:true, polygonOffsetFactor:-2});
   M.metal = pbr('gunmetal',{color:0xb8bcc0, metalness:1, envMapIntensity:0.9});
   M.darkMetal = pbr('gunmetal',{envMapIntensity:0.9});
   M.gunWood = pbr('gunwood',{envMapIntensity:0.6});
@@ -846,6 +850,33 @@ function buildMaterials(){
   M.poster2 = new THREE.MeshStandardMaterial({map:TEX.poster2, roughness:0.85, normalMap:TEX.fabric.normal, normalScale:new THREE.Vector2(0.6,0.6)});
 }
 let envTex=null;
+// ---- ảnh chất liệu chụp thật (Poly Haven, CC0) — tải nếu có, không có thì giữ chất liệu tự tạo
+async function loadRealTextures(){
+  const loader=new THREE.TextureLoader();
+  const load=(url,srgb)=>new Promise(res=>loader.load(url,t=>{ t.wrapS=t.wrapT=THREE.RepeatWrapping; t.anisotropy=maxAniso; if(srgb) t.colorSpace=THREE.SRGBColorSpace; res(t); },undefined,()=>res(null)));
+  const res0 = settings.quality==='low' ? '1k' : '2k';
+  const loadSet=async(key)=>{ for(const r of [res0,'1k']){ const d=await load(`assets/tex/${key}_${r}_diff.jpg`,true); if(d){ const [n,a]=await Promise.all([load(`assets/tex/${key}_${r}_nor.jpg`),load(`assets/tex/${key}_${r}_arm.jpg`)]); return [d,n,a]; } if(r==='1k') break; } return null; };
+  const apply=async(mat,key,rx,ry,o={})=>{ const s=await loadSet(key); if(!s) return false; const [d,n,a]=s;
+    for(const t of s) if(t) t.repeat.set(rx,ry);
+    mat.map=d; if(n){ mat.normalMap=n; mat.normalScale.set(o.ns||1,o.ns||1); } if(a){ mat.aoMap=a; mat.roughnessMap=a; mat.metalnessMap=a; mat.aoMapIntensity=o.ao??1; }
+    mat.color.set(o.color||0xffffff); mat.roughness=o.rough??1; mat.metalness=1; mat.needsUpdate=true; return true; };
+  const jobs=[
+    apply(M.concrete,'concrete',1,1.2),
+    apply(M.planks,'planks',1.5,1.8),
+    apply(M.floor,'floor',COLS*1.2,ROWS*1.2,{ns:1.3,color:0x8a7a68}),
+    apply(M.ceil,'ceil',COLS,ROWS,{color:0xb8a890}),
+    apply(M.beam,'beam',30,0.2),
+    apply(M.post,'beam',0.12,1.8),
+    apply(M.crate,'crate',1.2,0.65),
+    apply(M.genMetal,'metal',1,1),
+  ];
+  const ok=(await Promise.all(jobs)).filter(Boolean).length;
+  if(ok){ M.stencil.opacity=0.85; }
+  // HDRI phản chiếu môi trường thật
+  try{ const hdr=await new RGBELoader().loadAsync('assets/tex/env_1k.hdr'); const pm=new THREE.PMREMGenerator(renderer); const env=pm.fromEquirectangular(hdr).texture; hdr.dispose(); pm.dispose();
+    scene.environment=env; }catch(e){}
+  return ok;
+}
 function buildEnv(){
   const es=new THREE.Scene();
   es.add(new THREE.Mesh(new THREE.BoxGeometry(24,8,24), new THREE.MeshBasicMaterial({color:0x2b241c, side:THREE.BackSide})));
@@ -885,6 +916,8 @@ function buildLevel(){
   mk(new THREE.BoxGeometry(CELL,H,CELL), M.concrete, byType[1], H/2);
   mk(new THREE.BoxGeometry(CELL,H,CELL), M.planks, byType[2], H/2);
   mk(new RoundedBoxGeometry(CELL*0.94,1.5,CELL*0.94,3,0.05), M.crate, byType[3], 0.75, true);
+  { const st=[]; for(const [x,z] of byType[3]) for(const [dx,dz,ry] of [[0,1,0],[0,-1,Math.PI],[1,0,Math.PI/2],[-1,0,-Math.PI/2]]){ if(cellAt(x+dx,z+dz)) continue; st.push([x*CELL+CELL/2+dx*(CELL*0.47+0.006), z*CELL+CELL/2+dz*(CELL*0.47+0.006), ry]); }
+    if(st.length){ const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1.5,1.5), M.stencil, st.length); st.forEach(([x,z,ry],i)=>{ dummy.position.set(x,0.78,z); dummy.rotation.set(0,ry,0); dummy.scale.set(1,1,1); dummy.updateMatrix(); im.setMatrixAt(i,dummy.matrix); }); im.userData.noAO=true; level.add(im); } }
   mk(new RoundedBoxGeometry(CELL,1.1,CELL,4,0.22), M.sandbag, byType[4], 0.55);
   const W=COLS*CELL, D=ROWS*CELL;
   const fg=new THREE.PlaneGeometry(W,D,1,1); fg.rotateX(-Math.PI/2); fg.translate(W/2,0,D/2);
@@ -903,7 +936,7 @@ function buildLevel(){
     if(tallAt(x-1,z)) posts.push([cx-CELL/2+0.13,cz]); if(tallAt(x+1,z)) posts.push([cx+CELL/2-0.13,cz]); }
   for(const d of doorCells){ const hor=!solidAt(d.cx-1,d.cz)||!solidAt(d.cx+1,d.cz);
     if(hor){ posts.push([d.x,d.z-CELL/2+0.13],[d.x,d.z+CELL/2-0.13]); } else { posts.push([d.x-CELL/2+0.13,d.z],[d.x+CELL/2-0.13,d.z]); } }
-  if(posts.length){ const pm=new THREE.InstancedMesh(new RoundedBoxGeometry(0.24,H,0.24,2,0.03),M.beam,posts.length); posts.forEach(([x,z],i)=>{ dummy.position.set(x,H/2,z); dummy.rotation.set(0,rand(-0.02,0.02),rand(-0.01,0.01)); dummy.updateMatrix(); pm.setMatrixAt(i,dummy.matrix); }); pm.castShadow=true; pm.receiveShadow=true; level.add(pm); }
+  if(posts.length){ const pm=new THREE.InstancedMesh(new RoundedBoxGeometry(0.24,H,0.24,2,0.03),M.post,posts.length); posts.forEach(([x,z],i)=>{ dummy.position.set(x,H/2,z); dummy.rotation.set(0,rand(-0.02,0.02),rand(-0.01,0.01)); dummy.updateMatrix(); pm.setMatrixAt(i,dummy.matrix); }); pm.castShadow=true; pm.receiveShadow=true; level.add(pm); }
   // pipes along concrete walls
   const pipeSeg=[];
   for(let z=0;z<ROWS;z++) for(let x=0;x<COLS;x++){ if(grid[z*COLS+x]) continue; const cx=x*CELL+CELL/2, cz=z*CELL+CELL/2;
@@ -913,7 +946,7 @@ function buildLevel(){
     const pg=new THREE.CylinderGeometry(0.055,0.055,CELL,12); pg.rotateZ(Math.PI/2);
     const cg2=new THREE.CylinderGeometry(0.025,0.025,CELL,8); cg2.rotateZ(Math.PI/2);
     const brG=new THREE.BoxGeometry(0.05,0.2,0.16);
-    const pipes=new THREE.InstancedMesh(pg,M.olivePaint,pipeSeg.length), cables=new THREE.InstancedMesh(cg2,M.rubber,pipeSeg.length), brs=new THREE.InstancedMesh(brG,M.darkMetal,pipeSeg.length);
+    const pipes=new THREE.InstancedMesh(pg,M.genMetal,pipeSeg.length), cables=new THREE.InstancedMesh(cg2,M.rubber,pipeSeg.length), brs=new THREE.InstancedMesh(brG,M.darkMetal,pipeSeg.length);
     pipeSeg.forEach(([x,z,rot],i)=>{ dummy.rotation.set(0,rot?Math.PI/2:0,0); dummy.position.set(x,H-0.55,z); dummy.updateMatrix(); pipes.setMatrixAt(i,dummy.matrix);
       dummy.position.set(x+(rot?0:0),H-0.75,z+(rot?0:0)); dummy.updateMatrix(); cables.setMatrixAt(i,dummy.matrix);
       dummy.position.set(x,H-0.62,z); dummy.updateMatrix(); brs.setMatrixAt(i,dummy.matrix); });
@@ -969,7 +1002,7 @@ function buildLevel(){
   if(gc.length){ let sx=0,sz=0; gc.forEach(([x,z])=>{sx+=x;sz+=z;}); const gx=(sx/gc.length+0.5)*CELL, gz=(sz/gc.length+0.5)*CELL;
     const gen=new THREE.Group(); gen.position.set(gx,0,gz);
     const add=(geo,mat,x,y,z)=>{ const m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); m.castShadow=m.receiveShadow=true; gen.add(m); return m; };
-    add(new RoundedBoxGeometry(5.6,1.9,4.2,3,0.12), M.olivePaint, 0,0.95,0);
+    add(new RoundedBoxGeometry(5.6,1.9,4.2,3,0.12), M.genMetal, 0,0.95,0);
     add(new THREE.BoxGeometry(5.9,0.25,4.5), M.darkMetal, 0,0.12,0);
     const cyl=add(new THREE.CylinderGeometry(0.7,0.7,4.6,32), M.metal,0,2.05,0); cyl.rotation.z=Math.PI/2;
     for(let i=-2;i<=2;i++){ const fin=add(new THREE.TorusGeometry(0.72,0.05,8,32), M.darkMetal,i*0.9,2.05,0); fin.rotation.y=Math.PI/2; }
@@ -990,7 +1023,7 @@ function buildLevel(){
 }
 function addBarrel(x,z,rusty){
   const g=new THREE.Group(); g.position.set(x,0,z); g.rotation.y=rand(0,6);
-  const mat = rusty ? pbr('paint',{color:0x9a7a5a, envMapIntensity:0.5}) : M.olivePaint;
+  const mat = rusty ? pbr('paint',{color:0x9a7a5a, envMapIntensity:0.5}) : M.genMetal; if(!rusty) g.userData.real=true;
   const body=new THREE.Mesh(new THREE.CylinderGeometry(0.29,0.29,0.88,28,1),mat); body.position.y=0.44; body.castShadow=body.receiveShadow=true; g.add(body);
   for(const y of [0.03,0.3,0.6,0.86]){ const r=new THREE.Mesh(new THREE.TorusGeometry(0.292,0.014,6,28),mat); r.rotation.x=Math.PI/2; r.position.y=y; g.add(r); }
   const lid=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,0.02,10),M.darkMetal); lid.position.set(0.15,0.885,0.05); g.add(lid);
@@ -1240,15 +1273,24 @@ function buildSoldier(opt){
   const arms=[];
   for(const s of [-1,1]){ const sh=new THREE.Group(); sh.position.set(s*.25,.48,0); torso.add(sh); A(SG.upper,uni,sh,0,-.15,0,true);
     const el=new THREE.Group(); el.position.y=-.3; sh.add(el); A(SG.fore,uni,el,0,-.13,0,true); A(SG.hand,skin,el,0,-.3,0); arms.push({sh,el}); }
-  arms[1].sh.rotation.set(-1.25,0,.15); arms[1].el.rotation.set(-.35,0,0);
-  arms[0].sh.rotation.set(-1.35,0,-.55); arms[0].el.rotation.set(-.15,0,0);
-  const gunB=buildGun3P(opt.gun); const gun=gunB.g; gun.position.set(.06,.34,.36); torso.add(gun);
+  const gunB=buildGun3P(opt.gun); const gun=gunB.g; gun.position.set(.06,.32,.28); torso.add(gun);
+  // tư thế cầm súng: giải IK 2 khớp để bàn tay chạm báng (tay phải) và ốp lót tay (tay trái)
+  ikArm(arms[1], new V3(.25,.48,0), new V3(.075,.25,.2), new V3(.7,-1,-.2));
+  ikArm(arms[0], new V3(-.25,.48,0), new V3(.035,.31,opt.gun==='m60'?.5:.49), new V3(-.8,-1,0));
   const fl=new THREE.Sprite(new THREE.SpriteMaterial({map:TEX.flash,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0,color:0xffd9a0}));
   fl.position.copy(gunB.muzzle).add(new V3(0,0,.12)); fl.scale.set(.45,.45,.45); fl.userData.noAO=true; gun.add(fl);
   if(!Q.shadows){ if(!BLOB){ const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'); const gr=x.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(0,0,0,.55)'); gr.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle=gr; x.fillRect(0,0,64,64); BLOB=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}); }
     const bs=new THREE.Mesh(new THREE.PlaneGeometry(.9,.9),BLOB); bs.rotation.x=-Math.PI/2; bs.position.y=.02; bs.userData.noAO=true; bs.renderOrder=2; g.add(bs); }
   g.scale.setScalar(opt.scale||1);
   return {group:g, hips, legs, shins, torso, head, arms, gun, mats, muzzle:gunB.muzzle, walk:0, flash:fl, flashT:0, recoil:0, flinch:0, t:Math.random()*10, gunZ:gun.position.z};
+}
+function ikArm(arm, S, H, pole, L1=.3, L2=.3){
+  const d=H.clone().sub(S); const len=Math.min(d.length(), L1+L2-1e-3), dir=d.clone().normalize();
+  const a=Math.acos(clamp((L1*L1+len*len-L2*L2)/(2*L1*len),-1,1));
+  const axis=new V3().crossVectors(dir, pole.clone().normalize()).normalize();
+  const up=dir.clone().applyAxisAngle(axis, a); const E=S.clone().addScaledVector(up,L1);
+  const q1=new THREE.Quaternion().setFromUnitVectors(new V3(0,-1,0), up); arm.sh.quaternion.copy(q1);
+  const f=H.clone().sub(E).normalize().applyQuaternion(q1.clone().invert()); arm.el.quaternion.setFromUnitVectors(new V3(0,-1,0), f);
 }
 function animateSoldier(m, speed, dt, aimPitch){
   m.walk += speed*dt*2.2; const a=Math.min(1,speed/3)*0.65;
@@ -2110,6 +2152,7 @@ async function refreshNet(){
   setLoad(0.08,'ĐANG DỰNG CĂN CỨ…'); await tick();
   try{ await document.fonts.load('bold 20px "Chakra Petch"'); }catch(e){}
   await bakeAll(); buildEnv(); buildMaterials(); await tick();
+  setLoad(0.78,'ĐANG TẢI CHẤT LIỆU CHỤP THẬT…'); try{ window.__realTex = await loadRealTextures(); }catch(e){ window.__realTex=0; }
   setLoad(0.82,'ĐANG BỐ TRÍ PHÒNG TUYẾN…'); buildLevel(); buildFx(); buildSoldierGeo(); buildViewmodels(); buildMiniBase(); resetWeapons(); await tick();
   renderer.shadowMap.needsUpdate=true;
   setLoad(0.95,'ĐANG KHỞI ĐỘNG…');

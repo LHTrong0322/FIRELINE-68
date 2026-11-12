@@ -17,3 +17,10 @@
 - Biến thể tường: rễ cây, ống thông gió, dây điện võng giữa các đèn.
 - Khuôn mặt nhân vật chi tiết hơn, hoạt ảnh chết theo ragdoll đơn giản.
 - TAA / temporal upscaling cho mobile.
+
+## 2026-11-12 – v3 bước 1: chất liệu chụp thật
+- Thay chất liệu tự tạo bằng ảnh PBR quét từ vật thật của Poly Haven (CC0): tường bê tông `concrete_wall_006`, tường ván `wood_planks_dirt`, nền `dirt_floor`, trần `old_wood_floor`, cột/xà `rough_wood`, hòm đạn `green_rough_planks` (+ chữ stencil "ĐẠN 7,62" dạng decal), kim loại `green_metal_rust`. Mỗi bộ có diff + normal + ARM (AO/độ nhám/kim loại), 2K (tier med trở lên) và 1K (tier low).
+- Phản chiếu môi trường bằng HDRI thật `boiler_room` (Poly Haven).
+- Vẫn giữ chất liệu nướng GPU làm dự phòng nếu không tải được ảnh.
+- Lính cầm súng đúng tư thế nhờ IK 2 khớp (trước đó dang tay chữ T).
+- Tiếp theo: ánh sáng tính sẵn bằng Blender (baked GI), mô hình đồ vật thật, nhân vật có xương + hoạt ảnh.
