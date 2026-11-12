@@ -329,6 +329,11 @@ const FinalShader = {
     gl_FragColor=vec4(c,1.0);
   }`
 };
+const SanitizeShader = { uniforms:{tDiffuse:{value:null}},
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`uniform sampler2D tDiffuse; varying vec2 vUv; void main(){ vec4 c=texture2D(tDiffuse,vUv);
+    if(any(isnan(c.rgb))||any(isinf(c.rgb))) c.rgb=vec3(0.0);
+    c.rgb=clamp(c.rgb,0.0,24.0); gl_FragColor=vec4(c.rgb,1.0); }` };
 let composer=null, bloomPass=null, finalPass=null, aoPass=null;
 let renderScale=1;
 function basePR(){ return Math.min(devicePixelRatio||1, Q.dpr) * (IS_TOUCH && settings.quality==='low' ? 0.85 : 1); }
@@ -340,6 +345,7 @@ function setupPost(){
   const rt=new THREE.WebGLRenderTarget(innerWidth*pr, innerHeight*pr, {type:THREE.HalfFloatType, samples:Q.samples});
   composer = new EffectComposer(renderer, rt);
   composer.addPass(new RenderPass(scene, camera));
+  composer.addPass(new ShaderPass(SanitizeShader));
   if(Q.ao){
     aoPass = new GTAOPass(scene, camera, innerWidth, innerHeight);
     const sc = Q.ao===1 ? 0.5 : 1;
@@ -352,6 +358,7 @@ function setupPost(){
     composer.addPass(aoPass);
   }
   const vp = new RenderPass(vmScene, vmCam); vp.clear=false; vp.clearDepth=true; composer.addPass(vp);
+  composer.addPass(new ShaderPass(SanitizeShader));
   if(Q.bloom){ bloomPass = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.42, 0.5, 0.9); composer.addPass(bloomPass); }
   composer.addPass(new OutputPass());
   finalPass = new ShaderPass(FinalShader); composer.addPass(finalPass);
@@ -778,7 +785,7 @@ function addMacro(mat, kind){
       .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
       #ifdef MACRO_FLOOR
         roughnessFactor = mix(roughnessFactor, roughnessFactor*0.6, damp);
-        roughnessFactor = mix(roughnessFactor, 0.035, puddle);
+        roughnessFactor = mix(roughnessFactor, 0.12, puddle);
       #endif
       #ifdef MACRO_WALL
         roughnessFactor *= mix(0.75,1.0,smoothstep(0.0,0.6,vWP.y));
@@ -1074,8 +1081,8 @@ const AU = {
 /* ================= FX: particles, decals, tracers ================= */
 class Particles {
   constructor(n, opts){
-    this.n=n; this.pos=new Float32Array(n*3); this.vel=new Float32Array(n*3); this.life=new Float32Array(n); this.max=new Float32Array(n); this.col=new Float32Array(n*3); this.base=new Float32Array(n*3); this.i=0; this.g=opts.gravity??-9; this.drag=opts.drag??0.98;
-    const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.BufferAttribute(this.pos,3)); geo.setAttribute('color',new THREE.BufferAttribute(this.col,3));
+    this.n=n; this.pos=new Float32Array(n*3); this.vel=new Float32Array(n*3); this.life=new Float32Array(n); this.max=new Float32Array(n); this.col=new Float32Array(n*4); this.base=new Float32Array(n*3); this.i=0; this.g=opts.gravity??-9; this.drag=opts.drag??0.98;
+    const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.BufferAttribute(this.pos,3)); geo.setAttribute('color',new THREE.BufferAttribute(this.col,4));
     this.pts=new THREE.Points(geo,new THREE.PointsMaterial({size:opts.size, map:opts.map||TEX.soft, vertexColors:true, transparent:true, depthWrite:false, blending:opts.add?THREE.AdditiveBlending:THREE.NormalBlending, opacity:opts.opacity??1, sizeAttenuation:true}));
     this.pts.frustumCulled=false; this.pts.userData.noAO=true; scene.add(this.pts); for(let i=0;i<n;i++) this.pos[i*3+1]=-999;
   }
@@ -1086,7 +1093,7 @@ class Particles {
       this.vel[k+1]+=this.g*dt; this.vel[k]*=this.drag; this.vel[k+1]*=this.drag; this.vel[k+2]*=this.drag;
       this.pos[k]+=this.vel[k]*dt; this.pos[k+1]+=this.vel[k+1]*dt; this.pos[k+2]+=this.vel[k+2]*dt;
       if(this.pos[k+1]<0.02){ this.pos[k+1]=0.02; this.vel[k+1]*=-0.3; this.vel[k]*=0.6; this.vel[k+2]*=0.6; }
-      const f=this.life[i]/this.max[i]; this.col[k]=this.base[k]*f; this.col[k+1]=this.base[k+1]*f; this.col[k+2]=this.base[k+2]*f; }
+      const f=this.life[i]/this.max[i], c4=i*4; this.col[c4]=this.base[k]; this.col[c4+1]=this.base[k+1]; this.col[c4+2]=this.base[k+2]; this.col[c4+3]=f; }
     this.pts.geometry.attributes.position.needsUpdate=true; this.pts.geometry.attributes.color.needsUpdate=true;
   }
 }
@@ -1885,7 +1892,7 @@ function updateCamera(dt,t){
   camera.rotation.set(player.pitch+sy, player.yaw+sx, Math.sin(player.bob*0.5)*bobA*0.25*(player.alive?1:0) + (player.alive?0:0.6));
   flashlight.intensity = player.flash ? 45 : 0;
   { const wq=WEAPONS[player.cur]; const tf=lerp(75, wq.adsFov||75, player.ads); if(Math.abs(camera.fov-tf)>0.01){ camera.fov=tf; camera.updateProjectionMatrix(); } }
-  $('cross').style.opacity = player.ads>0.5 && !WEAPONS[player.cur].melee ? 0 : 1;
+  $('cross').style.opacity = (!player.alive || state.phase==='end' || (player.ads>0.5 && !WEAPONS[player.cur].melee)) ? 0 : 1;
   // viewmodel
   const vm=vmModels[player.cur]; vmModels.forEach((m,i)=>m.visible = i===player.cur && player.alive);
   if(!vm) return;
