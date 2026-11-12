@@ -19,7 +19,18 @@ export class GameRoom extends DurableObject {
     for (const w of this.ctx.getWebSockets()) if (w !== from) { try { w.send(text); } catch (e) {} }
   }
   webSocketMessage(ws, msg) {
-    if (typeof msg !== "string" || msg.length > 6000) return;
+    if (typeof msg !== "string") {
+      // giọng nói: gói âm thanh nhị phân (μ-law 16kHz), gắn mã người gửi rồi chuyển cho người khác
+      const data = msg instanceof ArrayBuffer ? new Uint8Array(msg) : null;
+      if (!data || data.byteLength === 0 || data.byteLength > 4096) return;
+      const a = ws.deserializeAttachment(); if (!a) return;
+      const out = new Uint8Array(12 + data.byteLength);
+      for (let i = 0; i < 12; i++) out[i] = a.id.charCodeAt(i) || 32;
+      out.set(data, 12);
+      for (const w of this.ctx.getWebSockets()) if (w !== ws) { try { w.send(out); } catch (e) {} }
+      return;
+    }
+    if (msg.length > 6000) return;
     let m; try { m = JSON.parse(msg); } catch (e) { return; }
     if (m.t !== "p" || typeof m.d !== "object" || m.d === null) return;
     const a = ws.deserializeAttachment(); if (!a) return;

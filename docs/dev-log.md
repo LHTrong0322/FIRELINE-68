@@ -14,3 +14,8 @@
 - Địch biết núp sau bao cát, ném lựu đạn khói.
 - Chế độ online đồng đội (co-op) đánh bot cùng nhau.
 - Bảng xếp hạng điểm chiến dịch.
+
+## 2026-11-12 (tối)
+- Nhân vật: vải quân phục có ánh vải (sheen), màu da khác nhau, mắt có lòng trắng, môi, gò má, cằm; bộ đội có ba lô con cóc + bi đông; lính Mỹ có quai mũ + dây đạn chéo; hoạt ảnh thở, giật súng, khựng khi trúng đạn, ngã gập gối; chớp lửa đầu nòng của địch/người chơi khác; bóng mờ dưới chân (tier low).
+- Vỏ đạn đồng văng ra khi bắn (góc nhìn thứ nhất).
+- Online: chat chữ (Enter/T, nút CHAT) qua presence; mic bộ đàm (giữ V, nút MIC) — μ-law 16kHz qua WebSocket nhị phân, chỉ chạy trên bản Cloudflare (claude.ai chặn micro).
