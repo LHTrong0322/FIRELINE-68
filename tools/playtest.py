@@ -39,7 +39,7 @@ async def run():
         # 2) mobile landscape
         pg=await new_page(b, errs, 'mobile', viewport={'width':844,'height':390}, is_mobile=True, has_touch=True)
         await pg.screenshot(path=f'{shots}/playtest_mobile_menu.png')
-        await pg.tap('#mCampaign'); await pg.wait_for_timeout(4000)
+        await pg.tap('#mCampaign'); await pg.wait_for_timeout(800); await pg.tap('#mStart'); await pg.wait_for_timeout(5000)
         await pg.tap('#bFire'); await pg.tap('#bSwap'); await pg.tap('#bAim'); await pg.wait_for_timeout(2000)
         await pg.screenshot(path=f'{shots}/playtest_mobile_play.png')
         report['mobile_touch_ui']=await pg.evaluate("!document.getElementById('touch').classList.contains('hidden')")

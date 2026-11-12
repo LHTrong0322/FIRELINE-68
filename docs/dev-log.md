@@ -31,3 +31,7 @@
 - LỖI: nút giải cứu trên điện thoại không hoạt động (nút chưa gắn sự kiện chạm, `touch.use` không bao giờ bật). ĐÃ SỬA: giữ nút ổ khoá to ở giữa màn hình, có vòng tiến trình.
 - Toàn bộ nút cảm ứng đổi sang biểu tượng hình (đạn, ống ngắm, mũi tên lên/xuống, băng đạn, đổi súng, đèn pin, ổ khoá, chat, mic).
 - Đồng đội nâng lên 1 tiểu đội: người chơi + 8 chiến sĩ (tier low: 5), đội hình 2 hàng dọc; tăng quân địch tương ứng.
+
+## 2026-11-13
+- Sửa test: `tools/playtest.py` bước mobile bấm "CHIẾN DỊCH" giờ mở bảng chọn bản đồ → thêm bấm `#mStart` (trước đó treo chờ nút #bFire không hiện).
+- Thêm `tools/closeup.py` chụp cận cảnh lính để soi hoạt ảnh.

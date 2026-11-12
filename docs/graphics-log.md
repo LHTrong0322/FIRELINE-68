@@ -35,3 +35,11 @@
 ## 2026-11-12 – v3.3
 - Cỏ tranh instanced (2 thẻ chéo, alpha test) lay theo gió trong vertex shader; dày ở Khe Sanh, thưa/khô ở Đồi A1.
 - Mưa đêm Điện Biên Phủ (line streaks theo camera) + bề mặt ướt (giảm độ nhám nền/hào/tường) phản chiếu lửa và pháo sáng + tiếng mưa.
+
+## 2026-11-13 — Nhân vật dựng bằng Blender (v3.4)
+- Kỹ thuật: thân người liền một khối có xương (skinned mesh) thay cho ghép khối rời; hoạt ảnh làm sẵn trong Blender (IK 2 khớp để hai tay bám súng), chơi bằng AnimationMixer + crossfade, cộng thêm góc ngắm (pitch) lên xương ngực theo thời gian thực — cách làm "animation layer" phổ biến ở các game FPS lớn.
+- Tệp: `tools/blender/build_soldier.py` (chạy bằng `pip install bpy`) → `public/assets/models/soldier.glb` (~340KB, 7 hoạt ảnh: aim, walk, run, idle, walkFree, captive, death).
+- Game: `loadSoldierGLB()` + `buildSoldierSK()`; mũ, mặt, trang bị, súng gắn vào xương bằng `boneAttach()`. Nếu tải GLB lỗi sẽ tự quay về mô hình cũ (`buildSoldierProc`).
+- Bài học: IK có pole target trong Blender bị kẹt khi mục tiêu gần vai → bỏ pole, solver tự gập khuỷu ra ngoài và đạt đúng vị trí.
+- Kiểm tra: check.py low/high ĐẠT, playtest ĐẠT, ảnh cận cảnh `tools/closeup.py`.
+- Backlog: nướng ánh sáng (lightmap) bằng Blender; thêm ngón tay/khuôn mặt dựng bằng Blender; quân phục có nếp gấp (normal map riêng); hoạt ảnh nạp đạn, ném lựu đạn, cúi người.

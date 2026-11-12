@@ -213,7 +213,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Năm 1968, một căn cứ ngầm bị bao vây. Bạn là chiến sĩ bộ đội cuối cùng giữ hầm chỉ huy. Hãy đẩy lui 8 đợt tấn công, hoặc vào chế độ online để đấu với đồng đội.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v3.3</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v3.4</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -292,6 +292,8 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 const V3 = THREE.Vector3;
 const $ = id => document.getElementById(id);
@@ -1511,7 +1513,117 @@ function clothMat(color){ const t=TEX.fabric; const o={map:t.map,normalMap:t.nor
   return new THREE.MeshPhysicalMaterial(Object.assign(o,{sheen:0.7, sheenRoughness:0.5, sheenColor:new THREE.Color(color).lerp(new THREE.Color(0xfff2dc),0.45)})); }
 const SKIN_TONES={vn:[0xc69772,0xb98a64,0xa87a55,0xc9a07a], us:[0xd8ac88,0xc89a76,0xb98a64,0x8d5f3e,0x6b4630], fr:[0xd8ac88,0xc89a76,0xb98a64,0x8d5f3e,0xc39069]};
 let BLOB=null;
+// ---- người lính dựng bằng Blender (có xương + hoạt ảnh thật). Nếu tải lỗi -> dùng mô hình thủ tục cũ
+let SKEL=null;
+async function loadSoldierGLB(){
+  try{ const gl=await new GLTFLoader().loadAsync('assets/models/soldier.glb');
+    const meshes=[]; gl.scene.traverse(o=>{ if(o.isSkinnedMesh) meshes.push(o); });
+    if(!meshes.length || !gl.animations.length) return 0;
+    const done=new Set(); for(const sm of meshes){ const uv=sm.geometry.attributes.uv; if(uv && !done.has(uv)){ done.add(uv); for(let i=0;i<uv.count;i++) uv.setXY(i,uv.getX(i)*6,uv.getY(i)*6); uv.needsUpdate=true; } }
+    SKEL={scene:gl.scene, clips:Object.fromEntries(gl.animations.map(c=>[c.name,c]))}; return 1;
+  }catch(e){ console.warn('soldier.glb', e); SKEL=null; return 0; }
+}
+// tạo nhóm gắn vào xương; toạ độ bên trong nhóm = toạ độ mô hình (tư thế gốc) trừ đi 'origin'
+function boneAttach(root, bone, ox, oy, oz){
+  const toBone=new THREE.Matrix4().copy(root.matrixWorld).invert().multiply(bone.matrixWorld).invert();
+  const w=new THREE.Group(); w.matrixAutoUpdate=true; toBone.multiply(new THREE.Matrix4().makeTranslation(ox,oy,oz));
+  toBone.decompose(w.position,w.quaternion,w.scale); bone.add(w); return w; }
 function buildSoldier(opt){
+  if(SKEL) return buildSoldierSK(opt);
+  return buildSoldierProc(opt);
+}
+function buildSoldierSK(opt){
+  const g=new THREE.Group(); g.rotation.order='YXZ';
+  const uni=clothMat(opt.uniform), gear=clothMat(opt.gear);
+  const skin=pbr('skin',{color:pick(SKIN_TONES[opt.side]), metalness:0, envMapIntensity:.3});
+  const mats=[uni,gear,skin];
+  const body=SkeletonUtils.clone(SKEL.scene); g.add(body);
+  const bones={};
+  body.traverse(o=>{ if(o.isBone) bones[o.name]=o;
+    if(o.isSkinnedMesh){ const n=o.material.name; o.material = n==='skin'?skin : n==='boots'?(opt.side==='vn'?skin:M.boot) : uni; o.castShadow=true; o.receiveShadow=true; } });
+  g.updateMatrixWorld(true);
+  const A=(geo,mat,parent,x,y,z,cast=false)=>{ const m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); m.castShadow=cast; m.receiveShadow=true; parent.add(m); return m; };
+  // thân trên: toạ độ giống mô hình cũ (gốc ở hông y=.95), nén nhẹ chiều sâu cho ôm sát thân mới
+  const torsoW=boneAttach(g,bones.chest,0,.95,0); const torso=new THREE.Group(); torso.scale.set(1,1,.85); torsoW.add(torso);
+  const hipW=boneAttach(g,bones.root||bones.spine,0,.95,0);
+  const bl=A(SG.belt,gear,hipW,0,.03,0); bl.rotation.x=Math.PI/2; bl.scale.set(.86,.62,1); A(SG.buckle,M.metal,hipW,0,.03,.115);
+  if(opt.side==='vn'){
+    for(const s of ['L','R']) if(bones['foot'+s]){ const fw=boneAttach(g,bones['foot'+s],0,0,0); A(SG.sole,M.rubber,fw,s==='L'?.11:-.11,.012,.05); }
+    for(const x of [-.09,.09]){ A(SG.pocket,uni,torso,x,.42,.128); A(SG.flap,uni,torso,x,.485,.132); A(SG.button,M.darkMetal,torso,x,.48,.146).rotation.x=Math.PI/2; }
+    for(const y of [.2,.3,.4]) A(SG.button,M.darkMetal,torso,0,y,.127).rotation.x=Math.PI/2;
+    const col=A(SG.collar,uni,torso,0,.575,0); col.rotation.x=Math.PI/2;
+    if(!opt.bare){ for(const x of [-.11,0,.11]) A(SG.pouch,gear,hipW,x,.17,.13);
+      const st=A(new THREE.BoxGeometry(.05,.62,.26),gear,torso,.08,.3,0); st.rotation.z=-.5; }
+    const scarf=new THREE.MeshStandardMaterial({color:opt.accent||0xc8302a, roughness:.85, normalMap:TEX.fabric.normal}); mats.push(scarf);
+    const sc=A(new THREE.TorusGeometry(.075,.028,8,18),scarf,torso,0,.585,.01); sc.rotation.x=Math.PI/2;
+    const tail=A(new RoundedBoxGeometry(.06,.16,.02,2,.008),scarf,torso,-.05,.49,.13); tail.rotation.z=.2;
+    if(!opt.bare){ const pack=A(new RoundedBoxGeometry(.3,.34,.15,3,.06),gear,torso,0,.33,-.19,true); pack.rotation.x=.08; }
+    A(SG.canteen,M.olivePaint,hipW,-.2,-.02,-.05);
+  } else if(opt.side==='fr'){
+    for(const x of [-.09,.09]){ A(SG.pocket,uni,torso,x,.42,.128); A(SG.flap,uni,torso,x,.485,.132); }
+    const col=A(SG.collar,uni,torso,0,.575,0); col.rotation.x=Math.PI/2;
+    for(const x of [-.13,.13]) A(SG.pouch,gear,hipW,x,.08,.14);
+    for(const x of [-.09,.09]) A(new THREE.BoxGeometry(.035,.5,.25),gear,torso,x,.33,0);
+    A(SG.pack,gear,torso,0,.3,-.2,true); A(SG.canteen,M.olivePaint,hipW,-.2,-.02,-.06);
+  } else {
+    const vestM=clothMat(0x5a6142); mats.push(vestM); const v=A(SG.vest,vestM,torso,0,.35,0,true); v.scale.set(.9,.92,.9);
+    const vc=A(SG.collar,vestM,torso,0,.575,0); vc.rotation.x=Math.PI/2; vc.scale.set(1.25,1.25,1.2);
+    A(SG.pouch,gear,hipW,-.14,.06,.15); A(SG.pouch,gear,hipW,.14,.06,.15); A(SG.pack,gear,torso,0,.32,-.22,true);
+    A(SG.canteen,M.olivePaint,hipW,.2,-.02,-.06);
+  }
+  // đầu: giữ khuôn mặt + mũ chi tiết, gắn vào xương đầu
+  const headW=boneAttach(g,bones.head,0,1.47,0); const head=new THREE.Group(); headW.add(head);
+  const hd=A(SG.head,skin,head,0,.16,.01,true); hd.scale.set(.9,1.05,.98);
+  A(SG.nose,skin,head,0,.155,.112); for(const s of [-1,1]){ A(SG.ear,skin,head,s*.1,.16,0).scale.set(.45,1,.8); A(SG.eyeWhite,M.eyeWhite,head,s*.036,.18,.094); A(SG.eyeG,M.eye,head,s*.036,.18,.104); A(SG.brow,M.boot,head,s*.036,.2,.1); A(SG.cheek,skin,head,s*.05,.14,.07); }
+  A(SG.mouth,M.lips,head,0,.115,.1); A(SG.jaw,skin,head,0,.1,.035);
+  if(opt.side==='vn'){
+    const hm=clothMat(0x8a8a5c); mats.push(hm);
+    const dome=A(SG.coi,hm,head,0,.21,0,true); dome.scale.set(1,.72,1.12);
+    const brim=A(SG.coiBrim,hm,head,0,.215,0,true); brim.scale.set(1,1,1.12);
+    const st=A(SG.star,M.star,head,0,.29,.2); st.rotation.x=-.42;
+    if(opt.leaves){ for(let i=0;i<9;i++){ const a=i/9*6.28; const lf=A(SG.leaf,M.leaf,head,Math.cos(a)*.17,.27+Math.random()*.05,Math.sin(a)*.19); lf.rotation.set(rand(-.6,.6),a,rand(.3,1.1)); } }
+    if(opt.bare){ dome.visible=false; brim.visible=false; st.visible=false; }
+  } else {
+    const hm=opt.side==='fr' ? M.olivePaint : pbr('camo',{metalness:0, envMapIntensity:.15}); if(opt.side!=='fr') mats.push(hm);
+    const dome=A(SG.m1,hm,head,0,.19,0,true); dome.scale.set(1,.92,1.1);
+    const rim=A(SG.m1Rim,M.olivePaint,head,0,.19,0); rim.rotation.x=Math.PI/2; rim.scale.set(1,1.1,1);
+    const band=A(SG.band,new THREE.MeshStandardMaterial({color:0x26261e,roughness:.9,side:THREE.DoubleSide}),head,0,.245,0); band.scale.z=1.1; if(opt.side==='fr') band.visible=false;
+    for(const s of [-1,1]){ const cs=A(new THREE.BoxGeometry(.012,.13,.006),M.boot,head,s*.115,.13,.02); cs.rotation.z=s*.12; }
+  }
+  // súng gắn vào ngực (hai bàn tay do IK trong Blender bám đúng báng + ốp lót tay)
+  const gunW=boneAttach(g,bones.chest,0,0,0);
+  const gunB=buildGun3P(opt.gun); const gun=gunB.g; gun.position.set(-.05,1.36,.25); gunW.add(gun); if(opt.gun==='none') gun.visible=false;
+  const fl=new THREE.Sprite(new THREE.SpriteMaterial({map:TEX.flash,blending:THREE.AdditiveBlending,depthWrite:false,transparent:true,opacity:0,color:0xffd9a0}));
+  fl.position.copy(gunB.muzzle).add(new V3(0,0,.12)); fl.scale.set(.45,.45,.45); fl.userData.noAO=true; gun.add(fl);
+  if(!Q.shadows){ if(!BLOB){ const c=document.createElement('canvas'); c.width=c.height=64; const x=c.getContext('2d'); const gr=x.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(0,0,0,.55)'); gr.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle=gr; x.fillRect(0,0,64,64); BLOB=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}); }
+    const bs=new THREE.Mesh(new THREE.PlaneGeometry(.9,.9),BLOB); bs.rotation.x=-Math.PI/2; bs.position.y=.02; bs.userData.noAO=true; bs.renderOrder=2; g.add(bs); }
+  mergeStatic(g);
+  // hoạt ảnh
+  const mixer=new THREE.AnimationMixer(body); const acts={};
+  for(const [n,c] of Object.entries(SKEL.clips)){ const a=mixer.clipAction(c); if(n==='death'||n==='captive'){ a.setLoop(THREE.LoopOnce); a.clampWhenFinished=true; } acts[n]=a; }
+  const free=opt.gun==='none'; const start=free?'idle':'aim';
+  if(acts[start]) acts[start].play(); mixer.update(Math.random()*0.5);
+  const pb=bones.spine2||bones.chest; const pq=new THREE.Quaternion(); pb.parent.getWorldQuaternion(pq); pq.premultiply(g.getWorldQuaternion(new THREE.Quaternion()).invert());
+  const pAxis=new V3(1,0,0).applyQuaternion(pq.clone().invert()), yAxis=new V3(0,1,0).applyQuaternion(pq.clone().invert());
+  g.scale.setScalar(opt.scale||1);
+  return {sk:true, group:g, body, bones, mixer, acts, cur:start, free, pBone:pb, pAxis, yAxis, pitchS:0, hips:hipW, legs:[], shins:[], torso, head, arms:[], gun, mats, muzzle:gunB.muzzle, walk:0, flash:fl, flashT:0, recoil:0, flinch:0, t:Math.random()*10, gunZ:gun.position.z};
+}
+const _sq=new THREE.Quaternion();
+function skPlay(m, name, fade=.25){ if(m.cur===name || !m.acts[name]) return; const nx=m.acts[name], pv=m.acts[m.cur];
+  nx.reset(); nx.setEffectiveWeight(1); nx.play(); if(pv) nx.crossFadeFrom(pv, fade, false); m.cur=name; }
+function animateSoldierSK(m, speed, dt, aimPitch){
+  m.t+=dt; m.recoil=Math.max(0,m.recoil-dt*9); m.flinch=Math.max(0,m.flinch-dt*4);
+  const want = m.free ? (speed>0.3?'walkFree':'idle') : (speed>2.7?'run':speed>0.3?'walk':'aim');
+  skPlay(m,want,.22);
+  const a=m.acts[m.cur]; if(m.cur==='walk'||m.cur==='walkFree') a.timeScale=clamp(speed/1.5,.5,1.8); else if(m.cur==='run') a.timeScale=clamp(speed/3.6,.6,1.6);
+  m.mixer.update(dt);
+  m.pitchS=lerp(m.pitchS, clamp(-aimPitch,-0.6,0.6)*0.8, Math.min(1,dt*8));
+  if(!m.free){ _sq.setFromAxisAngle(m.pAxis, m.pitchS - m.recoil*0.05 - m.flinch*0.12); m.pBone.quaternion.premultiply(_sq);
+    if(m.flinch>0){ _sq.setFromAxisAngle(m.yAxis, Math.sin(m.t*23)*m.flinch*0.15); m.pBone.quaternion.premultiply(_sq); } }
+  m.gun.position.z = m.gunZ - m.recoil*0.05;
+  if(m.flashT>0){ m.flashT-=dt; m.flash.material.opacity=1; m.flash.material.rotation=Math.random()*6; const s=rand(.3,.55); m.flash.scale.set(s,s,s); } else m.flash.material.opacity=0;
+}
+function buildSoldierProc(opt){
   const g=new THREE.Group(); g.rotation.order='YXZ';
   const uni=clothMat(opt.uniform);
   const gear=clothMat(opt.gear);
@@ -1605,7 +1717,7 @@ function mergeStatic(root){
   const parents=[]; root.traverse(o=>{ if(o.isGroup||o===root) parents.push(o); });
   for(const par of parents){
     const byMat=new Map();
-    for(const c of [...par.children]){ if(!c.isMesh || c.children.length || c.isInstancedMesh) continue; if(!c.visible){ par.remove(c); continue; }
+    for(const c of [...par.children]){ if(!c.isMesh || c.isSkinnedMesh || c.children.length || c.isInstancedMesh) continue; if(!c.visible){ par.remove(c); continue; }
       if(Array.isArray(c.material)) continue; if(!byMat.has(c.material)) byMat.set(c.material,[]); byMat.get(c.material).push(c); }
     for(const [mat,list] of byMat){ if(list.length<2) continue;
       const geos=[]; let cast=false;
@@ -1619,6 +1731,7 @@ function mergeStatic(root){
   }
 }
 function animateSoldier(m, speed, dt, aimPitch){
+  if(m.sk) return animateSoldierSK(m, speed, dt, aimPitch);
   m.walk += speed*dt*2.2; const a=Math.min(1,speed/3)*0.65;
   m.legs[0].rotation.x=Math.sin(m.walk)*a; m.legs[1].rotation.x=-Math.sin(m.walk)*a;
   m.shins[0].rotation.x=Math.max(0,Math.sin(m.walk+1.2))*a*1.2; m.shins[1].rotation.x=Math.max(0,-Math.sin(m.walk+1.2))*a*1.2;
@@ -1774,6 +1887,7 @@ function spawnHostage(c, i){
   model.group.position.copy(h.pos); scene.add(model.group); hostages.push(h);
 }
 function poseCaptive(m,on){
+  if(m.sk){ m.captive=on; if(on){ skPlay(m,'captive',0); m.body.position.y=-0.43; m.free=true; } else { m.body.position.y=0; m.free=true; skPlay(m,'idle',.3); } m.mixer.update(on?2:0); return; }
   if(on){ m.hips.position.y=0.5; m.legs.forEach(l=>l.rotation.set(0,0,0)); m.shins.forEach(s=>s.rotation.set(1.5,0,0)); m.captive=true;
     ikArm(m.arms[1], new V3(.25,.48,0), new V3(.05,.1,-.2), new V3(1,-1,0)); ikArm(m.arms[0], new V3(-.25,.48,0), new V3(-.05,.1,-.2), new V3(-1,-1,0)); m.head.rotation.x=0.45; }
   else { m.captive=false; m.hips.position.y=0.95; m.shins.forEach(s=>s.rotation.set(0,0,0)); ikArm(m.arms[1], new V3(.25,.48,0), new V3(.3,-.05,.08), new V3(1,0,-1)); ikArm(m.arms[0], new V3(-.25,.48,0), new V3(-.3,-.05,.08), new V3(-1,0,-1)); m.head.rotation.x=0; }
@@ -1804,6 +1918,7 @@ function moveUnit(u, mx, mz, spd, dt, others){
 }
 function deathAnim(u, dt){ const m=u.model; u.deadT+=dt; const t=Math.min(1,u.deadT/0.7), te=t*t*(3-2*t);
   m.group.rotation.x = -u.fallDir*te*Math.PI/2*0.96; m.group.position.y = Math.sin(t*Math.PI)*0.08;
+  if(m.sk){ if(m.cur!=='death'){ m.body.position.y=0; skPlay(m,'death',.12); } if(u.deadT<2) m.mixer.update(dt); m.flash.material.opacity=0; return; }
   m.shins.forEach(s=>s.rotation.x=te*1.1); m.legs.forEach((l,i)=>l.rotation.x=-te*0.5*(i?1:0.6)); m.head.rotation.x=-te*0.4*u.fallDir; m.flash.material.opacity=0; }
 function unitEye(u){ return new V3(u.pos.x, u.pos.y+1.6*((u.T&&u.T.scale)||1), u.pos.z); }
 const PLAYER_T={kind:'player'};
@@ -2693,7 +2808,7 @@ async function refreshNet(){
   await bakeAll(); buildEnv(); buildMaterials(); await tick();
   parseMap('cuchi');
   setLoad(0.78,'ĐANG TẢI CHẤT LIỆU CHỤP THẬT…'); try{ window.__realTex = await loadRealTextures(); }catch(e){ window.__realTex=0; }
-  setLoad(0.82,'ĐANG BỐ TRÍ PHÒNG TUYẾN…'); buildFx(); buildLevel(); applyMapEnv(); initFlare(); buildSoldierGeo(); buildViewmodels(); buildMiniBase(); resetWeapons(); await tick();
+  setLoad(0.82,'ĐANG BỐ TRÍ PHÒNG TUYẾN…'); buildFx(); buildLevel(); applyMapEnv(); initFlare(); buildSoldierGeo(); try{ window.__skel=await loadSoldierGLB(); }catch(e){} buildViewmodels(); buildMiniBase(); resetWeapons(); await tick();
   renderer.shadowMap.needsUpdate=true;
   setLoad(0.95,'ĐANG KHỞI ĐỘNG…');
   // warm up shaders with a sample soldier
