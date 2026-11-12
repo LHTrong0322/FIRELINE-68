@@ -1,0 +1,64 @@
+"""Chơi thử tự động FIRELINE '68 (dành cho bot QA).
+Chạy: python3 tools/playtest.py
+Kịch bản: (1) chiến dịch 40s, người chơi tự ngắm bắn, địch bắn trả, chụp ảnh liên tục;
+(2) điện thoại xoay ngang 844x390, cảm ứng; (3) 2 người chơi online qua máy chủ WebSocket cục bộ.
+Ghi lỗi JS + ảnh vào tools/shots/playtest_*.png. Thoát mã 1 nếu có lỗi."""
+import asyncio, os, sys, json
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import check
+from check import ROOT
+URL='http://127.0.0.1:8799/'
+ARGS=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']
+AIMBOT="""(()=>{const g=window.__game,p=g.player; if(!p.alive) return 'dead'; const e=g.enemies.filter(e=>e.alive&&e.los)[0];
+ if(e){ const dx=e.pos.x-p.pos.x, dz=e.pos.z-p.pos.z, dy=(e.pos.y+1.2)-(p.pos.y+p.eye); p.yaw=Math.atan2(-dx,-dz); p.pitch=Math.atan2(dy,Math.hypot(dx,dz)); p.fireHeld=true; } else p.fireHeld=false;
+ return JSON.stringify({hp:Math.round(p.hp),wave:g.state.wave,kills:g.state.kills,alive:g.enemies.filter(e=>e.alive).length}); })()"""
+async def new_page(b, errs, tag, **kw):
+    ctx=await b.new_context(**kw); await ctx.add_init_script("try{localStorage.setItem('tl_quality2', JSON.stringify('med'))}catch(e){}")
+    pg=await ctx.new_page(); pg.set_default_timeout(300000)
+    pg.on('pageerror', lambda e: errs.append(f'[{tag}] pageerror: {e}'))
+    pg.on('console', lambda m: errs.append(f'[{tag}] console: {m.text}') if m.type=='error' and '404' not in m.text else None)
+    await pg.goto(URL); await pg.wait_for_function('window.__gameReady===true', timeout=300000); return pg
+async def run():
+    from playwright.async_api import async_playwright
+    shots=f'{ROOT}/tools/shots'; os.makedirs(shots, exist_ok=True); errs=[]; report={}
+    async with async_playwright() as p:
+        exe='/usr/bin/google-chrome' if os.path.exists('/usr/bin/google-chrome') else None
+        b=await p.chromium.launch(executable_path=exe, args=ARGS)
+        # 1) campaign combat
+        pg=await new_page(b, errs, 'campaign', viewport={'width':960,'height':540})
+        await pg.evaluate("window.__game.state.diff=1; window.__game.startCampaign(); window.__game.state.waveT=0.5")
+        log=[]
+        for i in range(20):
+            await pg.wait_for_timeout(2000); log.append(await pg.evaluate(AIMBOT))
+            if i%5==4: await pg.screenshot(path=f'{shots}/playtest_combat_{i//5}.png')
+        report['campaign']=log[-5:]
+        for w in range(4):
+            await pg.evaluate(f"window.__game.switchWeapon({w})"); await pg.wait_for_timeout(1500)
+        await pg.screenshot(path=f'{shots}/playtest_weapons.png')
+        await pg.context.close()
+        # 2) mobile landscape
+        pg=await new_page(b, errs, 'mobile', viewport={'width':844,'height':390}, is_mobile=True, has_touch=True)
+        await pg.screenshot(path=f'{shots}/playtest_mobile_menu.png')
+        await pg.tap('#mCampaign'); await pg.wait_for_timeout(4000)
+        await pg.tap('#bFire'); await pg.tap('#bSwap'); await pg.tap('#bAim'); await pg.wait_for_timeout(2000)
+        await pg.screenshot(path=f'{shots}/playtest_mobile_play.png')
+        report['mobile_touch_ui']=await pg.evaluate("!document.getElementById('touch').classList.contains('hidden')")
+        await pg.context.close()
+        # 3) online 2 players
+        a=await new_page(b, errs, 'online-A', viewport={'width':800,'height':450}); c=await new_page(b, errs, 'online-B', viewport={'width':800,'height':450})
+        for pg in (a,c):
+            await pg.evaluate("document.getElementById('mOnline').click()"); await pg.wait_for_timeout(4000)
+            await pg.fill('#roomCode','qa-test'); await pg.evaluate("document.getElementById('mJoin').click()")
+        await a.wait_for_timeout(8000)
+        report['online_peers_A']=await a.evaluate("window.__game.net.remotes.size")
+        report['online_peers_B']=await c.evaluate("window.__game.net.remotes.size")
+        await a.screenshot(path=f'{shots}/playtest_online.png')
+        if report['online_peers_A']<1 or report['online_peers_B']<1: errs.append('online: 2 người chơi không thấy nhau')
+        await b.close()
+    return errs, report
+if __name__=='__main__':
+    check.prep(); pr=check.server()
+    try: errs,report=asyncio.run(run())
+    finally: pr.terminate()
+    print(json.dumps({'errors':errs[:30],'report':report}, ensure_ascii=False, indent=1))
+    print('KẾT QUẢ:', 'ĐẠT' if not errs else 'CÓ LỖI'); sys.exit(0 if not errs else 1)

@@ -8,7 +8,7 @@ ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 Q=sys.argv[1] if len(sys.argv)>1 else 'high'
 TMP='/tmp/fireline_check'
 def prep():
-    shutil.rmtree(TMP, ignore_errors=True); shutil.copytree(ROOT, TMP, ignore=shutil.ignore_patterns('node_modules','.git','.wrangler','shots'))
+    shutil.rmtree(TMP, ignore_errors=True); shutil.copytree(ROOT, TMP, ignore=shutil.ignore_patterns('node_modules','.git','.wrangler','shots','__pycache__'))
     if not os.path.exists('/tmp/fl_three/node_modules/three'):
         os.makedirs('/tmp/fl_three', exist_ok=True); subprocess.run('npm init -y >/dev/null && npm i three@0.160.0 --no-audit --no-fund', shell=True, cwd='/tmp/fl_three', check=True)
     shutil.copytree('/tmp/fl_three/node_modules/three/build', f'{TMP}/public/three/build'); shutil.copytree('/tmp/fl_three/node_modules/three/examples', f'{TMP}/public/three/examples')

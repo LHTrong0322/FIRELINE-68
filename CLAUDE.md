@@ -23,3 +23,22 @@ Game FPS 3D chạy trên trình duyệt (Three.js r160 từ CDN jsDelivr), deplo
 - Không thêm nội dung bạo lực máu me quá mức. Giữ chủ đề: bộ đội Việt Nam giữ căn cứ ngầm, bot là lính Mỹ (1968).
 - Không phá chế độ online (`net`, `wsRoom`, `worker/`), điều khiển cảm ứng, xoay ngang.
 - Giữ dòng credit "Agent build by @Trong0322".
+
+---
+# Bot trợ lý QA: sửa lỗi & nâng cấp trò chơi
+
+Bot thứ hai (chạy riêng với bot đồ hoạ) chuyên ổn định game và nâng cấp lối chơi. Nhật ký: `docs/dev-log.md`.
+
+## Quy trình mỗi lần chạy
+1. Đọc `docs/dev-log.md` (lỗi đã biết, backlog) và `git log -15` để biết bot đồ hoạ vừa đổi gì.
+2. Chạy `python3 tools/playtest.py`: chiến dịch có giao tranh thật, điện thoại xoay ngang (cảm ứng), 2 người chơi online. Kèm `python3 tools/check.py low`.
+3. MỞ TỪNG ẢNH `tools/shots/playtest_*.png` và soi kỹ: đốm đen/trắng lạ, vật thể nhấp nháy hoặc mất, UI chồng chéo, chữ bị che, súng lệch, màn hình quá tối hoặc quá sáng, nhân vật biến dạng.
+4. Ưu tiên SỬA LỖI theo thứ tự: crash/lỗi JS → hỏng hình → online → cảm ứng/mobile → cân bằng gameplay → hiệu năng.
+5. Nếu không có lỗi: làm MỘT nâng cấp lối chơi nhỏ từ backlog (ví dụ: bản đồ mới, loại địch mới, vũ khí mới, chế độ chơi, hoạt ảnh, âm thanh, HUD, cân bằng độ khó, nhiệm vụ trong trận).
+6. Chạy lại `tools/playtest.py` và `tools/check.py low` + `high`. Chỉ khi ĐẠT hết mới commit vào `main` và push (Cloudflare tự deploy). Không đạt sau 2 lần sửa thì hoàn tác, không bao giờ push bản lỗi.
+7. Ghi `docs/dev-log.md`: ngày, lỗi tìm thấy (kèm cách tái hiện), cách sửa, nâng cấp đã làm, kết quả test, backlog mới.
+
+## Lưu ý kỹ thuật
+- Môi trường test dùng SwiftShader (CPU), FPS rất thấp: hoạt ảnh theo thời gian có thể chưa xong khi chụp. Đừng nhầm với lỗi.
+- Card đồ hoạ thật dùng bộ đệm HalfFloat: mọi giá trị sáng > 65504 thành vô cực và gây đốm đen sau bloom. Đã có `SanitizeShader`, đừng gỡ.
+- Hạt (`Particles`) dùng màu RGBA, độ mờ nằm ở kênh alpha. Đừng đổi lại kiểu làm tối dần màu (từng gây lỗi chấm đen).
