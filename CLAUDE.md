@@ -6,6 +6,7 @@ Game FPS 3D chạy trên trình duyệt (Three.js r160 từ CDN jsDelivr), deplo
 - `public/index.html`: toàn bộ game trong một file (HTML + CSS + JS module). Vật liệu PBR được "nướng" bằng GPU (shader `SURF.*`), hậu kỳ gồm GTAO + Bloom + `FinalShader` (CAS sharpen, color grade).
 - `worker/index.js`: máy chủ online (Durable Object relay WebSocket). Chỉ sửa khi thật cần.
 - `tools/check.py <low|med|high|ultra>`: test tự động (wrangler dev + Chrome headless). Đạt = không lỗi JS và ảnh không đen/trắng toàn bộ. Ảnh chụp nằm ở `tools/shots/`, hãy MỞ RA XEM để tự đánh giá.
+- `public/assets/tex/`: ảnh chất liệu chụp thật Poly Haven (CC0), `<key>_<1k|2k>_<diff|nor|arm>.jpg` + `env_1k.hdr`, nạp bởi `loadRealTextures()`. Có thể tải thêm từ api.polyhaven.com / dl.polyhaven.org / ambientcg.com (chỉ tài nguyên CC0, dùng curl kèm User-Agent). Giữ ảnh ≤2K, tổng thư mục assets < 150MB.
 - `docs/graphics-log.md`: nhật ký các lần cải tiến. Luôn đọc trước khi làm và ghi thêm sau khi làm.
 
 ## Quy trình mỗi lần chạy (một cải tiến nhỏ, có kiểm chứng)
