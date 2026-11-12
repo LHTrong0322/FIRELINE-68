@@ -19,3 +19,10 @@
 - Nhân vật: vải quân phục có ánh vải (sheen), màu da khác nhau, mắt có lòng trắng, môi, gò má, cằm; bộ đội có ba lô con cóc + bi đông; lính Mỹ có quai mũ + dây đạn chéo; hoạt ảnh thở, giật súng, khựng khi trúng đạn, ngã gập gối; chớp lửa đầu nòng của địch/người chơi khác; bóng mờ dưới chân (tier low).
 - Vỏ đạn đồng văng ra khi bắn (góc nhìn thứ nhất).
 - Online: chat chữ (Enter/T, nút CHAT) qua presence; mic bộ đàm (giữ V, nút MIC) — μ-law 16kHz qua WebSocket nhị phân, chỉ chạy trên bản Cloudflare (claude.ai chặn micro).
+
+## 2026-11-12 – v3.2
+- Menu chọn trận đánh + nhiệm vụ (Giữ trận địa / Giải cứu con tin). Online chọn bản đồ theo phòng.
+- NPC đồng đội (bộ đội) đi theo, tự tìm và bắn địch; địch chọn mục tiêu gần nhất (người chơi hoặc đồng đội).
+- Lính gác có trạng thái cảnh giác: đứng canh, phát hiện theo góc nhìn/tiếng súng, báo động lan sang đồng bọn.
+- Nhiệm vụ giải cứu: giữ E / nút GIỮ CỨU 1,6 giây để cởi trói, con tin đi theo, đưa về vòng xanh sơ tán; quân tiếp viện địch tới sau khi giải cứu; con tin hy sinh = thất bại. Có chỉ dẫn mục tiêu trên màn hình + minimap.
+- Mobile: kiểm tra xoay màn hình liên tục, nút "Toàn màn hình + xoay ngang", "Vẫn chơi màn hình dọc", hướng dẫn cài PWA trên iPhone (manifest + icon), worker trả no-cache cho trang game, hiện số phiên bản ở menu.

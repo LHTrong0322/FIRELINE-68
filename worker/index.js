@@ -53,6 +53,11 @@ export default {
       const room = (url.searchParams.get("room") || "lobby").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40) || "lobby";
       return env.ROOMS.get(env.ROOMS.idFromName(room)).fetch(request);
     }
-    return env.ASSETS.fetch(request);
+    const res = await env.ASSETS.fetch(request);
+    // trang game luôn lấy bản mới nhất (tránh điện thoại giữ bản cũ)
+    if (url.pathname === "/" || url.pathname.endsWith(".html") || url.pathname.endsWith(".webmanifest")) {
+      const r = new Response(res.body, res); r.headers.set("Cache-Control", "no-cache, must-revalidate"); return r;
+    }
+    return res;
   },
 };

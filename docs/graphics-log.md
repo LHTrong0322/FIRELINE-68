@@ -24,3 +24,10 @@
 - Vẫn giữ chất liệu nướng GPU làm dự phòng nếu không tải được ảnh.
 - Lính cầm súng đúng tư thế nhờ IK 2 khớp (trước đó dang tay chữ T).
 - Tiếp theo: ánh sáng tính sẵn bằng Blender (baked GI), mô hình đồ vật thật, nhân vật có xương + hoạt ảnh.
+
+## 2026-11-12 – v3.2: bản đồ lịch sử, NPC, giải cứu con tin, tối ưu
+- 3 bản đồ: Địa đạo Củ Chi 1968 (trong hầm), Đồi A1 – Điện Biên Phủ 1954 (đêm, giao thông hào, hầm gạch, hố bộc phá, pháo sáng), Tà Cơn – Khe Sanh 1968 (sương sớm, đất đỏ bazan, đường băng thép PSP, dây thép gai, boongke bao cát, pháo).
+- Ánh sáng ngoài trời: trăng/mặt trời có bóng đổ, bầu trời sao, sương mù, rừng cây + đồi núi xa, đống lửa bập bùng, pháo sáng thả dù.
+- Chất liệu thật thêm: excavated_soil_wall, red_brick, red_laterite_soil_stones, brown_mud_02, metal_grate_rusty, burned_ground_01.
+- Phe địch theo lịch sử: quân viễn chinh Pháp (1954: MAS-36, MAT-49, mũ M1 trơn) và lính Mỹ (1968).
+- Tối ưu: gộp mảnh nhân vật (mergeGeometries, ~4x ít draw call), chuột thô (unadjustedMovement), nội suy vị trí người chơi online, gửi trạng thái 20Hz.
