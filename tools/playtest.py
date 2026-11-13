@@ -56,15 +56,24 @@ async def run():
         await c.wait_for_function("[...document.querySelectorAll('#roomList .roomc')].some(b=>b.textContent.includes('QA Kiểm thử'))", timeout=60000)
         report['room_list']=await c.evaluate("[...document.querySelectorAll('#roomList .roomc b')].map(b=>b.textContent)")
         await c.screenshot(path=f'{shots}/playtest_roomlist.png')
-        await c.evaluate("[...document.querySelectorAll('#roomList .roomc')].find(b=>b.textContent.includes('QA Kiểm thử')).click()")
+        await c.evaluate("window.__autoSide='us'; [...document.querySelectorAll('#roomList .roomc')].find(b=>b.textContent.includes('QA Kiểm thử')).click()")
         await c.wait_for_function("window.__game.state.mode==='online'", timeout=60000)
         for _ in range(30):  # SwiftShader rất chậm: chờ tối đa ~60s
             await a.wait_for_timeout(2000)
             report['online_peers_A']=await a.evaluate("window.__game.net.remotes.size")
             report['online_peers_B']=await c.evaluate("window.__game.net.remotes.size")
             if report['online_peers_A']>=1 and report['online_peers_B']>=1: break
-        await a.screenshot(path=f'{shots}/playtest_online.png')
+        # đấu đội: A là host điều khiển bot, B (phe Mỹ) thấy bot qua mạng
+        for _ in range(30):
+            await a.wait_for_timeout(2000)
+            report['tdm_A']=await a.evaluate("(()=>{const g=window.__game,n=g.net; return {tdm:n.tdm, host:n.isHost(), side:g.player.side, allies:g.allies.length, enemies:g.enemies.filter(e=>e.alive).length, ts:n.ts}})()")
+            report['tdm_B']=await c.evaluate("(()=>{const g=window.__game,n=g.net; return {tdm:n.tdm, host:n.isHost(), side:g.player.side, puppets:n.puppets.size, ts:n.ts}})()")
+            if report['tdm_B']['puppets']>=6: break
+        await a.screenshot(path=f'{shots}/playtest_online.png'); await c.screenshot(path=f'{shots}/playtest_online_B.png')
         if report['online_peers_A']<1 or report['online_peers_B']<1: errs.append('online: 2 người chơi không thấy nhau')
+        if not report['tdm_A']['host'] or report['tdm_B']['host']: errs.append('đấu đội: chọn host sai')
+        if report['tdm_B']['puppets']<6: errs.append('đấu đội: máy B không thấy bot')
+        if report['tdm_B']['side']!='us': errs.append('đấu đội: B không vào được phe Mỹ')
         await b.close()
     return errs, report
 if __name__=='__main__':

@@ -10,7 +10,7 @@ async def run():
         ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality4', JSON.stringify('{check.Q}'))}}catch(e){{}}")
         pg=await ctx.new_page(); pg.set_default_timeout(300000); pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('http://127.0.0.1:8799/'); await pg.wait_for_function('window.__gameReady===true', timeout=300000)
-        await pg.evaluate("(async()=>{ const g=window.__game; g.settings.map='khesanh'; g.settings.mode='base'; await g.startCampaign(); g.player.invuln=9999; })()")
+        await pg.evaluate("(async()=>{ const g=window.__game; g.settings.map='" + (os.environ.get('MAP') or 'khesanh') + "'; g.settings.mode='base'; await g.startCampaign(); g.player.invuln=9999; })()")
         await pg.wait_for_timeout(5000)
         for i,(side,dist) in enumerate([('vn',0.95),('us',0.95),('vn',2.6)]):
             await pg.evaluate(f"""(()=>{{ const g=window.__game,p=g.player; p.yaw=Math.atan2(-0.555,-0.377)+Math.PI; p.pitch=-0.03;

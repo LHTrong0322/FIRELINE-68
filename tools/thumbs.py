@@ -12,6 +12,7 @@ async def run():
         pg=await ctx.new_page(); pg.set_default_timeout(300000)
         await pg.goto('http://127.0.0.1:8799/'); await pg.wait_for_function('window.__gameReady===true', timeout=300000)
         ids=await pg.evaluate("Object.keys(window.__game.MAPS)")
+        only=os.environ.get('ONLY'); ids=[i for i in ids if not only or i in only.split(',')]
         for mid in ids:
             await pg.evaluate(f"(async()=>{{ const g=window.__game; g.settings.map='{mid}'; g.settings.mode='rescue'; await g.startCampaign(); }})()")
             await pg.wait_for_function("window.__game.state.phase==='playing'")

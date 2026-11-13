@@ -91,3 +91,20 @@
 ## 2026-11-13 — v4.6 / v4.7
 - v4.6: trời HDRI, sương mù theo độ cao, tia nắng, bóng mây; dọn+nén ảnh 142MB → 54MB. Lỗi phát hiện: camera.far=160 làm trời/núi không bao giờ hiện (đã sửa: ngoài trời 700).
 - v4.7: dựng lại khuôn mặt/da/mắt nhân vật (xem graphics-log). Script mới: `tools/portrait.py`, `tools/skytest.py`.
+
+## 2026-11-13 — v4.8 (theo yêu cầu người chơi)
+- **Mở đầu lịch sử** (`playIntro`, `MAP_INTRO`): trước mỗi trận chiến dịch hiện đoạn chữ chạy về bối cảnh (Củ Chi, Đồi A1, Khe Sanh, Him Lam, Cồn Tiên), nhiệm vụ của trận và câu động viên tinh thần dân tộc. Chạm để hiện hết / vào trận, có nút BỎ QUA. Test bỏ qua tự động khi chạy headless (trừ khi `window.__forceIntro`).
+- **Tiếp tế toàn đội** (`teamSupply`): nhặt gói đỏ (người chơi hoặc đồng đội) → cả đội hồi đầy máu, áo giáp 100, +2 B40 và 1 lượt CHI VIỆN (luân phiên pháo binh / không kích). Bảng thông báo `#supPanel`.
+- **Chi viện chọn toạ độ** (`openSupMap`, `callSupport`, `updateStrikes`): nút CHI VIỆN (phím T) mở bản đồ, chọn pháo binh (9 quả trong bán kính ~9m) hoặc không kích (máy bay thả 8 quả bom thành đường ~40m), khói đỏ đánh dấu mục tiêu. `fireShell(..., quiet)` trả về viên đạn, hỗ trợ R/dmg riêng.
+- **Minimap**: gói tiếp tế ngoài tầm hiện mũi tên nhấp nháy ở mép (dù đang rơi / thùng đã đáp).
+- **Online đấu đội** (phòng có tiền tố `td-`): chọn chế độ khi tạo phòng → vào phòng chọn phe VN/Mỹ (`pickSide`) → máy có id nhỏ nhất làm host điều khiển bot (`net.hostSim`), bot lấp chỗ để hai bên bằng quân số (tối thiểu 5/bên). Máy khác thấy bot qua `presence.bots` (`syncPuppets`), bắn trúng bot gửi `bdm` cho host; bot bắn trúng người gửi `bd`. Điểm đội 40 thắng, 8s sau vòng mới. Không bắn được đồng đội.
+- Sửa lỗi: mở bản đồ pháo / chi viện trên máy tính làm hiện menu tạm dừng (do thoát khoá chuột).
+- Mic (V / nút 🎙) và chat (Enter) đã có sẵn từ trước, dùng được trong đấu đội.
+- Test: playtest (thêm kiểm tra đấu đội: A host VN có 4+4 bot, B phe Mỹ thấy 8 bot), `tools/supporttest.py` (mới).
+
+## 2026-11-13 — v4.9
+- **Sửa lỗi "bắn pháo mà địch không chết"**: trong `explode`, tầm nhìn từ điểm nổ bị gờ hào/bao cát che (điểm nổ sát đất y=0.2) nên địch đứng sau vật che không nhận sát thương; sát thương lại giảm tuyến tính nên ở 5m chỉ ~77. Sửa: kiểm tra từ điểm nổ nâng lên 1m, trong nửa bán kính luôn trúng, đạn lớn giảm theo lập phương khoảng cách; đạn pháo R=8, dmg=280; chi viện pháo/bom mạnh hơn. Test mới `tools/blasttest.py`: khesanh 4/4, himlam 7/8 bị hạ.
+- **5 bản đồ mới**: Ba Chúc (1978, Khmer Đỏ, căn cứ), Tiến về Phnôm Pênh (7/1/1979, Khmer Đỏ, lô cốt), Đồng Đăng – Lạng Sơn (1979, Trung Quốc, lô cốt), Thị xã Cao Bằng (1979, Trung Quốc, căn cứ), Mặt trận Vị Xuyên (1984, Trung Quốc, hoàng hôn). Có đoạn mở đầu lịch sử riêng, ảnh thu nhỏ (`tools/thumbs.py`, biến ONLY).
+- **Phe mới** `FACTIONS.kh` (áo đen, khăn krama kẻ ô, mũ mềm đen) và `FACTIONS.cn` (quân phục xanh, phù hiệu cổ đỏ, mũ mềm sao đỏ), dùng thân người Á Đông; cờ SVG + cờ cắm lô cốt.
+- **Chế độ mới TỬ THỦ 5 PHÚT** (`state.defend`, trên bản đồ căn cứ): xe chỉ huy địch không phá được, địch tăng quân mỗi 40 giây (tối đa 16), mỗi phút một đợt xung phong; giữ xe chỉ huy ta đủ 5 phút là thắng.
+- Test: modetest với `MODEMAPS=...` cho 5 bản đồ mới, portrait (`MAP=`) soi lính Khmer Đỏ / Trung Quốc.

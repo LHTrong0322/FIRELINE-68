@@ -128,6 +128,48 @@ button{font-family:inherit;cursor:pointer}
 #objMark{opacity:.75;transition:opacity .2s}#objMark b{display:block;font-size:13px;line-height:1}#objMark span{font-size:10px;background:rgba(0,0,0,.35);padding:0 4px;border-radius:2px}#objMark.near{opacity:.12}
 .umark{position:absolute;transform:translate(-50%,-100%);font-weight:800;text-shadow:0 1px 3px #000;pointer-events:none;white-space:nowrap;font-size:11px;text-align:center}
 .umark.c{color:#ffd34a}.umark.c b{display:block;font-size:20px}
+/* v4.8: mở đầu lịch sử */
+#intro{position:fixed;inset:0;z-index:300;background:#050403;overflow:hidden;cursor:pointer;color:#efe6d2;font-family:inherit}
+#intro .iv{position:absolute;inset:-6%;background-size:cover;background-position:center;filter:grayscale(.55) sepia(.35) brightness(.38) contrast(1.1) blur(1px);animation:introZoom 26s linear forwards}
+#intro::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 30%,rgba(0,0,0,.85) 100%),repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 3px);pointer-events:none}
+#intro .ib{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(860px,90vw);text-align:center;z-index:2}
+#intro .iy{font-size:clamp(12px,1.6vw,15px);letter-spacing:6px;color:#ffd34a;font-weight:800;opacity:0;animation:fadeUp 1s .2s forwards}
+#intro .it{font-size:clamp(24px,4.6vw,46px);font-weight:900;letter-spacing:3px;margin:6px 0 14px;text-shadow:0 0 22px rgba(255,180,60,.35),0 3px 6px #000;opacity:0;animation:fadeUp 1.1s .5s forwards}
+#intro .it:after{content:'';display:block;width:120px;height:2px;margin:12px auto 0;background:linear-gradient(90deg,transparent,#c8302a,#ffd34a,#c8302a,transparent)}
+#intro .ip p{margin:0 0 9px;font-size:clamp(13px,1.85vw,17px);line-height:1.55;opacity:0;transform:translateY(10px);transition:opacity .9s,transform .9s;text-shadow:0 2px 4px #000}
+#intro .ip p.on{opacity:1;transform:none}
+#intro .ip b{color:#ffd34a;font-weight:800}
+#intro .ip p.mis{margin-top:16px;padding:9px 14px;border-top:1px solid rgba(255,211,74,.4);border-bottom:1px solid rgba(255,211,74,.4);color:#fff;font-weight:700;letter-spacing:.5px;background:linear-gradient(90deg,transparent,rgba(120,20,10,.45),transparent)}
+#intro .ip p.hero{font-size:clamp(15px,2.3vw,21px);font-weight:900;color:#ff6a4a;letter-spacing:1px;text-shadow:0 0 16px rgba(255,80,40,.6),0 2px 4px #000}
+#intro .ip p.q{font-style:italic;color:#e8dcc2}
+#intro .go{margin-top:16px;display:inline-block;padding:10px 34px;border:2px solid #ffd34a;color:#ffd34a;font-weight:900;letter-spacing:4px;opacity:0;transition:opacity .6s;background:rgba(0,0,0,.4)}
+#intro .go.on{opacity:1;animation:pulseGo 1.4s infinite}
+#introSkip{position:absolute;right:calc(14px + env(safe-area-inset-right));top:calc(12px + env(safe-area-inset-top));z-index:3;background:rgba(0,0,0,.5);color:#ddd;border:1px solid rgba(255,255,255,.3);padding:7px 14px;font-weight:700;letter-spacing:1px;border-radius:3px}
+@keyframes introZoom{from{transform:scale(1)}to{transform:scale(1.14) translate(-1.5%,1%)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pulseGo{0%,100%{box-shadow:0 0 0 rgba(255,211,74,0)}50%{box-shadow:0 0 22px rgba(255,211,74,.55)}}
+/* v4.8: bảng tiếp tế + chi viện */
+#supPanel{position:absolute;left:50%;top:24%;transform:translateX(-50%);z-index:9;pointer-events:none;text-align:center;animation:bannerIn .45s ease-out}
+#supPanel .h{display:inline-block;font-weight:900;letter-spacing:2px;font-size:clamp(13px,2vw,18px);color:#ffd34a;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(20,14,4,.9) 12%,rgba(20,14,4,.9) 88%,rgba(0,0,0,0));padding:5px 34px;text-shadow:0 0 10px rgba(255,190,60,.6)}
+#supPanel .g{display:flex;gap:8px;justify-content:center;margin-top:7px;flex-wrap:wrap}
+#supPanel .g span{background:rgba(10,12,8,.82);border:1px solid rgba(255,211,74,.55);border-radius:4px;padding:6px 10px;font-weight:800;font-size:clamp(11px,1.5vw,13px);color:#fff;white-space:nowrap}
+#supPanel .g span i{font-style:normal;color:#ffd34a;margin-right:5px}
+#bSup{position:absolute;right:calc(64px + env(safe-area-inset-right));top:calc(64px + env(safe-area-inset-top));z-index:7;pointer-events:auto;background:linear-gradient(180deg,rgba(150,30,20,.92),rgba(90,15,10,.92));border:2px solid #ffd34a;color:#fff;font-weight:900;letter-spacing:1px;font-size:12px;padding:7px 11px;border-radius:5px;box-shadow:0 0 14px rgba(255,120,40,.55);animation:pulseGo 1.6s infinite}
+#bSup small{display:block;font-size:9px;color:#ffd34a;letter-spacing:.5px}
+#supSel{display:flex;gap:8px}#supSel button{background:rgba(0,0,0,.5);color:#ddd;border:1px solid #777;padding:6px 14px;font-weight:800;border-radius:3px}#supSel button.on{background:#c8302a;color:#fff;border-color:#ffd34a}
+/* v4.8: chọn phe online */
+#sidePick{position:fixed;inset:0;z-index:290;background:radial-gradient(ellipse at center,rgba(20,16,8,.78),rgba(0,0,0,.94));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px}
+#sidePick h2{margin:0;color:#ffd34a;letter-spacing:3px;font-size:clamp(16px,2.6vw,24px);text-align:center}
+#sidePick .sub{color:#ccc;font-size:13px;text-align:center;max-width:620px}
+#sidePick .sides{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+#sidePick .sd{width:min(260px,42vw);padding:14px 12px;border:2px solid rgba(255,255,255,.25);background:rgba(10,10,6,.75);color:#fff;border-radius:6px;text-align:center;cursor:pointer}
+#sidePick .sd svg{width:90px;height:60px;box-shadow:0 2px 10px #000}
+#sidePick .sd b{display:block;margin-top:8px;font-size:16px;letter-spacing:1px}
+#sidePick .sd span{display:block;color:#ffd34a;font-weight:800;margin-top:4px}
+#sidePick .sd.vn:hover,#sidePick .sd.vn:active{border-color:#da251d;box-shadow:0 0 24px rgba(218,37,29,.5)}
+#sidePick .sd.us:hover,#sidePick .sd.us:active{border-color:#5a8aff;box-shadow:0 0 24px rgba(90,138,255,.5)}
+.roomc .md{position:absolute;left:6px;top:28px;font-size:10px;font-weight:900;letter-spacing:1px;padding:2px 6px;border-radius:3px;background:#c8302a;color:#fff}
+.roomc .md.ffa{background:#555}
 #banner{position:absolute;left:50%;top:15%;transform:translateX(-50%);text-align:center;pointer-events:none;z-index:8}
 #banner .t{display:inline-block;font-size:clamp(15px,2.4vw,22px);font-weight:900;letter-spacing:2px;color:#ffd34a;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(20,14,4,.88) 15%,rgba(20,14,4,.88) 85%,rgba(0,0,0,0));padding:5px 36px;text-shadow:0 0 12px rgba(255,190,60,.7),0 2px 4px #000;animation:bannerIn .5s ease-out}
 #banner .s{margin-top:4px;font-size:clamp(11px,1.4vw,13px);font-weight:700;color:#fff;text-shadow:0 2px 4px #000}
@@ -282,7 +324,8 @@ button{font-family:inherit;cursor:pointer}
   <div id="marks"></div><div id="killIco"><div class="k"><b>✕</b><span class="t">HẠ GỤC</span></div><div class="s"></div></div><div id="banner" class="hidden"><div class="t"></div><div class="s"></div></div>
   <div id="shellHud" class="hidden"><div class="lb t"></div><div class="lb b"></div><span class="sk">CHẠM / NHẤN E ĐỂ BỎ QUA</span><span class="tx"></span></div>
   <div id="artBtns" class="hidden"><button id="artMapB">🗺 BẢN ĐỒ BẮN XA (M)</button><button class="x" id="artExitB">✕ RỜI PHÁO (E)</button></div>
-  <div id="artMap" class="hidden"><div class="hd">CHỌN ĐIỂM TRÊN BẢN ĐỒ ĐỂ NÃ PHÁO · địch không hiện — hãy phán đoán!</div><canvas id="artCv"></canvas><div id="artInfo" class="hd" style="color:#fff;font-size:13px"></div><button class="mbtn" id="artMapClose" style="text-align:center;width:auto;padding:8px 30px">ĐÓNG BẢN ĐỒ</button></div>
+  <div id="supPanel" class="hidden"><div class="h"></div><div class="g"></div></div><button id="bSup" class="hidden">💥 CHI VIỆN<small></small></button>
+  <div id="artMap" class="hidden"><div class="hd" id="artHd">CHỌN ĐIỂM TRÊN BẢN ĐỒ ĐỂ NÃ PHÁO · địch không hiện — hãy phán đoán!</div><div id="supSel" class="hidden"><button data-t="phao">💥 PHÁO BINH <b></b></button><button data-t="air">✈ KHÔNG KÍCH <b></b></button></div><canvas id="artCv"></canvas><div id="artInfo" class="hd" style="color:#fff;font-size:13px"></div><button class="mbtn" id="artMapClose" style="text-align:center;width:auto;padding:8px 30px">ĐÓNG BẢN ĐỒ</button></div>
   <div id="touch" class="hidden">
     <div id="joyHint"></div>
     <div id="joy"><i></i></div>
@@ -321,13 +364,13 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.7</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.9</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
       <div id="pMain">
         <h2>BẢNG CHỈ HUY</h2>
-        <button class="mbtn pri" id="mCampaign">▶ CHIẾN DỊCH<small>5 trận đánh lịch sử · công phá căn cứ · chiếm lô cốt · giải cứu con tin</small></button>
+        <button class="mbtn pri" id="mCampaign">▶ CHIẾN DỊCH<small>10 trận đánh lịch sử 1954–1984 · công phá căn cứ · tử thủ · chiếm lô cốt · giải cứu con tin</small></button>
         <button class="mbtn" id="mOnline">⚔ ĐẤU ONLINE<small>Đấu súng với người chơi khác theo mã phòng</small></button>
         <button class="mbtn" id="mSettings">⚙ CÀI ĐẶT</button>
         <button class="mbtn" id="mHelp">? HƯỚNG DẪN</button>
@@ -336,7 +379,7 @@ button{font-family:inherit;cursor:pointer}
       <div id="pMaps" class="hidden">
         <h2>CHỌN TRẬN ĐÁNH</h2>
         <div id="mapList"></div>
-        <div class="row" id="modeRow" style="margin-top:8px"><label>Nhiệm vụ</label><div class="seg" id="segMode"><button data-v="base">Công phá căn cứ</button><button data-v="rescue">Giải cứu con tin</button></div></div>
+        <div class="row" id="modeRow" style="margin-top:8px"><label>Nhiệm vụ</label><div class="seg" id="segMode"><button data-v="base">Công phá căn cứ</button><button data-v="defend">Tử thủ 5 phút</button><button data-v="rescue">Giải cứu con tin</button></div></div>
         <button class="mbtn pri" id="mStart" style="text-align:center">▶ XUẤT KÍCH</button>
         <button class="back" data-back>← Quay lại</button>
       </div>
@@ -348,10 +391,11 @@ button{font-family:inherit;cursor:pointer}
         <div id="roomBox"><div id="roomList" class="roomGrid"></div></div>
         <div id="createBox" class="hidden">
           <div class="row"><label>Tên phòng</label><input type="text" id="roomCode" maxlength="30" placeholder="Phòng của bạn"></div>
+          <div class="row"><label>Chế độ</label><div class="seg" id="segNetMode"><button data-v="tdm">Đấu đội VN – Mỹ (có bot)</button><button data-v="ffa">Tự do (mỗi người một mình)</button></div></div>
           <div class="mapPick" id="segNetMap"></div>
           <div style="display:flex;gap:8px"><button class="mbtn pri" id="mJoin" style="flex:2;text-align:center">TẠO &amp; VÀO PHÒNG</button><button class="mbtn" id="mCreateX" style="flex:1;text-align:center">HUỶ</button></div>
         </div>
-        <div class="note" id="qNote" style="display:none"></div><div class="note">Bấm vào một phòng để vào chơi cùng. Ai hạ đủ <b>15 mạng</b> trước sẽ thắng vòng.</div>
+        <div class="note" id="qNote" style="display:none"></div><div class="note">Bấm vào một phòng để vào chơi. <b>Đấu đội</b>: chọn phe Việt Nam hoặc Mỹ, bot tự thêm cho cân quân số, đội nào đạt <b>40 điểm hạ</b> trước thắng. <b>Tự do</b>: ai hạ đủ <b>15 mạng</b> trước thắng.</div>
         <button class="back" data-back>← Quay lại</button>
       </div>
       <div id="pSettings" class="hidden">
@@ -392,7 +436,9 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <div id="rotate" class="hidden"><div class="ph"></div><h2 style="margin:0;color:var(--acc);letter-spacing:2px">XOAY NGANG ĐIỆN THOẠI</h2><p>Game được thiết kế để chơi ở màn hình ngang.</p><div class="rb"><button class="mbtn pri" id="rotFull" style="text-align:center">TOÀN MÀN HÌNH + XOAY NGANG</button><button class="mbtn" id="rotPortrait" style="text-align:center">VẪN CHƠI MÀN HÌNH DỌC</button></div><p style="font-size:12px">Nếu không xoay được: tắt "Khoá xoay màn hình" trong Trung tâm điều khiển.</p></div>
-<div id="loading"><svg width="46" height="46" viewBox="0 0 100 100" style="color:#c8302a"><polygon fill="currentColor" points="50,4 61,38 97,38 68,59 79,94 50,73 21,94 32,59 3,38 39,38"/></svg><div class="b"><i id="loadBar"></i></div><p id="loadTxt">ĐANG TẢI ĐỘNG CƠ 3D…</p></div>
+<div id="sidePick" class="hidden"><h2>CHỌN PHE</h2><div class="sub" id="sideSub"></div><div class="sides"><div class="sd vn" data-s="vn"></div><div class="sd us" data-s="us"></div></div><div class="sub">Trận bắt đầu ngay — máy tự thêm lính máy (bot) để hai bên <b style="color:#ffd34a">bằng quân số</b>. Bấm <b>V</b> hoặc nút 🎙 để nói, <b>Enter</b> để nhắn.</div></div>
+  <div id="intro" class="hidden"><div class="iv"></div><div class="ib"><div class="iy"></div><div class="it"></div><div class="ip"></div><div class="go">▸ VÀO TRẬN</div></div><button id="introSkip">BỎ QUA ▸▸</button></div>
+  <div id="loading"><svg width="46" height="46" viewBox="0 0 100 100" style="color:#c8302a"><polygon fill="currentColor" points="50,4 61,38 97,38 68,59 79,94 50,73 21,94 32,59 3,38 39,38"/></svg><div class="b"><i id="loadBar"></i></div><p id="loadTxt">ĐANG TẢI ĐỘNG CƠ 3D…</p></div>
 
 <script>
 setTimeout(function(){ if(!window.__gameReady && !window.__loadErr){ var t=document.getElementById('loadTxt'); if(t) t.textContent='Tải chậm hơn dự kiến… nếu không vào được, hãy tải lại trang.'; } }, 15000);
@@ -430,7 +476,7 @@ const store = {
 const settings = {
   nick: store.get('nick','ChienSi'+Math.floor(100+Math.random()*900)),
   color: store.get('color',0), sens: store.get('sens',1.0), vol: store.get('vol',0.7),
-  quality: store.get('quality4', 'high'), fps: store.get('fps5', 'auto'), diff: store.get('diff',1),
+  netMode: store.get('netMode','tdm'), quality: store.get('quality4', 'high'), fps: store.get('fps5', 'auto'), diff: store.get('diff',1),
   map: store.get('map','cuchi'), mode: store.get('mode','base')==='rescue'?'rescue':'base', netMap: store.get('netMap','cuchi'), portrait: false,
 };
 const QT = {
@@ -1015,6 +1061,122 @@ const MAPS = {
     "#............X...........L.X............XL.......#",
     "##################################################"
   ] },
+  bachuc: { name:'Ba Chúc – Biên giới Tây Nam', year:'1978', place:'Xã Ba Chúc, huyện Tri Tôn, An Giang', enemy:'kh', outdoor:true, desc:'Đồng lúa, bờ thốt nốt và chùa làng ở biên giới An Giang. Đánh bật quân Khmer Đỏ xâm lược, bảo vệ đồng bào.', tex:{w1:'soil',w2:'sandbag',floor:'mud',trench:'soil'}, h1:3.0, h2:2.4, tint:{w1:0xb09070,trench:0xb09070,floor:0xa49478}, grid:[
+    "########################################",
+    "#P....X....T.......L......T.....X....E.#",
+    "#.....X....T..SS.......SS.T.....X......#",
+    "#P....X....T..............T..C..X..E...#",
+    "#..........TTTT....WWW+WWW...........L.#",
+    "#...L..............W.....W....SS.......#",
+    "#.....SS...........W..H..W..........E..#",
+    "#P.................WWWWWWW.....X.......#",
+    "#..........X...................X....SS.#",
+    "#....TTTT..X...SS.....L....TTTTX.......#",
+    "#h...T.....X..........................E#",
+    "#....T.........a.....C....T........r...#",
+    "#P...TTTT..X...SS.........T...X........#",
+    "#..........X..............TTTTX....SS..#",
+    "#..L.......X.....WWW+WWW.......X.......#",
+    "#.....SS.........W.....W.......X....E..#",
+    "#P...............W..H..W...L...........#",
+    "#.........TTTT...WWWWWWW.........C.....#",
+    "#..C......T..............SS.......X....#",
+    "#P........T.....L...........TTT...X..E.#",
+    "#.........T.................T.....X....#",
+    "########################################"
+  ] },
+  phnompenh: { name:'Tiến về Phnôm Pênh', year:'1979', place:'Cửa ngõ Phnôm Pênh, ngày 7/1/1979', enemy:'kh', outdoor:true, bunker:true, desc:'CHIẾM LÔ CỐT · Cùng lực lượng cách mạng Campuchia thọc sâu giải phóng thủ đô, chấm dứt chế độ diệt chủng. Đánh chiếm lần lượt 3 cứ điểm.', tex:{w1:'concrete',w2:'brick',floor:'laterite',trench:'soil'}, h1:3.4, h2:2.6, tint:{w1:0xb8ab98,trench:0xb09070,floor:0xd8c0a8}, grid:[
+    "##################################################",
+    "#...........X.........L...X.........W+WWW...E....#",
+    "#.P.........X.....WWW+W...X..SS.....W...W........#",
+    "#.......L...X.....W...W.............W.3.W....E...#",
+    "#...............SSW.1.W...X....L....WWWWW........#",
+    "#.P..........C....WWWWW...X..........SS.......E..#",
+    "#.........TTTT............X.....WW+WW.......L....#",
+    "#...SS....T.......L............W...W.............#",
+    "#.P.......T..........X.........W.2.W..X...SS.....#",
+    "#h........T....SS....X....SS...WWWWW..X.......E..#",
+    "#.........TTTT.......X................X..........#",
+    "#.P.................................C.........E..#",
+    "#....L....X.....WWW......TTTTT..........L........#",
+    "#.a.......X.....W.....C..T.......SS..X...........#",
+    "#.P.......X.....W.H......T.......SS..X......E....#",
+    "#.........X.....WWW......TTTTT.......X...........#",
+    "#...SS..........................L..........SS....#",
+    "#.P.......L.........X......SS.......X.........E..#",
+    "#...................X...............X............#",
+    "#..r......SS........X......L........X....L.......#",
+    "##################################################"
+  ] },
+  langson: { name:'Đồng Đăng – Lạng Sơn', year:'1979', place:'Thị trấn Đồng Đăng, Lạng Sơn, tháng 2/1979', enemy:'cn', outdoor:true, bunker:true, desc:'CHIẾM LÔ CỐT · Biên giới phía Bắc, tháng 2/1979. Bám trụ đồi đá vôi Đồng Đăng, đánh chiếm lại lần lượt 3 điểm cao bị quân xâm lược chiếm giữ.', tex:{w1:'concrete',w2:'sandbag',floor:'mud',trench:'soil'}, h1:3.4, h2:2.4, tint:{w1:0x9a9a92,trench:0x8a8478,floor:0x8c8270}, grid:[
+    "##################################################",
+    "#P.......T........X..........TTTT.........X....E.#",
+    "#........T...L....X....SS....T..T.....3...X......#",
+    "#P.......T.............SS....T..T....SSS.....E...#",
+    "#........TTTT.....X..........TTTT.........X......#",
+    "#..L..............X......L...........L....X...E..#",
+    "#.......SS....TTTT.....X.........SS..............#",
+    "#P......SS....T........X..2......SS....TTTT......#",
+    "#.............T.....SSSX.....L.........T......E..#",
+    "#h......X.....TTTT.....X...............T.........#",
+    "#.......X.........L..........TTTT......TTTT......#",
+    "#P......X...1..........SS....T..T...L.........E..#",
+    "#.......X..SSS.........SS....T..T................#",
+    "#...L.........X..............TTTT....X....SS.....#",
+    "#a............X.......L..............X....SS..E..#",
+    "#P......TTTT..X.........X......SS....X...........#",
+    "#.......T...............X......SS..........L.....#",
+    "#..r....T......SS.......X...........TTTT.....E...#",
+    "#P......TTTT...SS..L.........L......T............#",
+    "#.........................X.........T......X.....#",
+    "##################################################"
+  ] },
+  caobang: { name:'Thị xã Cao Bằng', year:'1979', place:'Cao Bằng, biên giới phía Bắc, tháng 2/1979', enemy:'cn', outdoor:true, desc:'Thung lũng giữa núi đá, nhà dân đổ nát bên đường số 3. Phá xe chỉ huy của quân xâm lược, giữ vững từng tấc đất biên cương.', tex:{w1:'concrete',w2:'brick',floor:'mud',trench:'soil'}, h1:3.2, h2:2.6, tint:{w1:0x9c988c,trench:0x8a8478,floor:0x8e8472}, grid:[
+    "########################################",
+    "#P...TTTT......X.........L.....TTTT..E.#",
+    "#....T.........X...WWW+WW......T.......#",
+    "#P...T....L........W....W......T....E..#",
+    "#....TTTT..........W..H.W......TTTT....#",
+    "#.........SS.......WWWWWW..........L...#",
+    "#.L.......SS...........................#",
+    "#P...........X.....SS......X.......E...#",
+    "#............X.....SS......X...........#",
+    "#h...WWW+WW..X.............X..SS.......#",
+    "#....W...W.......L............SS....E..#",
+    "#....W.H.W...X........C....X...........#",
+    "#P...WWWWW...X.............X......L....#",
+    "#.............SS........SS.............#",
+    "#.L...........SS........SS.......WWW+W.#",
+    "#P.....TTTT..............L.......W...W.#",
+    "#......T......X......X...........W.H.W.#",
+    "#.a....T......X......X...........WWWWW.#",
+    "#P.....TTTT...X..r...X......SS.......E.#",
+    "#..............L............SS....L....#",
+    "########################################"
+  ] },
+  vixuyen: { name:'Mặt trận Vị Xuyên – Hà Giang', year:'1984', place:'Cao điểm 1509, Vị Xuyên, Hà Giang', enemy:'cn', outdoor:true, dusk:true, desc:'"Lò vôi thế kỷ" giữa núi đá tai mèo. Hợp với chế độ TỬ THỦ: giữ vững trận địa, đẩy lùi từng đợt xung phong suốt 5 phút.', tex:{w1:'concrete',w2:'sandbag',floor:'mud',trench:'soil'}, h1:3.6, h2:2.4, tint:{w1:0x8e8c86,trench:0x7e786c,floor:0x7a7062}, grid:[
+    "########################################",
+    "#P..TTT..X....TTTTT.....TT....X..T..E..#",
+    "#...T....X....T...T......T....X..T.....#",
+    "#P..T.SS......T.L.T...SS.T.......TT.E..#",
+    "#...T.SS..X...TTTTT...SS.....X.........#",
+    "#.........X..............L...X...TTT...#",
+    "#.L..TTTT.........X..........X...T..E..#",
+    "#P...T.....SS.....X....TTTT......T.....#",
+    "#....T.....SS.....X....T..T..........L.#",
+    "#h...TTTT..............TTTT...SS.......#",
+    "#..........L.....TTT..........SS....E..#",
+    "#P....X..........T.....X...............#",
+    "#.....X...SS.....TTT...X....TTTT.......#",
+    "#.a...X...SS...........X....T......E...#",
+    "#P........X.......L.........T..L.......#",
+    "#....TTTT.X....SS.......X...TTTT.......#",
+    "#....T.........SS..TTT..X...........E..#",
+    "#.r..T...L.........T....X...SS.........#",
+    "#P...TTTT..........TTT......SS....L....#",
+    "#.........X...........X................#",
+    "########################################"
+  ] }
 };
 let MAPID='cuchi', MAPDEF=MAPS.cuchi, MAPVAR='orig';
 let ROWS=23, COLS=30; const MAXR=40, MAXC=64;
@@ -1903,7 +2065,7 @@ function clothMat(color){ const t=TEX.fabric; const o={map:t.map,normalMap:t.nor
   if(settings.quality==='low') return new THREE.MeshStandardMaterial(o);
   return new THREE.MeshPhysicalMaterial(Object.assign(o,{sheen:0.7, sheenRoughness:0.5, sheenColor:new THREE.Color(color).lerp(new THREE.Color(0xfff2dc),0.45)})); }
 // v4.7: nhân vật có ảnh da vẽ sẵn -> màu ở đây chỉ là hệ số nhân nhẹ để mỗi người một sắc
-const SKIN_MUL={vn:[0xffffff,0xf7efe8,0xeee3d8,0xfff8f0,0xe8dccf], us:[0xffffff,0xf6ece4,0xe9dace,0xa58470,0x7d604e], fr:[0xffffff,0xf6ece4,0xe9dace,0xd8c4b4]};
+const SKIN_MUL={kh:[0xe8d8c8,0xdccab8,0xd2bca6,0xe0cfbe], cn:[0xffffff,0xf7efe8,0xfff4ea,0xeee3d8], vn:[0xffffff,0xf7efe8,0xeee3d8,0xfff8f0,0xe8dccf], us:[0xffffff,0xf6ece4,0xe9dace,0xa58470,0x7d604e], fr:[0xffffff,0xf6ece4,0xe9dace,0xd8c4b4]};
 const SKIN_TONES={vn:[0xc69772,0xb98a64,0xa87a55,0xc9a07a], us:[0xd8ac88,0xc89a76,0xb98a64,0x8d5f3e,0x6b4630], fr:[0xd8ac88,0xc89a76,0xb98a64,0x8d5f3e,0xc39069]};
 let BLOB=null;
 // ---- người lính dựng bằng Blender (có xương + hoạt ảnh thật). Nếu tải lỗi -> dùng mô hình thủ tục cũ
@@ -1946,11 +2108,11 @@ function buildSoldier(opt){
 function buildSoldierSK(opt){
   const g=new THREE.Group(); g.rotation.order='YXZ';
   const uni=clothMat(opt.uniform), gear=clothMat(opt.gear);
-  const SK0=SKEL[opt.side==='vn'?'vn':'us'], TX=SK0.tex||{};
+  const ASIA=opt.side==='vn'||opt.side==='kh'||opt.side==='cn'; const SK0=SKEL[ASIA?'vn':'us'], TX=SK0.tex||{};
   const skin = TX.skin ? new THREE.MeshStandardMaterial({map:TX.skin, normalMap:TX.skinN||null, normalScale:new THREE.Vector2(0.8,0.8), roughness:0.56, metalness:0, envMapIntensity:0.35, color:pick(SKIN_MUL[opt.side]||SKIN_MUL.us)})
     : pbr('skin',{color:pick(SKIN_TONES[opt.side]), metalness:0, envMapIntensity:.3});
   const mats=[uni,gear,skin];
-  const SK=SKEL[opt.side==='vn'?'vn':'us'], MT=SK.meta;
+  const SK=SKEL[ASIA?'vn':'us'], MT=SK.meta;
   const body=SkeletonUtils.clone(SK.scene); g.add(body);
   const bones={}; const pants=clothMat(new THREE.Color(opt.uniform).multiplyScalar(0.86).getHex()); mats.push(pants);
   const hair = TX.skin ? new THREE.MeshStandardMaterial({map:TX.skin, normalMap:TX.skinN||null, roughness:0.72, metalness:0, envMapIntensity:0.3})
@@ -1976,6 +2138,18 @@ function buildSoldierSK(opt){
     const tail=A(new RoundedBoxGeometry(.06,.16,.02,2,.008),scarf,torso,-.05,.49,.13); tail.rotation.z=.2;
     if(!opt.bare){ const pack=A(new RoundedBoxGeometry(.3,.34,.15,3,.06),gear,torso,0,.33,-.19,true); pack.rotation.x=.08; }
     A(SG.canteen,M.olivePaint,hipW,-.2,-.02,-.05);
+  } else if(opt.side==='kh'){ // áo đen, khăn krama kẻ ô đỏ trắng quàng cổ
+    const col=A(SG.collar,uni,torso,0,.575,0); col.rotation.x=Math.PI/2;
+    const kc=document.createElement('canvas'); kc.width=kc.height=32; const kx=kc.getContext('2d'); kx.fillStyle='#e8e2d6'; kx.fillRect(0,0,32,32); kx.fillStyle='#b8221e'; for(let i=0;i<4;i++){ kx.fillRect(i*8,0,4,32); kx.fillRect(0,i*8,32,4); }
+    const kt=new THREE.CanvasTexture(kc); kt.colorSpace=THREE.SRGBColorSpace; kt.wrapS=kt.wrapT=THREE.RepeatWrapping; kt.repeat.set(3,1); kt.magFilter=THREE.NearestFilter;
+    const krama=new THREE.MeshStandardMaterial({map:kt, roughness:.9}); mats.push(krama);
+    const sc=A(new THREE.TorusGeometry(.078,.032,8,18),krama,torso,0,.585,.01); sc.rotation.x=Math.PI/2; const tl=A(new RoundedBoxGeometry(.07,.2,.02,2,.008),krama,torso,.05,.47,.13); tl.rotation.z=-.15;
+    for(const x of [-.12,0,.12]) A(SG.pouch,gear,hipW,x,.12,.13); A(SG.canteen,M.olivePaint,hipW,-.2,-.02,-.05);
+  } else if(opt.side==='cn'){ // quân phục xanh, phù hiệu cổ đỏ, túi đạn ngực
+    for(const x of [-.09,.09]){ A(SG.pocket,uni,torso,x,.42,.128); A(SG.flap,uni,torso,x,.485,.132); }
+    const col=A(SG.collar,uni,torso,0,.575,0); col.rotation.x=Math.PI/2;
+    const red=new THREE.MeshStandardMaterial({color:0xc81e1e, roughness:.7}); for(const x of [-.06,.06]) A(new THREE.BoxGeometry(.035,.022,.01),red,torso,x,.55,.115);
+    const chest=A(new RoundedBoxGeometry(.26,.12,.05,2,.012),gear,torso,0,.36,.135); A(SG.canteen,M.olivePaint,hipW,-.2,-.02,-.05); A(SG.pack,gear,torso,0,.32,-.2,true);
   } else if(opt.side==='fr'){
     for(const x of [-.09,.09]){ A(SG.pocket,uni,torso,x,.42,.128); A(SG.flap,uni,torso,x,.485,.132); }
     const col=A(SG.collar,uni,torso,0,.575,0); col.rotation.x=Math.PI/2;
@@ -2000,6 +2174,12 @@ function buildSoldierSK(opt){
     const st=A(SG.star,M.star,head,0,.29,.2); st.rotation.x=-.42;
     if(opt.leaves){ for(let i=0;i<9;i++){ const a=i/9*6.28; const lf=A(SG.leaf,M.leaf,head,Math.cos(a)*.17,.27+Math.random()*.05,Math.sin(a)*.19); lf.rotation.set(rand(-.6,.6),a,rand(.3,1.1)); } }
     if(opt.bare){ dome.visible=false; brim.visible=false; st.visible=false; }
+  } else if(opt.side==='kh' || opt.side==='cn'){ // mũ mềm có lưỡi trai (Khmer Đỏ: đen; Trung Quốc: xanh, sao đỏ)
+    const cm=clothMat(opt.side==='kh'?0x1e1e20:0x5b6a3c); mats.push(cm);
+    const cap=A(new THREE.CylinderGeometry(.118,.112,.085,20),cm,head,0,.255,.005,true); cap.scale.z=1.1;
+    const top=A(new THREE.SphereGeometry(.118,20,8,0,Math.PI*2,0,Math.PI/2),cm,head,0,.295,.005); top.scale.set(1,.35,1.1);
+    const visor=A(new THREE.CylinderGeometry(.11,.11,.012,20,1,false,-Math.PI/2.4,Math.PI/1.2),cm,head,0,.218,.03); visor.scale.set(1,1,1.25);
+    if(opt.side==='cn'){ const st=A(SG.star,M.star,head,0,.258,.13); st.scale.setScalar(0.8); }
   } else {
     const hm=opt.side==='fr' ? M.olivePaint : pbr('camo',{metalness:0, envMapIntensity:.15}); if(opt.side!=='fr') mats.push(hm);
     const dome=A(SG.m1,hm,head,0,.19,0,true); dome.scale.set(1,.92,1.1);
@@ -2278,6 +2458,13 @@ const FACTIONS = {
     types:{ rifle:{name:'Lính Lê dương Pháp', gun:'mas36', snd:'ak', burst:1, cd:1.7, dmg:13, spread:0.035},
             shotgun:{name:'Lính dù Pháp', gun:'mat49', snd:'k54', burst:5, br:0.09, cd:1.4, dmg:5, range:12, pref:7, pellets:1, spread:0.07},
             mg:{name:'Xạ thủ trung liên Pháp'} } },
+  // v4.9: chiến tranh bảo vệ biên giới Tây Nam (1978–79) và biên giới phía Bắc (1979–89)
+  kh:{ uniform:0x1c1c1e, mgUniform:0x222226, gear:0x3c3528, side:'kh', label:'lính Khmer Đỏ',
+    types:{ rifle:{name:'Lính Khmer Đỏ', gun:'ak', snd:'ak', dmg:7}, shotgun:{name:'Lính xung kích Khmer Đỏ', gun:'ak', snd:'ak', burst:5, br:0.09, pellets:1, spread:0.07, range:14, pref:7, dmg:6},
+            mg:{name:'Xạ thủ trung liên Khmer Đỏ', snd:'ak'} } },
+  cn:{ uniform:0x5b6a3c, mgUniform:0x55633a, gear:0x6a6040, side:'cn', label:'lính Trung Quốc',
+    types:{ rifle:{name:'Lính bộ binh Trung Quốc', gun:'ak', snd:'ak', dmg:7}, shotgun:{name:'Lính xung kích Trung Quốc', gun:'mat49', snd:'k54', burst:6, br:0.08, pellets:1, spread:0.07, range:13, pref:7, dmg:5},
+            mg:{name:'Xạ thủ trung liên Trung Quốc', snd:'ak'} } },
 };
 const DIFF = [{dmg:0.6,acc:1.4,hp:0.85},{dmg:1,acc:1,hp:1},{dmg:1.45,acc:0.75,hp:1.15}];
 const allies=[], hostages=[];
@@ -2351,6 +2538,16 @@ function deathAnim(u, dt){ const m=u.model; u.deadT+=dt; const t=Math.min(1,u.de
   m.shins.forEach(s=>s.rotation.x=te*1.1); m.legs.forEach((l,i)=>l.rotation.x=-te*0.5*(i?1:0.6)); m.head.rotation.x=-te*0.4*u.fallDir; m.flash.material.opacity=0; }
 function unitEye(u){ return new V3(u.pos.x, u.pos.y+1.6*((u.T&&u.T.scale)||1), u.pos.z); }
 const PLAYER_T={kind:'player'};
+// v4.8: đấu đội online — máy chủ (host) điều khiển bot; người chơi ở xa (remote) là mục tiêu của bot theo phe
+const isTdm = ()=> state.mode==='online' && state.mission==='tdm';
+function remotesOf(side){ return net.room ? [...net.remotes.values()].filter(r=>r.alive && r.side===side) : []; }
+function foesOfEnemies(){ return [...(isTdm()&&player.side==='us'?[]:[PLAYER_T]), ...allies.filter(a=>a.alive), ...(isTdm()?remotesOf('vn'):[])]; }
+function foesOfAllies(){ return [...enemies.filter(e=>e.alive), ...(isTdm()&&player.side==='us'&&player.alive?[PLAYER_T]:[]), ...(isTdm()?remotesOf('us'):[])]; }
+function posOf(t){ return t===PLAYER_T ? player.pos : t.pos; }
+function nearestOf(u, list){ let b=null, bd=1e9; for(const t of list){ if(!tgtAlive(t)) continue; const p=posOf(t); const d=Math.hypot(p.x-u.pos.x,p.z-u.pos.z); if(d<bd){ bd=d; b=t; } } return b; }
+function huntMove(u, list, dt){ u.huntT=(u.huntT||0)-dt; if(u.huntT<=0 || !u.hunt || !tgtAlive(u.hunt)){ u.huntT=3; u.hunt=nearestOf(u,list); }
+  if(!u.hunt) return [0,0]; const p=posOf(u.hunt); const st=steerTo(u,p.x,p.z,true,flowTo(p.x,p.z)); return [st[0],st[1]]; }
+function hitRemoteByBot(r, dm){ net.botHit(r.peer, dm); }
 function tgtPos(t){ return t===PLAYER_T ? new V3(player.pos.x,player.pos.y+player.eye-0.35,player.pos.z) : new V3(t.pos.x,t.pos.y+1.15,t.pos.z); }
 function tgtAlive(t){ return t===PLAYER_T ? player.alive : t && t.alive; }
 
@@ -2363,7 +2560,7 @@ function updateEnemies(dt){
     // chọn mục tiêu: người chơi hoặc bộ đội gần nhất trong tầm nhìn
     e.losT-=dt;
     if(e.losT<=0){ e.losT=0.22; let best=null, bd=e.alert?45:22;
-      const cands=[PLAYER_T, ...allies.filter(a=>a.alive)];
+      const cands=foesOfEnemies();
       for(const t of cands){ if(!tgtAlive(t)) continue; const p=t===PLAYER_T?player.pos:t.pos; const d=Math.hypot(p.x-e.pos.x,p.z-e.pos.z); if(d>=bd) continue;
         if(!e.alert){ const ang=Math.abs(angDiff(e.yaw, Math.atan2(p.x-e.pos.x,p.z-e.pos.z))); if(ang>1.1 && d>6) continue; }
         if(losClear(eEye, t===PLAYER_T?new V3(player.pos.x,player.pos.y+player.eye,player.pos.z):unitEye(t))){ bd=d; best=t; } }
@@ -2393,6 +2590,7 @@ function updateEnemies(dt){
         if(unitArtTick(e)) faceYaw=e.art.yaw;
         else { const hy=state.mission==='base'?botHQAttack(e,'en',dt):null; const g=goalMove(e,'en',dt);
           if(hy!==null){ faceYaw=hy; mx=g[0]*0.3; mz=g[1]*0.3; } else { mx=g[0]; mz=g[1]; if(Math.hypot(e.vel.x,e.vel.z)>0.3) faceYaw=Math.atan2(e.vel.x,e.vel.z); } }
+      } else if(isTdm()){ const g=huntMove(e, foesOfEnemies(), dt); mx=g[0]; mz=g[1]; if(Math.hypot(e.vel.x,e.vel.z)>0.3) faceYaw=Math.atan2(e.vel.x,e.vel.z);
       } else {
       const st=steerTo(e, player.pos.x, player.pos.z, true); mx=st[0]; mz=st[1];
       if(Math.hypot(e.vel.x,e.vel.z)>0.3) faceYaw=Math.atan2(e.vel.x,e.vel.z); }
@@ -2410,7 +2608,7 @@ function alertEnemy(e){ if(e.alert) return; e.alert=true; e.react=Math.max(e.rea
 function shotSpheres(t){ if(t===PLAYER_T){ if(player.prone) return [[player.pos.x,player.pos.y+0.28,player.pos.z,0.42,1],[player.pos.x,player.pos.y+0.42,player.pos.z,0.17,1.6]]; const cr=player.crouch?0.62:1; return [[player.pos.x,player.pos.y+1.1*cr,player.pos.z,0.42,1],[player.pos.x,player.pos.y+player.eye,player.pos.z,0.18,1.6]]; }
   const y0=t.model&&t.model.captive?0.5:1.18; return [[t.pos.x,y0,t.pos.z,0.42,1],[t.pos.x,y0+0.52,t.pos.z,0.17,1.6]]; }
 function enemyShoot(e,tgt,dist,D){
-  soldierShot(e.model);
+  soldierShot(e.model); e.shotSeq=(e.shotSeq||0)+1;
   const m=e.model; m.group.updateMatrixWorld(true);
   const o=m.gun.localToWorld(m.muzzle.clone());
   const target=tgtPos(tgt);
@@ -2425,13 +2623,14 @@ function enemyShoot(e,tgt,dist,D){
     d.x+=rand(-1,1)*spread; d.y+=rand(-1,1)*spread*0.7; d.z+=rand(-1,1)*spread; d.normalize();
     const w=raycast(o.x,o.y,o.z,d.x,d.y,d.z,150);
     let t=w.t, hitU=null, head=false;
-    const cands=[PLAYER_T, ...allies.filter(a=>a.alive), ...hostages.filter(h=>h.alive)];
+    const cands=[...foesOfEnemies(), ...hostages.filter(h=>h.alive)];
     for(const u of cands){ if(u===PLAYER_T && !player.alive) continue; const sp=shotSpheres(u);
       for(const [x,y,z,r,mult] of sp){ const tt=raySphere(o,d,{x,y,z},r); if(tt>=0&&tt<t){ t=tt; hitU=u; head=mult>1; } } }
     const end=o.clone().addScaledVector(d,t);
     if(p===0 || Math.random()<0.3) addTracer(o,end);
     const dmg=e.T.dmg*D.dmg*(head?1.6:1);
-    if(hitU===PLAYER_T) damagePlayer(dmg, e.pos, null);
+    if(hitU===PLAYER_T) damagePlayer(dmg, e.pos, isTdm()?'bot':null);
+    else if(hitU && hitU.peer){ hitRemoteByBot(hitU, dmg); bloodFx(end,d); }
     else if(hitU){ damageUnit(hitU, dmg, d); }
     else if(w.t<150){ impactFx(end,w.n); if(Math.random()<0.5) addDecal(end,w.n); if(end.distanceTo(eye)<3) AU.play('ric',end); }
   }
@@ -2443,7 +2642,13 @@ function damageUnit(u, dm, dir){
     if(u.kind==='hostage' && state.mode==='campaign' && state.mission==='rescue' && state.phase==='playing'){ feed(`<span style="color:#ff8a7a">Con tin ${esc(u.name)} đã hy sinh</span>`); state.phase='end'; setTimeout(()=>showEnd(false,'Con tin đã hy sinh. Nhiệm vụ thất bại.'),1200); } }
 }
 function allyShoot(a, e, dist){
-  soldierShot(a.model); const m=a.model; m.group.updateMatrixWorld(true);
+  if(e===PLAYER_T || e.peer){ soldierShot(a.model); a.shotSeq=(a.shotSeq||0)+1; const m=a.model; m.group.updateMatrixWorld(true); const o=m.gun.localToWorld(m.muzzle.clone());
+    const tp=tgtPos(e); const d=tp.clone().sub(o).normalize(); const sp=0.06*(1+dist*0.012); d.x+=rand(-1,1)*sp; d.y+=rand(-1,1)*sp*0.6; d.z+=rand(-1,1)*sp; d.normalize();
+    AU.play(MAPDEF.year==='1954'?'k54':'ak', o); const w=raycast(o.x,o.y,o.z,d.x,d.y,d.z,150); let t=w.t, hit=false, head=false;
+    for(const [x,y,z,r,mult] of shotSpheres(e)){ const tt=raySphere(o,d,{x,y,z},r); if(tt>=0&&tt<t){ t=tt; hit=true; head=mult>1; } }
+    const end=o.clone().addScaledVector(d,t); addTracer(o,end); const dmg=Math.round(13*(head?1.6:1));
+    if(hit){ if(e===PLAYER_T) damagePlayer(dmg, a.pos, 'bot'); else { hitRemoteByBot(e, dmg); bloodFx(end,d); } } else if(w.t<150) impactFx(end,w.n); return; }
+  soldierShot(a.model); a.shotSeq=(a.shotSeq||0)+1; const m=a.model; m.group.updateMatrixWorld(true);
   const o=m.gun.localToWorld(m.muzzle.clone()); const s=e.T.scale||1;
   const target=new V3(e.pos.x, e.pos.y+1.15*s, e.pos.z); const d=target.clone().sub(o).normalize();
   const spread=0.05*(1+dist*0.012); d.x+=rand(-1,1)*spread; d.y+=rand(-1,1)*spread*0.6; d.z+=rand(-1,1)*spread; d.normalize();
@@ -2456,29 +2661,30 @@ function allyShoot(a, e, dist){
 }
 const FOLLOW=[]; for(let i=0;i<10;i++){ const r=Math.floor(i/2); FOLLOW.push([(i%2?1:-1)*(1.5+(r%2)*0.6), 2.2+r*1.7]); }
 function updateAllies(dt){
-  const sy=Math.sin(player.yaw), cy=Math.cos(player.yaw); const modeAI = state.mission==='base'||state.mission==='bunker';
+  const sy=Math.sin(player.yaw), cy=Math.cos(player.yaw); const modeAI = state.mission==='base'||state.mission==='bunker'||state.mission==='tdm'; const TD=isTdm();
   for(let i=allies.length-1;i>=0;i--){ const a=allies[i], m=a.model;
     if(!a.alive){ deathAnim(a,dt);
       if(a.down){ a.downT-=dt; if(a.downT<=0){ a.down=false; a.respT = modeAI?RESPAWN_T:-1; feed(`<span style="color:#ff8a7a">Đồng đội ${esc(a.name)} hy sinh</span>`); } }
-      else if(a.respT>0){ a.respT-=dt; if(a.respT<=0){ if(state.mission==='bunker'){ if(state.tickets<=0){ a.respT=-1; continue; } state.tickets--; } reviveUnit(a, respawnPointVN()); } }
+      else if(a.respT>0){ a.respT-=dt; if(a.respT<=0){ if(TD){ reviveUnit(a, pick(spawnP)); continue; } if(state.mission==='bunker'){ if(state.tickets<=0){ a.respT=-1; continue; } state.tickets--; } reviveUnit(a, respawnPointVN()); } }
       continue; }
     const aEye=unitEye(a);
-    a.tT-=dt; if(a.tT<=0){ a.tT=0.35; a.target=null; let bd=40; for(const e of enemies){ if(!e.alive) continue; const d=Math.hypot(e.pos.x-a.pos.x,e.pos.z-a.pos.z); if(d<bd && losClear(aEye, unitEye(e))){ bd=d; a.target=e; } } }
-    if(a.target && !a.target.alive) a.target=null;
-    const escort = !modeAI || a.role==='escort';
+    a.tT-=dt; if(a.tT<=0){ a.tT=0.35; a.target=null; let bd=40; for(const e of (TD?foesOfAllies():enemies)){ if(!tgtAlive(e)) continue; const ep=posOf(e); const d=Math.hypot(ep.x-a.pos.x,ep.z-a.pos.z); if(d<bd && losClear(aEye, e===PLAYER_T?new V3(player.pos.x,player.pos.y+player.eye,player.pos.z):unitEye(e))){ bd=d; a.target=e; } } }
+    if(a.target && !tgtAlive(a.target)) a.target=null;
+    const escort = !TD && (!modeAI || a.role==='escort');
     const [fx,fz]=FOLLOW[a.slot%FOLLOW.length]; const tx=player.pos.x+fx*cy+fz*sy, tz=player.pos.z-fx*sy+fz*cy;
     let mx=0,mz=0,spd=4.6,faceYaw=a.yaw;
     const dp=Math.hypot(player.pos.x-a.pos.x,player.pos.z-a.pos.z);
-    if(a.target){ const e=a.target, dx=e.pos.x-a.pos.x, dz=e.pos.z-a.pos.z, dist=Math.hypot(dx,dz);
-      faceYaw=Math.atan2(dx,dz); a.aimPitch=Math.atan2((e.pos.y+1.15)-(a.pos.y+1.45), dist);
+    if(a.target){ const e=a.target, ep=posOf(e), dx=ep.x-a.pos.x, dz=ep.z-a.pos.z, dist=Math.hypot(dx,dz);
+      faceYaw=Math.atan2(dx,dz); a.aimPitch=Math.atan2((ep.y+1.15)-(a.pos.y+1.45), dist);
       if(escort && dp>9 && player.alive){ const st=steerTo(a,tx,tz,dp>7); mx=st[0]; mz=st[1]; spd=3.6; }
-      else if(!escort && dist>24 && !unitArtTick(a)){ const st=steerTo(a,e.pos.x,e.pos.z,true,flowTo(e.pos.x,e.pos.z)); mx=st[0]; mz=st[1]; spd=3.4; }
+      else if(!escort && dist>24 && !unitArtTick(a)){ const st=steerTo(a,ep.x,ep.z,true,flowTo(ep.x,ep.z)); mx=st[0]; mz=st[1]; spd=3.4; }
       else { a.strafeT-=dt; if(a.strafeT<=0){ a.strafeT=rand(1,2.4); a.strafe=Math.random()<0.5?-1:(Math.random()<0.5?1:0); } mx=-dz/dist*a.strafe*0.5; mz=dx/dist*a.strafe*0.5; spd=2; }
       if(a.burst<=0){ a.cool-=dt; if(a.cool<=0){ a.burst=3+Math.floor(rand(0,3)); a.brT=0; } }
       if(a.burst>0){ a.brT-=dt; if(a.brT<=0){ a.brT=0.12; a.burst--; allyShoot(a,e,dist); if(a.burst<=0) a.cool=rand(0.7,1.5); } }
-      if(state.mode==='campaign'){ if(a.nadeCD===undefined) a.nadeCD=rand(6,14); a.nadeCD-=dt; if(a.nadeCD<=0 && dist>7 && dist<20){ a.nadeCD=rand(14,24); botThrow(a, new V3(e.pos.x,0.2,e.pos.z), 'a'); } }
+      if(state.mode==='campaign'){ if(a.nadeCD===undefined) a.nadeCD=rand(6,14); a.nadeCD-=dt; if(a.nadeCD<=0 && dist>7 && dist<20){ a.nadeCD=rand(14,24); botThrow(a, new V3(ep.x,0.2,ep.z), 'a'); } }
     } else { a.aimPitch=0;
       if(escort){ if(player.alive){ const st=steerTo(a,tx,tz, dp>7); if(st[2]>1.2){ mx=st[0]; mz=st[1]; spd = st[2]>6?5.6:3.6; } if(a.speed>0.4) faceYaw=Math.atan2(a.vel.x,a.vel.z); else faceYaw=player.yaw+Math.PI; } }
+      else if(TD){ const g=huntMove(a, foesOfAllies(), dt); mx=g[0]; mz=g[1]; spd=4.4; if(a.speed>0.4) faceYaw=Math.atan2(a.vel.x,a.vel.z); }
       else if(unitArtTick(a)) faceYaw=a.art.yaw;
       else { const hy=state.mission==='base'?botHQAttack(a,'vn',dt):null; const g=goalMove(a,'vn',dt);
         if(hy!==null){ faceYaw=hy; mx=g[0]*0.3; mz=g[1]*0.3; } else { mx=g[0]; mz=g[1]; spd=g[2]>8?5.2:3.8; if(a.speed>0.4) faceYaw=Math.atan2(a.vel.x,a.vel.z); } }
@@ -2539,11 +2745,13 @@ function assignRole(u, side, i){
 function activeCap(){ return capCells[Math.min(state.capIdx||0, capCells.length-1)]; }
 function pickGoal(u, side){
   const W=COLS*CELL, D=ROWS*CELL; let g=null; const own=hqOf(side), foe=hqOf(foeSide(side));
+  if(state.defend && side==='en' && u.role!=='art' && Math.random()<0.8) u.role='attack';
   if(u.role==='attack' && foe && !foe.dead) g=openNear(foe.x,foe.z,4,9);
   else if(u.role==='defend' && own) g=openNear(own.x,own.z,5,13);
   else if(u.role==='hold'){ const cp=capCells[Math.max(u.cap||0, state.capIdx||0)]||activeCap(); if(cp) g=openNear(cp.x,cp.z,1,7); }
   else if(u.role==='push'){ const cp=activeCap(); if(cp) g=openNear(cp.x,cp.z,0,4.5); }
   else if(u.role==='hunt'){ g={x:player.pos.x,z:player.pos.z}; }
+  if(state.defend && side==='en' && u.role!=='art' && own && !g){ const vh=hqOf('vn'); if(vh) g=openNear(vh.x,vh.z,3,10); }
   else if(u.role==='art' && u.art){ g=openNear(u.art.x,u.art.z,1.6,2.4); }
   if(!g){ for(let i=0;i<30;i++){ const x=rand(W*0.22,W*0.78), z=rand(CELL,D-CELL); if(openAt(x,z)){ g={x,z}; break; } } }
   u.goal=g||{x:u.pos.x,z:u.pos.z}; u.goalT=u.role==='hunt'?rand(3,6):rand(16,30); u.dwell=0; u.dwellMax=rand(2,7);
@@ -2616,7 +2824,8 @@ function buildHQs(){
 const MIN_MATCH=300; // giây
 function damageHQ(h, dm, by){
   if(!h || h.dead || state.phase!=='playing') return;
-  const floor = (state.matchT||0) < MIN_MATCH ? h.max*0.15 : 0; // xe được gia cố: chưa thể bị phá trong 5 phút đầu
+  if(state.defend && h.side==='en') return;
+  const floor = !state.defend && (state.matchT||0) < MIN_MATCH ? h.max*0.15 : 0; // xe được gia cố: chưa thể bị phá trong 5 phút đầu
   if(floor && h.hp-dm<=floor){ h.hp=floor; if(!h.shieldMsg){ h.shieldMsg=true; feed(`<span style="color:#ffd34a">Xe chỉ huy ${h.side==='vn'?'của ta':'địch'} đang được gia cố — chỉ phá được sau phút thứ 5</span>`); } return; }
   h.hp=Math.max(0,h.hp-dm);
   const f=h.hp/h.max;
@@ -2702,7 +2911,7 @@ function playerCharge(){
   plantCharge(p,'p'); toast('Đã đặt bộc phá — chạy xa! (5 giây)'); AU.play('reload');
 }
 let SHELL_GLOW=null;
-function fireShell(o, v, owner, art){
+function fireShell(o, v, owner, art, quiet){
   const m=new THREE.Group(); const body=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.075,0.42,10).rotateX(Math.PI/2),M.brass||M.darkMetal); m.add(body);
   if(!SHELL_GLOW) SHELL_GLOW=new THREE.SpriteMaterial({map:TEX.soft,color:0xffb050,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false});
   const gl=new THREE.Sprite(SHELL_GLOW); gl.scale.set(1.1,1.1,1); gl.userData.noAO=true; m.add(gl);
@@ -2712,6 +2921,7 @@ function fireShell(o, v, owner, art){
   const tg=new THREE.BufferGeometry(); tg.setAttribute('position',new THREE.BufferAttribute(pos,3)); tg.setAttribute('color',new THREE.BufferAttribute(col,3));
   const trail=new THREE.Line(tg,new THREE.LineBasicMaterial({vertexColors:true,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false})); trail.frustumCulled=false; trail.userData.noAO=true; scene.add(trail);
   const sh={pos:o.clone(), vel:v.clone(), owner, mesh:m, trail, tn:0, life:12, whistled:false, t:0, art}; shells.push(sh);
+  if(quiet) return sh;
   // lửa đầu nòng: quả cầu lửa kéo dài theo hướng bắn, chỉ loé 1-2 khung hình
   const d=v.clone().normalize(); AU.play('cannon',o); fxLight2.position.copy(o); fxLight2.intensity=60; fxLight2.userData.t=0.12;
   for(let i=0;i<34;i++){ const k=rand(0,1); fire.emit(o.clone().addScaledVector(d,k*1.6),[d.x*rand(6,22)+rand(-2,2),d.y*rand(6,22)+rand(-1,2),d.z*rand(6,22)+rand(-2,2)],rand(0.08,0.22),[1,rand(0.6,0.85),0.3]); }
@@ -2722,6 +2932,7 @@ function fireShell(o, v, owner, art){
   for(let i=0;i<30;i++){ const a=i/30*6.283+rand(-.1,.1), sp=rand(5,9); dustFx.emit(gp.clone().add(new V3(Math.cos(a)*1.2,0,Math.sin(a)*1.2)),[Math.cos(a)*sp,rand(0.2,1),Math.sin(a)*sp],rand(0.8,1.6),[0.6,0.5,0.4]); }
   if(art){ art.recoil=1; art.smokeT=2.5; }
   if(owner==='p') startShellCam(sh);
+  return sh;
 }
 // camera bám theo đạn pháo (chỉ đạn của người chơi): thấy đạn rời nòng, bay vòng cầu, rơi chậm và nổ
 const shellCam={on:false, sh:null, hold:0, pos:new V3(), look:new V3(), impact:null};
@@ -2791,7 +3002,7 @@ function updateProjectiles(dt){
     if(c.t<=0){ explode(c.pos.clone().add(new V3(0,0.3,0)), c.owner, {R:7.5, dmg:280, hqDmg:1400}); state.shake=Math.max(state.shake,0.9); scene.remove(c.mesh); charges.splice(i,1); } }
   for(let i=shells.length-1;i>=0;i--){ const s=shells[i]; s.life-=dt; s.t+=dt; s.vel.y-=9.8*dt; const sp=s.vel.length(), step=sp*dt, d=s.vel.clone().divideScalar(sp);
     const w=raycast(s.pos.x,s.pos.y,s.pos.z,d.x,d.y,d.z,step);
-    if(w.t<step || s.life<=0 || s.pos.y<0){ const p=s.pos.clone().addScaledVector(d,Math.min(w.t,step)); p.y=Math.max(p.y,0.2); explode(p, s.owner, {R:7, dmg:200, hqDmg:450}); shellImpactFx(p); scene.remove(s.mesh); scene.remove(s.trail); s.trail.geometry.dispose(); shells.splice(i,1); continue; }
+    if(w.t<step || s.life<=0 || s.pos.y<0){ const p=s.pos.clone().addScaledVector(d,Math.min(w.t,step)); p.y=Math.max(p.y,0.2); explode(p, s.owner, {R:s.R||8, dmg:s.dmg||280, hqDmg:450}); shellImpactFx(p); if(s.bomb) state.shake=Math.max(state.shake,0.8); scene.remove(s.mesh); scene.remove(s.trail); s.trail.geometry.dispose(); shells.splice(i,1); continue; }
     s.pos.addScaledVector(d,step); s.mesh.position.copy(s.pos); s.mesh.lookAt(s.pos.clone().add(d));
     if(Math.random()<0.6) smoke.emit(s.pos,[rand(-.2,.2),rand(0,.3),rand(-.2,.2)],rand(0.8,1.6),[0.62,0.6,0.57]);
     // vệt sáng: dịch các điểm, đầu sáng cam, đuôi mờ dần
@@ -2824,16 +3035,23 @@ function mountArt(a){ player.onArt=a; a.gunner=PLAYER_T; player.crouch=false; pl
 const artShots=[];
 function openArtMap(){ if(!player.onArt) return; const cv=$('artCv'), k=Math.min(innerWidth*0.94/(COLS*CELL), innerHeight*0.7/(ROWS*CELL)); cv.width=Math.round(COLS*CELL*k); cv.height=Math.round(ROWS*CELL*k); cv.dataset.k=k;
   $('artMap').classList.remove('hidden'); player.fireHeld=false; if(document.pointerLockElement) document.exitPointerLock(); drawArtMap(); }
-function closeArtMap(){ if($('artMap').classList.contains('hidden')) return; $('artMap').classList.add('hidden'); if(!IS_TOUCH && !lookFallback && state.phase==='playing' && player.onArt) requestLock(); }
+function closeArtMap(){ if($('artMap').classList.contains('hidden')) return; $('artMap').classList.add('hidden'); if(supMode){ closeSupMap(); if(!IS_TOUCH && !lookFallback && state.phase==='playing') requestLock(); return; } if(!IS_TOUCH && !lookFallback && state.phase==='playing' && player.onArt) requestLock(); }
 function drawArtMap(){ const cv=$('artCv'), x=cv.getContext('2d'), k=+cv.dataset.k; x.fillStyle='#1d1a14'; x.fillRect(0,0,cv.width,cv.height); x.drawImage(miniBase,0,0,cv.width,cv.height);
   if(state.mission==='base'){ x.fillStyle='rgba(87,224,138,.18)'; x.fillRect(CELL*k,0,9*CELL*k,cv.height); x.fillStyle='rgba(255,70,50,.2)'; x.fillRect(cv.width-10*CELL*k,0,9*CELL*k,cv.height); }
   for(const h of hqs){ x.fillStyle=h.dead?'#444':'#ff2a1a'; x.fillRect(h.x0*k,h.z0*k,(h.x1-h.x0)*k,(h.z1-h.z0)*k); x.strokeStyle=h.side==='vn'?'#57e08a':'#fff'; x.lineWidth=2; x.strokeRect(h.x0*k,h.z0*k,(h.x1-h.x0)*k,(h.z1-h.z0)*k); }
   if(state.mission==='bunker') capCells.forEach((c,i)=>{ x.strokeStyle=i<state.capIdx?'#57e08a':'#ff5a40'; x.lineWidth=2; x.beginPath(); x.arc(c.x*k,c.z*k,6*k,0,7); x.stroke(); });
   for(const s of artShots){ const a=clamp(1-(state.time-s.t)/20,0,1); if(a<=0) continue; x.strokeStyle=`rgba(255,200,60,${a})`; x.lineWidth=2; x.beginPath(); x.arc(s.x*k,s.z*k,7*k,0,7); x.stroke(); x.beginPath(); x.moveTo(s.x*k-5,s.z*k-5); x.lineTo(s.x*k+5,s.z*k+5); x.moveTo(s.x*k+5,s.z*k-5); x.lineTo(s.x*k-5,s.z*k+5); x.stroke(); }
   const a=player.onArt; if(a){ x.fillStyle='#57e08a'; x.beginPath(); x.arc(a.x*k,a.z*k,6,0,7); x.fill(); x.strokeStyle='rgba(87,224,138,.35)'; x.beginPath(); x.arc(a.x*k,a.z*k,170*k,0,7); x.stroke(); }
+  if(supMode){ x.fillStyle='#57e08a'; for(const u of allies){ if(!u.alive) continue; x.beginPath(); x.arc(u.pos.x*k,u.pos.z*k,3,0,7); x.fill(); }
+    x.fillStyle='#ffd34a'; x.beginPath(); x.arc(player.pos.x*k,player.pos.z*k,6,0,7); x.fill(); x.strokeStyle='#ffd34a'; x.lineWidth=1.5; x.beginPath(); x.arc(player.pos.x*k,player.pos.z*k,14*k,0,7); x.stroke();
+    const L=state.support||[]; document.querySelectorAll('#supSel button').forEach(b=>{ b.classList.toggle('on',b.dataset.t===supMode); b.querySelector('b').textContent='×'+L.filter(t=>t===b.dataset.t).length; });
+    $('artInfo').textContent = supMode==='phao' ? 'Pháo binh: 9 quả đạn rơi trong bán kính ~9m quanh điểm chọn' : 'Không kích: máy bay thả 8 quả bom thành một đường dài ~40m qua điểm chọn'; return; }
   $('artInfo').textContent = a ? (a.queued?'Đang xoay nòng về mục tiêu…':a.cool>0?`Pháo thủ đang nạp đạn… ${a.cool.toFixed(1)}s`:'Sẵn sàng — chạm vào bản đồ để bắn') : ''; }
 function fireArtNow(a, v){ a.cool=3.2; fireShell(artMuzzle(a), v, 'p', a); state.shake=Math.max(state.shake,0.7); player.kick=1; setTimeout(()=>{ if(arts.includes(a)) artReload(a); },900); }
-function artMapFire(ev){ const a=player.onArt; if(!a) return; ev.preventDefault(); const cv=$('artCv'), r=cv.getBoundingClientRect(), k=+cv.dataset.k;
+function artMapFire(ev){ if(supMode){ ev.preventDefault(); const cv=$('artCv'), r=cv.getBoundingClientRect(), k=+cv.dataset.k; const pt=ev.touches?ev.touches[0]:ev;
+    const wx=(pt.clientX-r.left)*(cv.width/r.width)/k, wz=(pt.clientY-r.top)*(cv.height/r.height)/k; const d=Math.hypot(wx-player.pos.x,wz-player.pos.z);
+    if(d<14){ toast('Quá gần vị trí của bạn — nguy hiểm!'); return; } const t=supMode; closeSupMap(); $('artMap').classList.add('hidden'); if(!IS_TOUCH && !lookFallback && state.phase==='playing') requestLock(); callSupport(t, wx, wz); return; }
+  const a=player.onArt; if(!a) return; ev.preventDefault(); const cv=$('artCv'), r=cv.getBoundingClientRect(), k=+cv.dataset.k;
   const pt=ev.touches?ev.touches[0]:ev; const wx=(pt.clientX-r.left)*(cv.width/r.width)/k, wz=(pt.clientY-r.top)*(cv.height/r.height)/k;
   if(a.cool>0){ AU.play('empty'); return; } const d=Math.hypot(wx-a.x,wz-a.z); if(d<12){ toast('Quá gần khẩu pháo!'); return; } if(d>170){ toast('Ngoài tầm bắn (170m)'); return; }
   const tgt=new V3(wx+rand(-2.5,2.5),0.3,wz+rand(-2.5,2.5)); const o=artMuzzle(a); const t=clamp(d/32,1.4,5.5); const g=9.8;
@@ -2885,7 +3103,55 @@ function spawnCrate(p, y){ const type=Math.random()<0.5?'giap':'phao'; const m=c
   const c={x:p.x,z:p.z,y,side:p.side,type,alive:true,landed:false,mesh:m}; crates.push(c);
   const pool = p.side==='vn' ? [allies, enemies] : [enemies, allies];
   for(const [k,arr] of pool.entries()){ let best=null,bd=1e9; for(const u of arr){ if(!u.alive||u.crate||u.role==='escort'||u.role==='art'||u.onArt) continue; const d=Math.hypot(u.pos.x-p.x,u.pos.z-p.z); if(d<bd){bd=d;best=u;} } if(best) best.crate=c; } }
+// v4.8: gói tiếp tế của ta = cả đội hồi đầy máu + áo giáp + một lượt CHI VIỆN (pháo binh hoặc không kích)
+function teamSupply(byName){
+  if(player.alive){ player.hp=100; player.armor=100; } for(const a of allies) if(a.alive) a.hp=Math.max(a.hp,180);
+  const s=player.ws[3]; if(s) s.res=Math.min(WEAPONS[3].maxRes,s.res+2);
+  const typ = (state.supN=(state.supN||0)+1)%2 ? 'phao' : 'air'; (state.support=state.support||[]).push(typ);
+  const P=$('supPanel'); P.querySelector('.h').textContent='✈ TIẾP TẾ ĐÃ VỀ'+(byName?' · '+byName+' nhận hàng':'')+' — TOÀN ĐỘI NHẬN:';
+  P.querySelector('.g').innerHTML=`<span><i>✚</i>HỒI ĐẦY MÁU</span><span><i>🛡</i>ÁO GIÁP 100</span><span><i>${typ==='phao'?'💥':'✈'}</i>${typ==='phao'?'CHI VIỆN PHÁO BINH':'KHÔNG KÍCH'}</span><span><i>▲</i>+2 ĐẠN B40</span>`;
+  P.classList.remove('hidden'); P.style.animation='none'; void P.offsetWidth; P.style.animation=''; clearTimeout(teamSupply.t); teamSupply.t=setTimeout(()=>P.classList.add('hidden'),5200);
+  AU.play('win'); updateSupBtn(); updateWeaponHUD();
+  feed(`<span style="color:#ffd34a">${typ==='phao'?'💥 Có 1 lượt CHI VIỆN PHÁO BINH':'✈ Có 1 lượt KHÔNG KÍCH'} — bấm ${IS_TOUCH?'nút CHI VIỆN':'<b>T</b>'} và chọn toạ độ</span>`);
+}
+function updateSupBtn(){ const L=state.support||[]; const b=$('bSup'); const show=L.length>0 && state.mode==='campaign' && state.phase==='playing'; b.classList.toggle('hidden',!show);
+  if(show){ const np=L.filter(t=>t==='phao').length, na=L.length-np; b.querySelector('small').textContent=[np?`PHÁO ×${np}`:'', na?`KHÔNG KÍCH ×${na}`:''].filter(Boolean).join(' · ')+(IS_TOUCH?'':' · phím T'); } }
+let supMode=null;
+function openSupMap(){ const L=state.support||[]; if(!L.length || state.phase!=='playing') return;
+  supMode = L.includes(supMode) ? supMode : L[0];
+  const cv=$('artCv'), k=Math.min(innerWidth*0.94/(COLS*CELL), innerHeight*0.64/(ROWS*CELL)); cv.width=Math.round(COLS*CELL*k); cv.height=Math.round(ROWS*CELL*k); cv.dataset.k=k;
+  $('artHd').textContent='CHỌN TOẠ ĐỘ CHI VIỆN · địch không hiện trên bản đồ — hãy phán đoán!'; $('supSel').classList.remove('hidden');
+  $('artMap').classList.remove('hidden'); player.fireHeld=false; if(document.pointerLockElement) document.exitPointerLock(); drawArtMap(); }
+function closeSupMap(){ supMode=null; $('supSel').classList.add('hidden'); $('artHd').textContent='CHỌN ĐIỂM TRÊN BẢN ĐỒ ĐỂ NÃ PHÁO · địch không hiện — hãy phán đoán!'; }
+$('supSel').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; if((state.support||[]).includes(b.dataset.t)){ supMode=b.dataset.t; drawArtMap(); } else toast('Chưa có lượt '+(b.dataset.t==='phao'?'pháo binh':'không kích')+' — nhặt thêm gói tiếp tế đỏ'); });
+const strikes=[];
+function callSupport(type, x, z){
+  const L=state.support||[]; const i=L.indexOf(type); if(i<0) return; L.splice(i,1); updateSupBtn();
+  const st={type, x, z, t:0, n:0, smokeT:9}; strikes.push(st);
+  banner(type==='phao'?'💥 PHÁO BINH ĐANG BẮN CHI VIỆN':'✈ KHÔNG KÍCH ĐANG TỚI', 'Mục tiêu đánh dấu khói đỏ · đồng đội tránh xa khu vực!', 4);
+  feed(`<span style="color:#ff8a5a">${type==='phao'?'💥 Pháo binh':'✈ Máy bay'} nhận toạ độ — ${Math.round(Math.hypot(x-player.pos.x,z-player.pos.z))}m</span>`);
+  if(type==='air'){ const p=buildPlane(); p.traverse(o=>{ if(o.isMesh && o.material) { o.material=o.material.clone(); o.material.color&&o.material.color.multiplyScalar(0.7); } }); p.scale.setScalar(1.15);
+    const dir=new V3(1,0,rand(-0.25,0.25)).normalize(); st.dir=dir; st.plane=p; p.position.set(x-dir.x*170,58,z-dir.z*170); p.rotation.y=-Math.atan2(dir.z,dir.x); scene.add(p); AU.play('wave'); }
+}
+function updateStrikes(dt){
+  for(let i=strikes.length-1;i>=0;i--){ const st=strikes[i]; st.t+=dt;
+    if(st.smokeT>0){ st.smokeT-=dt; if(Math.random()<0.6) smoke.emit(new V3(st.x+rand(-.3,.3),0.3,st.z+rand(-.3,.3)),[rand(-.4,.4),rand(1.4,2.6),rand(-.4,.4)],rand(2.5,4),[0.75,0.16,0.1]); }
+    if(st.type==='phao'){
+      if(st.t>2.6 && st.n<9 && st.t>2.6+st.n*0.55){ st.n++; const tx=st.x+rand(-9,9), tz=st.z+rand(-9,9);
+        const sh=fireShell(new V3(tx-12,140,tz-6), new V3(12/2.1*0.9,-68,6/2.1*0.9), 'p', null, true); if(sh){ sh.R=8; sh.dmg=280; } }
+      if(st.n>=9 && st.t>9){ strikes.splice(i,1); }
+    } else {
+      const p=st.plane; if(p){ p.position.addScaledVector(st.dir, dt*62); p.rotation.z=Math.sin(st.t*0.8)*0.05;
+        const along=(p.position.x-st.x)*st.dir.x+(p.position.z-st.z)*st.dir.z;
+        if(along>-90 && st.n<8 && along>-90+st.n*5.5){ st.n++; const sh=fireShell(p.position.clone().add(new V3(0,-1.6,0)), st.dir.clone().multiplyScalar(25).add(new V3(0,-6,0)), 'p', null, true);
+          if(sh){ sh.R=10; sh.dmg=320; sh.bomb=true; sh.mesh.scale.setScalar(2.2); } }
+        if(along>220){ scene.remove(p); st.plane=null; } }
+      if(!st.plane && st.t>14) strikes.splice(i,1);
+    }
+  }
+}
 function takeCrate(c, who){ c.alive=false; scene.remove(c.mesh); for(const u of [...allies,...enemies]) if(u.crate===c) u.crate=null;
+  if(who==='player' && c.side==='vn'){ AU.play('pickup'); teamSupply(); return; }
   if(who==='player'){ if(c.type==='giap'){ player.armor=100; toast('<b style="color:#7fb0d6">GÓI TIẾP TẾ: ÁO GIÁP 100</b>'); } else { const s=player.ws[3]; s.res=Math.min(WEAPONS[3].maxRes,s.res+3); player.nades+=2; toast('<b style="color:#ffd34a">GÓI TIẾP TẾ: +3 ĐẠN B40, +2 LỰU ĐẠN</b>'); } AU.play('pickup'); updateWeaponHUD(); } }
 function smashCrate(c, by){ c.alive=false; for(const u of [...allies,...enemies]) if(u.crate===c) u.crate=null;
   for(let i=0;i<16;i++) sparks.emit(new V3(c.x,0.5,c.z),[rand(-4,4),rand(1,5),rand(-4,4)],rand(0.3,0.7),[1,0.8,0.4]); for(let i=0;i<10;i++) smoke.emit(new V3(c.x,0.4,c.z),[rand(-1,1),rand(0.5,1.5),rand(-1,1)],rand(1,2),[0.4,0.38,0.35]);
@@ -2904,13 +3170,16 @@ function updateSupply(dt){
       const stomp = state.time-(player.landT||-9)<0.25 && (player.landV||0)<-3.5;
       if(c.side==='en' && stomp) smashCrate(c,'player'); else takeCrate(c,'player'); continue; }
     for(const u of [...allies,...enemies]){ if(!u.alive) continue; if(Math.hypot(u.pos.x-c.x,u.pos.z-c.z)<1.2){ const us=u.kind==='enemy'?'en':'vn';
-        if(us===c.side){ c.alive=false; scene.remove(c.mesh); u.hp=Math.max(u.hp, u.kind==='enemy'?u.T.hp*1.3:180); feed(us==='vn'?'<span style="color:#8fd18a">Đồng đội đã nhận gói tiếp tế</span>':'<span style="color:#ff8a7a">Địch đã nhận gói tiếp tế</span>'); for(const o of [...allies,...enemies]) if(o.crate===c) o.crate=null; }
+        if(us===c.side){ c.alive=false; scene.remove(c.mesh); u.hp=Math.max(u.hp, u.kind==='enemy'?u.T.hp*1.3:180); for(const o of [...allies,...enemies]) if(o.crate===c) o.crate=null;
+          if(us==='vn') teamSupply(u.name); else { for(const o of enemies) if(o.alive) o.hp=Math.max(o.hp,o.T.hp*1.3); feed('<span style="color:#ff8a7a">Địch đã nhận gói tiếp tế — toàn đội địch hồi máu</span>'); } }
         else smashCrate(c, us); break; } } }
 }
 
 // ---- LÔ CỐT: chiếm lần lượt từng điểm
 function flagTex(kind){ const c=mkCanvas(96,64), x=c.getContext('2d');
   if(kind==='vn'){ x.fillStyle='#da251d'; x.fillRect(0,0,96,64); x.fillStyle='#ffde00'; x.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, r=i%2?9:22; x.lineTo(48+Math.cos(a)*r,32+Math.sin(a)*r); } x.fill(); }
+  else if(kind==='kh'){ x.fillStyle='#cf2a27'; x.fillRect(0,0,96,64); x.fillStyle='#f5d33a'; x.fillRect(22,36,52,9); for(const [tx,h] of [[28,14],[44,22],[60,14]]){ x.fillRect(tx,36-h,10,h); x.beginPath(); x.moveTo(tx,36-h); x.lineTo(tx+5,36-h-8); x.lineTo(tx+10,36-h); x.fill(); } }
+  else if(kind==='cn'){ x.fillStyle='#de2910'; x.fillRect(0,0,96,64); x.fillStyle='#ffde00'; const st=(cx,cy,r)=>{ x.beginPath(); for(let i=0;i<10;i++){ const a=-Math.PI/2+i*Math.PI/5, rr=i%2?r*0.4:r; x.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr); } x.fill(); }; st(16,16,10); st(32,6,3.2); st(38,13,3.2); st(38,22,3.2); st(32,29,3.2); }
   else if(kind==='fr'){ x.fillStyle='#0055a4'; x.fillRect(0,0,32,64); x.fillStyle='#fff'; x.fillRect(32,0,32,64); x.fillStyle='#ef4135'; x.fillRect(64,0,32,64); }
   else { for(let i=0;i<13;i++){ x.fillStyle=i%2?'#fff':'#b22234'; x.fillRect(0,i*64/13,96,64/13+1); } x.fillStyle='#3c3b6e'; x.fillRect(0,0,40,34); x.fillStyle='#fff'; for(let i=0;i<4;i++) for(let j=0;j<5;j++) x.fillRect(4+j*7.5,4+i*7.5,2.2,2.2); }
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t; }
@@ -2941,8 +3210,12 @@ function updateBunker(dt){
   const alive=enemies.filter(e=>e.alive).length+(state.enQ?state.enQ.length:0);
   if(alive<state.enMax) state.enQ.push(RESPAWN_T+2);
 }
+const DEFEND_T=300;
 function updateBase(dt){
   updateHQs(dt);
+  if(state.defend){ state.enMax=Math.min(settings.quality==='low'?12:16, 8+Math.floor((state.matchT||0)/40)*2);
+    const left=DEFEND_T-(state.matchT||0); if(left<=0 && state.phase==='playing'){ state.phase='end'; AU.play('win'); showMsg('TỬ THỦ THÀNH CÔNG','Trận địa vẫn đứng vững!',3); setTimeout(()=>showEnd(true,'Đã giữ vững trận địa suốt 5 phút trước các đợt xung phong.'),1800); return; }
+    const wv=Math.floor((state.matchT||0)/60); if(wv>(state.defWave||0)){ state.defWave=wv; banner('⚠ ĐỢT XUNG PHONG THỨ '+(wv+1), 'Địch tăng quân — giữ vững xe chỉ huy!',3); } }
   const alive=enemies.filter(e=>e.alive).length+(state.enQ?state.enQ.length:0);
   if(alive<state.enMax) state.enQ.push(RESPAWN_T);
 }
@@ -3095,7 +3368,7 @@ addEventListener('keydown',e=>{
   if(e.code==='KeyQ') switchWeapon(player.prev);
   if(e.code==='Tab'){ e.preventDefault(); showBoard(true); }
   const n=parseInt(e.key); if(n>=1&&n<=5) switchWeapon(n-1);
-  if(e.code==='KeyG') playerThrow(); if(e.code==='KeyX') playerCharge(); if(e.code==='KeyH') useMed(); if(e.code==='KeyZ') toggleProne(); if(e.code==='KeyB'){ e.preventDefault(); shopOpen(); }
+  if(e.code==='KeyG') playerThrow(); if(e.code==='KeyX') playerCharge(); if(e.code==='KeyH') useMed(); if(e.code==='KeyZ') toggleProne(); if(e.code==='KeyB'){ e.preventDefault(); shopOpen(); } if(e.code==='KeyT' && state.mode==='campaign'){ e.preventDefault(); openSupMap(); }
   if(e.code==='KeyE' && shellCam.on){ endShellCam(); player.needERelease=true; return; }
   if(e.code==='KeyE' && player.onArt && !e.repeat && !player.needERelease){ dismountArt(); keys.KeyE=false; }
   if(e.code==='KeyM' && player.onArt){ if($('artMap').classList.contains('hidden')) openArtMap(); else closeArtMap(); }
@@ -3113,7 +3386,7 @@ addEventListener('mouseup',e=>{ if(e.button===0){ player.fireHeld=false; player.
 addEventListener('mousemove',e=>{ if(state.phase!=='playing') return; if(pointerLocked || (lookFallback && e.buttons)){ lookDX+=e.movementX||0; lookDY+=e.movementY||0; } });
 addEventListener('wheel',e=>{ if(state.phase!=='playing') return; const d=Math.sign(e.deltaY); switchWeapon(nextWeapon(d,false)); },{passive:true});
 function requestLock(){ try{ const p=canvas.requestPointerLock({unadjustedMovement:true}); if(p&&p.catch) p.catch(()=>{ try{ const q=canvas.requestPointerLock(); if(q&&q.catch) q.catch(()=>{lookFallback=true;}); }catch(e){ lookFallback=true; } }); }catch(err){ try{ canvas.requestPointerLock(); }catch(e){ lookFallback=true; } } }
-document.addEventListener('pointerlockchange',()=>{ const was=pointerLocked; pointerLocked=document.pointerLockElement===canvas; if(was && !pointerLocked && state.phase==='playing' && !IS_TOUCH && !chatOpen) openPause(); });
+document.addEventListener('pointerlockchange',()=>{ const was=pointerLocked; pointerLocked=document.pointerLockElement===canvas; if(was && !pointerLocked && state.phase==='playing' && !IS_TOUCH && !chatOpen && $('artMap').classList.contains('hidden')) openPause(); });
 document.addEventListener('pointerlockerror',()=>{ lookFallback=true; toast('Giữ chuột trái và kéo để ngắm'); });
 addEventListener('blur',()=>{ for(const k in keys) keys[k]=false; player.fireHeld=false; });
 
@@ -3141,7 +3414,7 @@ tbtn('bSwap',()=>switchWeapon(nextWeapon(1,true)));
 tbtn('bProne',()=>toggleProne());
 { const sk=e=>{ e.preventDefault(); e.stopPropagation(); endShellCam(); }; $('shellHud').addEventListener('touchstart',sk,{passive:false}); $('shellHud').addEventListener('mousedown',sk); }
 for(const [id,fn] of [['artMapB',()=>openArtMap()],['artExitB',()=>dismountArt()],['artMapClose',()=>closeArtMap()]]){ const b=$(id); b.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); fn(); },{passive:false}); b.addEventListener('click',e=>{ e.stopPropagation(); fn(); }); }
-$('artCv').addEventListener('touchstart',artMapFire,{passive:false}); $('artCv').addEventListener('mousedown',artMapFire); tbtn('bNade',()=>playerThrow()); tbtn('bCharge',()=>playerCharge()); tbtn('bHeal',()=>useMed()); tbtn('bShop',()=>shopOpen());
+$('artCv').addEventListener('touchstart',artMapFire,{passive:false}); $('artCv').addEventListener('mousedown',artMapFire); tbtn('bNade',()=>playerThrow()); tbtn('bCharge',()=>playerCharge()); tbtn('bHeal',()=>useMed()); tbtn('bShop',()=>shopOpen()); $('bSup').addEventListener('click',e=>{ e.preventDefault(); openSupMap(); }); $('bSup').addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); openSupMap(); },{passive:false});
 // nút NGỒI: chạm = ngồi/đứng, giữ 0,4 giây = nằm bò
 { const el=$('bCrouch'); let tm=null, long=false;
   el.addEventListener('touchstart',e=>{ e.preventDefault(); e.stopPropagation(); AU.init(); long=false; tm=setTimeout(()=>{ long=true; if(!player.prone) toggleProne(); syncStance(); },400); },{passive:false});
@@ -3209,11 +3482,14 @@ function meleeAttack(w){
   else { const r=raycast(o.x,o.y,o.z,d.x,d.y,d.z,w.range); if(r.t<w.range){ const p=o.clone().addScaledVector(d,r.t); impactFx(p,r.n); AU.play('impact'); } }
 }
 function findTarget(o,d,maxT){
-  let best={t:maxT,target:null,mult:1,kind:null};
-  for(const e of enemies){ if(!e.alive) continue; const s=e.T.scale||1;
+  let best={t:maxT,target:null,mult:1,kind:null}; const TD=isTdm(), US=TD&&player.side==='us';
+  const box=(u,kind,cr=1)=>{ for(const hb of [[1.62*cr,0.18,2.5,'head'],[1.15*cr,0.38,1,'body'],[0.55*cr,0.3,0.75,'leg']]){ const t=raySphere(o,d,{x:u.pos.x,y:u.pos.y+hb[0],z:u.pos.z},hb[1]); if(t>=0&&t<best.t) best={t,target:u,mult:hb[2],kind,part:hb[3]}; } };
+  if(US) for(const a of allies){ if(a.alive) box(a,'ally'); }
+  if(TD) for(const b of net.puppets.values()){ if(b.alive && b.side!==player.side) box(b,'puppet'); }
+  for(const e of (US?[]:enemies)){ if(!e.alive) continue; const s=e.T.scale||1;
     for(const hb of [[1.62*s,0.17*s,2.5,'head'],[1.18*s,0.36*s,1,'body'],[0.55*s,0.28*s,0.75,'leg']]){
       const t=raySphere(o,d,{x:e.pos.x,y:e.pos.y+hb[0],z:e.pos.z},hb[1]); if(t>=0&&t<best.t) best={t,target:e,mult:hb[2],kind:'enemy',part:hb[3]}; } }
-  if(net.room){ for(const r of net.remotes.values()){ if(!r.alive) continue; const cr=r.crouch?0.62:1;
+  if(net.room){ for(const r of net.remotes.values()){ if(!r.alive || (TD && r.side===player.side)) continue; const cr=r.crouch?0.62:1;
     for(const hb of [[1.62*cr,0.18,2.5,'head'],[1.15*cr,0.38,1,'body'],[0.55*cr,0.3,0.75,'leg']]){
       const t=raySphere(o,d,{x:r.pos.x,y:r.pos.y+hb[0],z:r.pos.z},hb[1]); if(t>=0&&t<best.t) best={t,target:r,mult:hb[2],kind:'remote',part:hb[3]}; } } }
   return best;
@@ -3230,7 +3506,9 @@ function hitscan(o,d,dmg,byPlayer){
 function applyHit(res,dmg,d,byPlayer){
   const p=res.target.pos; const hp=new V3(p.x, p.y+(res.part==='head'?1.6:res.part==='leg'?0.6:1.15), p.z); bloodFx(hp,d);
   const dm=Math.round(dmg*res.mult);
-  if(res.kind==='enemy'){ damageEnemy(res.target, dm, res.part==='head', d); }
+  if(res.kind==='enemy'){ const was=res.target.alive; damageEnemy(res.target, dm, res.part==='head', d); if(was && !res.target.alive && state.mode==='online') net.k++; }
+  else if(res.kind==='ally'){ const u=res.target, was=u.alive; damageUnit(u, dm, d); if(was && !u.alive){ net.k++; feed(`<b>Bạn</b> ✛ bộ đội (bot)`); botKillFx(res.part==='head'); } }
+  else if(res.kind==='puppet'){ net.botDmg[res.target.id]=(net.botDmg[res.target.id]||0)+dm; res.target.hitAt=state.time; res.target.hitHead=res.part==='head'; }
   else { net.hit(res.target, dm); }
   if(byPlayer){ state.hits++; hitMarker(res.part==='head'); }
 }
@@ -3269,12 +3547,18 @@ function explode(p, owner, o={}){
   for(let i=0;i<30;i++) sparks.emit(p,[rand(-9,9),rand(0,9),rand(-9,9)],rand(0.3,0.9),[1,0.7,0.3]);
   const dEye=p.distanceTo(camera.position); state.shake=Math.max(state.shake, clamp(1.2-dEye/(14*k),0,1.2));
   const byP = owner===true||owner==='p', byVN = byP||owner==='a', byEN = owner==='e';
-  if(byVN){
-    for(const e of enemies){ if(!e.alive) continue; const c=new V3(e.pos.x,e.pos.y+1.1,e.pos.z); const d=c.distanceTo(p); if(d<R && losClear(p,c)){ const dir=c.clone().sub(p).normalize(); damageEnemy(e, Math.round(DM*(1-d/R)+20), false, dir, !byP); if(byP) hitMarker(false); } }
+  // v4.8 sửa lỗi "pháo nổ mà địch không chết": kiểm tra tầm nhìn từ điểm nổ nâng lên 1m (không bị gờ hào/bao cát che), trong bán kính lõi luôn trúng; đạn lớn giảm sát thương theo bình phương khoảng cách
+  const pE=p.clone(); pE.y=Math.max(p.y,1.0); const BIG=R>=6.5; const fall=d=>BIG?1-Math.pow(d/R,3):1-d/R; const reach=(c,d)=>d<R && (d<R*0.5 || losClear(pE,c) || losClear(p,c));
+  if(isTdm() && byP){ const near=u=>{ const c=new V3(u.pos.x,(u.pos.y||0)+1.1,u.pos.z); const d=Math.hypot(c.x-p.x,c.z-p.z); return reach(c,d) ? Math.max(0.05,fall(d)) : 0; };
+    for(const u of (player.side==='us'?allies:enemies)){ if(!u.alive) continue; const f=near(u); if(!f) continue; const was=u.alive; if(u.kind==='enemy') damageEnemy(u, Math.round(DM*f+20), false, null, false); else damageUnit(u, Math.round(DM*f+20), null); if(was&&!u.alive) net.k++; hitMarker(false); }
+    for(const b of net.puppets.values()){ if(!b.alive || b.side===player.side) continue; const f=near(b); if(f){ net.botDmg[b.id]=(net.botDmg[b.id]||0)+Math.round(DM*f+20); b.hitAt=state.time; hitMarker(false); } }
+    for(const r of net.remotes.values()){ if(!r.alive || r.side===player.side) continue; const f=near(r); if(f){ net.hit(r, Math.round(150*f+15)); hitMarker(false); } }
+  } else if(byVN){
+    for(const e of enemies){ if(!e.alive) continue; const c=new V3(e.pos.x,e.pos.y+1.1,e.pos.z); const d=Math.hypot(c.x-p.x,c.z-p.z); if(reach(c,d)){ const dir=c.clone().sub(p).normalize(); damageEnemy(e, Math.round(DM*fall(d)+20), false, dir, !byP); if(byP) hitMarker(false); } }
     if(byP && net.room) for(const r of net.remotes.values()){ if(!r.alive) continue; const c=new V3(r.pos.x,r.pos.y+1.1,r.pos.z); const d=c.distanceTo(p); if(d<R && losClear(p,c)){ net.hit(r, Math.round(150*(1-d/R)+15)); hitMarker(false); } }
   }
-  if(byP||byEN){ const me=new V3(player.pos.x,player.pos.y+(player.prone?0.3:1.1),player.pos.z), dm=me.distanceTo(p); if(dm<R && losClear(p,me)) damagePlayer(Math.round((byEN?DM*0.6:55)*(1-dm/R)*(player.prone?0.7:1)), p, null); }
-  if(byEN){ for(const u of [...allies,...hostages]){ if(!u.alive) continue; const c=new V3(u.pos.x,1.1,u.pos.z), d=c.distanceTo(p); if(d<R && losClear(p,c)) damageUnit(u, Math.round(DM*0.75*(1-d/R)), c.clone().sub(p).normalize()); } }
+  if(byP||byEN){ const me=new V3(player.pos.x,player.pos.y+(player.prone?0.3:1.1),player.pos.z), dm=me.distanceTo(p); if(dm<R && losClear(p,me)) damagePlayer(Math.round((byEN?Math.min(DM,200)*0.6:55)*(1-dm/R)*(player.prone?0.7:1)), p, null); }
+  if(byEN){ for(const u of [...allies,...hostages]){ if(!u.alive) continue; const c=new V3(u.pos.x,1.1,u.pos.z), d=Math.hypot(c.x-p.x,c.z-p.z); if(reach(c,d)) damageUnit(u, Math.round(DM*0.75*fall(d)), c.clone().sub(p).normalize()); } }
   if(byVN||byEN) for(const h of hqs){ if(h.dead) continue; if((byVN&&h.side==='en')||(byEN&&h.side==='vn')){ const d=distToHQ(h,p); if(d<R) damageHQ(h, (o.hqDmg||300)*(1-0.6*d/R), byVN?'vn':'en'); } }
   addDecal(new V3(p.x,Math.max(p.y,0.01),p.z),[0,1,0]);
 }
@@ -3312,11 +3596,12 @@ let feedEls=[];
 function feed(html){ const d=document.createElement('div'); d.innerHTML=html; $('feed').prepend(d); feedEls.push(d); setTimeout(()=>{ d.remove(); },4500); while($('feed').children.length>5) $('feed').lastChild.remove(); }
 function toast(t){ feed(`<span style="color:#cde">${t}</span>`); }
 let killStreak=0, killStreakT=0, killT=null;
+function botKillFx(head){ killNotice({T:{name:'Lính đối phương'}}, head); }
 function killNotice(e, head){
   killStreak = state.time-killStreakT<4 ? killStreak+1 : 1; killStreakT=state.time;
   const el=$('killIco'); el.classList.toggle('hs',!!head);
   el.querySelector('.t').textContent = killStreak>=5?'HUỶ DIỆT!':killStreak===4?'HẠ 4 LIÊN TIẾP':killStreak===3?'HẠ 3 LIÊN TIẾP':killStreak===2?'HẠ 2 LIÊN TIẾP':(head?'BẮN VÀO ĐẦU':'HẠ GỤC');
-  el.querySelector('.s').textContent = state.mode==='campaign' ? `${e.T.name} · chạy tới nhặt xác +${VND(lootValue(e,head))}` : e.T.name;
+  el.querySelector('.s').textContent = state.mode==='campaign' && e.pos ? `${e.T.name} · chạy tới nhặt xác +${VND(lootValue(e,head))}` : e.T.name;
   el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); AU.play('kill');
   const h=$('hitm'); h.classList.add('kill'); clearTimeout(killT); killT=setTimeout(()=>h.classList.remove('kill'),300); }
 // địch ngã: súng văng khỏi tay, trúng đầu thì mũ bật ra, bụi bốc khi thân chạm đất
@@ -3357,6 +3642,7 @@ function updateHUD(dt){
   if(state.mode==='campaign'){
     const alive=enemies.filter(e=>e.alive).length + state.queue.length;
     if(state.mission==='rescue'){ const cap=hostages.filter(h=>h.alive&&h.state==='captive').length; $('obj').textContent = cap ? `GIẢI CỨU CON TIN · CÒN ${cap}/${hostages.length} · ĐỒNG ĐỘI ${allies.filter(a=>a.alive).length}` : 'ĐƯA CON TIN VỀ ĐIỂM SƠ TÁN (VÒNG XANH)'; }
+    else if(state.mission==='base' && state.defend){ const left=Math.max(0,DEFEND_T-(state.matchT||0)); const vh=hqOf('vn'); $('obj').textContent=`TỬ THỦ · GIỮ XE CHỈ HUY · CÒN ${Math.floor(left/60)}:${String(Math.floor(left%60)).padStart(2,'0')} · XE TA ${vh?Math.round(100*vh.hp/vh.max):0}%`; }
     else if(state.mission==='base'){ const hb=hqOf('en'); const d=hb?Math.round(Math.hypot(hb.x-player.pos.x,hb.z-player.pos.z)):0; $('obj').textContent = player.onArt ? (player.onArt.queued?'PHÁO · ĐANG XOAY NÒNG':player.onArt.cool>0?`PHÁO · ĐANG NẠP ĐẠN ${player.onArt.cool.toFixed(1)}s`:'PHÁO · SẴN SÀNG BẮN') : `PHÁ XE CHỈ HUY ĐỊCH · CĂN CỨ ĐỊCH CÁCH ${d}m`; }
     else if(state.mission==='bunker'){ $('obj').textContent = `LÔ CỐT ${Math.min(state.capIdx+1,capCells.length)}/${capCells.length} · ${state.capLock>0?'ĐỊCH ĐANG TĂNG CƯỜNG · MỞ SAU '+Math.ceil(state.capLock)+'s':state.capCont?'ĐANG GIAO TRANH TRONG VÒNG':state.capProg>0?'ĐANG CHIẾM '+Math.round(state.capProg/18*100)+'%':'TIẾN VÀO VÒNG VÀNG'} · TIẾP VIỆN ${state.tickets}`; }
     else $('obj').textContent = state.waveT>0 ? `ĐỢT ${state.wave+1}/${TOTAL_WAVES} SAU ${Math.ceil(state.waveT)} GIÂY` : `ĐỢT ${state.wave}/${TOTAL_WAVES} · ĐỊCH CÒN ${alive} · ĐỒNG ĐỘI ${allies.filter(a=>a.alive).length}`;
@@ -3373,9 +3659,14 @@ function drawMini(){
   const cv=$('mini'), x=cv.getContext('2d'), W=cv.width, H=cv.height, sc=10/CELL*1.6;
   x.clearRect(0,0,W,H); x.save(); x.translate(W/2,H/2); x.rotate(player.yaw); x.translate(-player.pos.x*sc,-player.pos.z*sc);
   x.drawImage(miniBase,0,0,COLS*10*1.6,ROWS*10*1.6);
+  if(isTdm()){ const dot=(u,c,r)=>{ x.fillStyle=c; x.beginPath(); x.arc(u.pos.x*sc,u.pos.z*sc,r,0,7); x.fill(); };
+    const units=[...allies.map(a=>({u:a,side:'vn',f:state.time-(a.lastShotT||-9)})), ...enemies.map(e=>({u:e,side:'us'})), ...[...net.puppets.values()].map(p=>({u:p,side:p.side}))];
+    for(const o of units){ if(!o.u.alive) continue; if(o.side===player.side) dot(o.u,'#57e08a',4.5); else { const d=Math.hypot(o.u.pos.x-player.pos.x,o.u.pos.z-player.pos.z); if(d<22 && (o.u.los||d<10)) dot(o.u,'#ff4a3a',5); } }
+    for(const r of net.remotes.values()){ if(r.alive && r.side===player.side) dot(r,'#7fffb0',6); }
+  } else {
   x.fillStyle='#ff4a3a';
   for(const e of enemies){ if(!e.alive) continue; const d=Math.hypot(e.pos.x-player.pos.x,e.pos.z-player.pos.z); if(d<22 && (e.los||d<8)){ x.beginPath(); x.arc(e.pos.x*sc,e.pos.z*sc,5,0,7); x.fill(); } }
-  x.fillStyle='#57e08a'; for(const a of allies){ if(!a.alive) continue; x.beginPath(); x.arc(a.pos.x*sc,a.pos.z*sc,4.5,0,7); x.fill(); }
+  x.fillStyle='#57e08a'; for(const a of allies){ if(!a.alive) continue; x.beginPath(); x.arc(a.pos.x*sc,a.pos.z*sc,4.5,0,7); x.fill(); } }
   x.fillStyle='#ffe066'; for(const hh of hostages){ if(!hh.alive) continue; x.beginPath(); x.arc(hh.pos.x*sc,hh.pos.z*sc,5,0,7); x.fill(); }
   if(state.mission==='base'){ const bw=9*CELL*sc, D=ROWS*CELL*sc, Wd=COLS*CELL*sc; x.fillStyle='rgba(87,224,138,.16)'; x.fillRect(CELL*sc,0,bw,D); x.fillStyle='rgba(255,70,50,.18)'; x.fillRect(Wd-CELL*sc-bw,0,bw,D);
     x.font='bold 22px system-ui'; x.textAlign='center'; x.save(); x.fillStyle='rgba(140,255,170,.9)'; x.translate(CELL*sc+bw/2, D/2-40); x.rotate(-player.yaw); x.fillText('TA',0,0); x.restore(); x.save(); x.fillStyle='rgba(255,140,120,.95)'; x.translate(Wd-CELL*sc-bw/2, D/2-40); x.rotate(-player.yaw); x.fillText('ĐỊCH',0,0); x.restore(); }
@@ -3386,8 +3677,17 @@ function drawMini(){
   if(state.mission==='bunker'){ capCells.forEach((c,i)=>{ x.strokeStyle=i<state.capIdx?'#57e08a':i===state.capIdx?'#ffd34a':'#ff5a40'; x.lineWidth=3; x.beginPath(); x.arc(c.x*sc,c.z*sc,6*sc,0,7); x.stroke(); }); }
   for(const a of allies){ if(!a.down) continue; x.fillStyle='#ffd34a'; x.fillRect(a.pos.x*sc-4,a.pos.z*sc-1.5,8,3); x.fillRect(a.pos.x*sc-1.5,a.pos.z*sc-4,3,8); }
   if(state.mission==='rescue' && zoneCell){ x.strokeStyle='#57e08a'; x.lineWidth=3; x.beginPath(); x.arc(zoneCell.x*sc,zoneCell.z*sc,14,0,7); x.stroke(); }
-  if(net.room) for(const r of net.remotes.values()){ if(!r.alive || state.time-r.firedAt>2) continue; x.fillStyle=SCARF[r.color]||'#f44'; x.beginPath(); x.arc(r.pos.x*sc,r.pos.z*sc,6,0,7); x.fill(); }
+  if(net.room) for(const r of net.remotes.values()){ if(!r.alive || state.time-r.firedAt>2 || (isTdm() && r.side===player.side)) continue; x.fillStyle=SCARF[r.color]||'#f44'; x.beginPath(); x.arc(r.pos.x*sc,r.pos.z*sc,6,0,7); x.fill(); }
   x.restore();
+  // v4.8: gói tiếp tế ngoài tầm minimap -> mũi tên ở mép, nhấp nháy
+  { const cy=Math.cos(player.yaw), sy=Math.sin(player.yaw), lim=Math.min(W,H)/2-9, bl=0.55+0.45*Math.sin(state.time*6);
+    for(const c of crates){ if(!c.alive) continue; const dx=(c.x-player.pos.x)*sc, dz=(c.z-player.pos.z)*sc; let px=dx*cy-dz*sy, pz=dx*sy+dz*cy;
+      const m=Math.max(Math.abs(px),Math.abs(pz)); const out=m>lim; if(out){ px*=lim/m; pz*=lim/m; }
+      x.save(); x.translate(W/2+px,H/2+pz); x.globalAlpha=out?bl:1; x.fillStyle=c.side==='vn'?'#ff6a50':'#5a8aff';
+      if(!c.landed){ x.beginPath(); x.arc(0,-3,7,Math.PI,0); x.fill(); x.strokeStyle='#fff'; x.lineWidth=1; x.beginPath(); x.moveTo(-7,-3); x.lineTo(0,5); x.lineTo(7,-3); x.stroke(); x.fillRect(-3,3,6,5); }
+      else { x.fillRect(-6,-6,12,12); x.strokeStyle='#fff'; x.lineWidth=1.5; x.strokeRect(-6,-6,12,12); }
+      if(out){ x.rotate(Math.atan2(pz,px)); x.fillStyle='#fff'; x.beginPath(); x.moveTo(10,0); x.lineTo(5,-4); x.lineTo(5,4); x.fill(); }
+      x.restore(); } x.globalAlpha=1; }
   x.fillStyle='#e2b23c'; x.beginPath(); x.moveTo(W/2,H/2-9); x.lineTo(W/2-6,H/2+6); x.lineTo(W/2+6,H/2+6); x.fill();
 }
 function updateObjMarker(){
@@ -3424,7 +3724,7 @@ function updateRescue(dt){
 }
 function updateCampaign(dt){
   state.matchT=(state.matchT||0)+dt;
-  updateRespawns(dt); updateSupply(dt); updateArts(dt);
+  updateRespawns(dt); updateSupply(dt); updateArts(dt); updateStrikes(dt); if(((state.supBtnT=(state.supBtnT||0)+dt))>0.5){ state.supBtnT=0; updateSupBtn(); }
   if(state.mission==='rescue') return updateRescue(dt);
   if(state.mission==='base') return updateBase(dt);
   if(state.mission==='bunker') return updateBunker(dt);
@@ -3440,7 +3740,7 @@ function updateCampaign(dt){
 /* ================= NETWORK (room capability) ================= */
 const KILL_LIMIT=15;
 const net = {
-  lobby:null, room:null, my:null, remotes:new Map(), presT:0, sh:0, rk:null, rkSeq:0, dmg:{}, seenDmg:{}, k:0, d:0, kb:null, rd:0, code:'',
+  lobby:null, room:null, my:null, remotes:new Map(), puppets:new Map(), botDmg:{}, bdm:{}, seenB:{}, seenBD:0, ts:[0,0], hr:0, tw:null, twT:0, botSeq:0, tdQ:[], tdm:false, side:'vn', presT:0, sh:0, rk:null, rkSeq:0, dmg:{}, seenDmg:{}, k:0, d:0, kb:null, rd:0, code:'',
   async probe(){ if(this._probeP) return this._probeP; this._probeP=this._probe(); return this._probeP; },
   async _probe(){
     const selfHosted=/^https?:$/.test(location.protocol) && !/claude/i.test(location.hostname) && !(window.claude&&window.claude.use);
@@ -3457,20 +3757,24 @@ const net = {
   async join(code, title){
     if(!this.lobby) throw new Error('none');
     this.code=code; this.room = await this.lobby.join('tl-'+code, title);
-    this.remotes.clear(); this.dmg={}; this.seenDmg={}; this.k=0; this.d=0; this.sh=0; this.kb=null; this.rd=0;
+    this.remotes.clear(); this.dmg={}; this.seenDmg={}; this.k=0; this.d=0; this.sh=0; this.kb=null; this.rd=0; this.clearPuppets(); this.botDmg={}; this.bdm={}; this.seenB={}; this.seenBD=0; this.ts=[0,0]; this.hr=0; this.tw=null; this.tdQ=[]; this.wasHost=false;
     this.room.onPeers(ch=>{ for(const p of ch.peers){ if(p.sameTab) this.my=p.peer; } for(const p of ch.left){ const r=this.remotes.get(p.peer); if(r){ scene.remove(r.model.group); if(r.label) scene.remove(r.label); this.remotes.delete(p.peer); feed(`${esc(r.name)} rời phòng`); } } }, ()=>{});
     this.room.onConnection(c=>{ this.connected=c; },()=>{});
     if(this.room.onBinary) this.room.onBinary((id,data)=>VOICE.receive(id,data));
   },
   ch:null, chSeq:0,
   say(text){ text=String(text).replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2060-\u206f\ufeff]/g,'').trim().slice(0,120); if(!text||!this.room) return; this.chSeq++; this.ch={s:this.chSeq,t:text}; chatLine(settings.nick+' (bạn)', text); this.push(true); },
-  leave(){ VOICE.stop(true); if(this.room){ try{ this.room.leave(); }catch(e){} } this.room=null; for(const r of this.remotes.values()){ scene.remove(r.model.group); if(r.label) scene.remove(r.label); } this.remotes.clear(); },
+  clearPuppets(){ for(const b of this.puppets.values()) scene.remove(b.model.group); this.puppets.clear(); },
+  botHit(peer, dm){ this.bdm[peer]=(this.bdm[peer]||0)+dm; },
+  leave(){ VOICE.stop(true); this.clearPuppets(); if(this.room){ try{ this.room.leave(); }catch(e){} } this.room=null; this.tdm=false; for(const r of this.remotes.values()){ scene.remove(r.model.group); if(r.label) scene.remove(r.label); } this.remotes.clear(); },
   shot(){ if(this.room) this.sh++; },
   rocket(o,d){ if(this.room){ this.rkSeq++; this.rk={s:this.rkSeq,p:[+o.x.toFixed(2),+o.y.toFixed(2),+o.z.toFixed(2)],v:[+d.x.toFixed(3),+d.y.toFixed(3),+d.z.toFixed(3)]}; } },
   hit(r,dm){ this.dmg[r.peer]=(this.dmg[r.peer]||0)+dm; },
-  died(killer){ this.d++; this.kb=killer||null; const kr=killer&&this.remotes.get(killer); feed(kr?`${esc(kr.name)} ✛ <b>bạn</b>`:'Bạn tự hạ mình'); this.push(true);
-    $('dead').classList.remove('hidden'); $('deadT').textContent='HY SINH'; $('deadP').innerHTML=(kr?`Bị hạ bởi <b>${esc(kr.name)}</b><br>`:'')+'Hồi sinh sau 3 giây…'; $('deadBtns').innerHTML=''; },
+  died(killer){ this.d++; this.kb=killer||null; const kr=killer&&this.remotes.get(killer); feed(kr?`${esc(kr.name)} ✛ <b>bạn</b>`:killer==='bot'?'Lính đối phương ✛ <b>bạn</b>':'Bạn tự hạ mình');
+    if(this.tdm && this.isHost()) this.ts[player.side==='vn'?1:0]++; this.push(true);
+    $('dead').classList.remove('hidden'); $('deadT').textContent='HY SINH'; $('deadP').innerHTML=(kr?`Bị hạ bởi <b>${esc(kr.name)}</b><br>`:'')+(this.tdm?'Hồi sinh tại căn cứ sau 5 giây…':'Hồi sinh sau 3 giây…'); $('deadBtns').innerHTML=''; },
   respawn(){
+    if(this.tdm){ const s=pick(player.side==='us'?spawnE:spawnP); placePlayer(s); player.hp=100; player.armor=50; player.alive=true; player.invuln=2; resetWeapons(); updateWeaponHUD(); $('dead').classList.add('hidden'); return; }
     const others=[...this.remotes.values()].filter(r=>r.alive);
     const pts=[...spawnP,...spawnE].map(s=>({s,d: others.length?Math.min(...others.map(r=>Math.hypot(r.pos.x-s.x,r.pos.z-s.z))):rand(0,50)})).sort((a,b)=>b.d-a.d);
     const s=pick(pts.slice(0,3)).s; placePlayer(s); player.hp=100; player.armor=0; player.alive=true; player.invuln=1.5; resetWeapons(); updateWeaponHUD(); $('dead').classList.add('hidden');
@@ -3480,20 +3784,22 @@ const net = {
     for(const k in this.dmg) if(!this.remotes.has(k)) delete this.dmg[k];
     const p={ n:settings.nick.slice(0,14), c:settings.color, p:[+player.pos.x.toFixed(2),+player.pos.y.toFixed(2),+player.pos.z.toFixed(2)], r:[+player.yaw.toFixed(3),+player.pitch.toFixed(3)],
       w:player.cur, a:player.alive?1:0, cr:player.crouch?1:0, sh:this.sh, d:this.d, kb:this.kb, k:this.k, rd:this.rd, dmg:this.dmg, rk:this.rk, ch:this.ch, mic:VOICE.talking?1:0, v:+Math.hypot(player.vel.x,player.vel.z).toFixed(1) };
+    if(this.tdm){ for(const id in this.botDmg) if(!this.puppets.has(id)) delete this.botDmg[id]; p.sd=this.side; p.bdm=this.botDmg; if(this.isHost()){ p.bots=this.snapBots(); p.ts=this.ts; p.hr=this.hr; p.tw=this.tw; p.bd=this.bdm; } else { p.bots=null; p.ts=null; p.bd=null; p.tw=null; } }
     this.room.presence(p).catch(()=>{});
   },
   update(dt){
     if(!this.room) return;
-    if(!player.alive){ player.deadT+=dt; if(player.deadT>3 && !state.roundEnd){ this.respawn(); } }
+    if(!player.alive){ player.deadT+=dt; if(player.deadT>(this.tdm?5:3) && !state.roundEnd){ this.respawn(); } }
     let maxRd=this.rd;
     const peers=this.room.peers();
     for(const pe of peers){
       if(pe.sameTab){ this.my=pe.peer; continue; }
       const pr=pe.presence||{}; if(!pr.p) continue;
       let r=this.remotes.get(pe.peer);
+      if(r && this.tdm && (pr.sd||'vn')!==r.side){ scene.remove(r.model.group); r.model=this.humanModel(pr.sd||'vn', SCARF[r.color]); scene.add(r.model.group); r.side=pr.sd||'vn'; scene.remove(r.label); r.label=makeLabel(r.name, r.side===player.side?'#57e08a':'#ff5a40'); scene.add(r.label); }
       if(!r){ const col=SCARF[(pr.c|0)%SCARF.length];
-        r={peer:pe.peer, model:buildSoldier({side:'vn',uniform:0x56603a,gear:0x6f5a3a,accent:new THREE.Color(col).getHex(),gun:'ak'}), pos:new V3(...pr.p), tpos:new V3(...pr.p), yaw:pr.r?.[0]||0, pitch:0, sh:pr.sh|0, d:pr.d|0, alive:!!pr.a, name:String(pr.n||'Chiến sĩ').slice(0,14), color:(pr.c|0)%SCARF.length, k:0, rd:0, firedAt:-9, rk:pr.rk?pr.rk.s:0, crouch:false};
-        scene.add(r.model.group); r.label=makeLabel(r.name, col); scene.add(r.label); this.remotes.set(pe.peer,r);
+        r={peer:pe.peer, side:pr.sd||'vn', model:this.humanModel(this.tdm?(pr.sd||'vn'):'vn', col), pos:new V3(...pr.p), tpos:new V3(...pr.p), yaw:pr.r?.[0]||0, pitch:0, sh:pr.sh|0, d:pr.d|0, alive:!!pr.a, name:String(pr.n||'Chiến sĩ').slice(0,14), color:(pr.c|0)%SCARF.length, k:0, rd:0, firedAt:-9, rk:pr.rk?pr.rk.s:0, crouch:false};
+        scene.add(r.model.group); r.label=makeLabel(r.name, this.tdm?(r.side===player.side?'#57e08a':'#ff5a40'):col); scene.add(r.label); this.remotes.set(pe.peer,r);
         this.seenDmg[pe.peer]=(pr.dmg&&this.my&&pr.dmg[this.my])|0; feed(`${esc(r.name)} vào phòng`); }
       r.tpos.set(...pr.p); r.tyaw=pr.r?.[0]||0; { const b=r.buf||(r.buf=[]); const L=b[b.length-1]; if(!L || L.x!==pr.p[0]||L.y!==pr.p[1]||L.z!==pr.p[2]||L.yaw!==r.tyaw){ b.push({t:performance.now(),x:pr.p[0],y:pr.p[1],z:pr.p[2],yaw:r.tyaw}); if(b.length>30) b.shift(); } } r.pitch=pr.r?.[1]||0; r.alive=!!pr.a; r.crouch=!!pr.cr; r.k=pr.k|0; r.rd=pr.rd|0; r.vel=pr.v||0;
       if(typeof pr.n==='string' && pr.n.slice(0,14)!==r.name){ r.name=pr.n.slice(0,14); scene.remove(r.label); r.label=makeLabel(r.name,SCARF[r.color]); scene.add(r.label); }
@@ -3506,13 +3812,16 @@ const net = {
       // damage to me
       if(this.my){ const tot=(pr.dmg&&pr.dmg[this.my])|0; const seen=this.seenDmg[pe.peer]|0; if(tot>seen){ this.seenDmg[pe.peer]=tot; if(player.alive && r.rd===this.rd) damagePlayer(tot-seen, r.pos, pe.peer); } else if(tot<seen) this.seenDmg[pe.peer]=tot; }
       // deaths
-      const dd=pr.d|0; if(dd>r.d){ if(pr.kb && pr.kb===this.my && r.rd===this.rd){ this.k++; feed(`<b>Bạn</b> ✛ ${esc(r.name)}`); state.score=this.k; }
+      const dd=pr.d|0; if(dd>r.d && this.tdm && this.isHost()) this.ts[r.side==='vn'?1:0]++;
+      if(dd>r.d){ if(pr.kb && pr.kb===this.my && (this.tdm || r.rd===this.rd)){ this.k++; feed(`<b>Bạn</b> ✛ ${esc(r.name)}`); state.score=this.k; }
         else if(pr.kb){ const kr=this.remotes.get(pr.kb); if(kr) feed(`${esc(kr.name)} ✛ ${esc(r.name)}`); } }
-      r.d=dd;
+      r.d=dd; r.k=pr.k|0;
     }
-    if(maxRd>this.rd){ this.rd=maxRd; this.k=0; this.d=0; state.roundEnd=0; showMsg('VÒNG MỚI','Hạ '+KILL_LIMIT+' mạng để thắng'); if(!player.alive) this.respawn(); }
+    if(this.tdm){ this.teamUpdate(dt); }
+    else if(maxRd>this.rd){ this.rd=maxRd; this.k=0; this.d=0; state.roundEnd=0; showMsg('VÒNG MỚI','Hạ '+KILL_LIMIT+' mạng để thắng'); if(!player.alive) this.respawn(); }
     // win check
-    if(!state.roundEnd){ let winner=null; if(this.k>=KILL_LIMIT) winner='Bạn'; for(const r of this.remotes.values()) if(r.rd===this.rd && r.k>=KILL_LIMIT) winner=r.name;
+    if(this.tdm){}
+    else if(!state.roundEnd){ let winner=null; if(this.k>=KILL_LIMIT) winner='Bạn'; for(const r of this.remotes.values()) if(r.rd===this.rd && r.k>=KILL_LIMIT) winner=r.name;
       if(winner){ state.roundEnd=7; showMsg(`${esc(winner).toUpperCase()} THẮNG VÒNG!`,'Vòng mới bắt đầu sau vài giây',6); AU.play('win'); } }
     else { state.roundEnd-=dt; if(state.roundEnd<=0){ state.roundEnd=0; this.rd++; this.k=0; this.d=0; showMsg('VÒNG MỚI','Hạ '+KILL_LIMIT+' mạng để thắng'); this.respawn(); } }
     // animate remotes
@@ -3526,10 +3835,69 @@ const net = {
       g.scale.y = r.crouch?0.68:1;
       animateSoldier(r.model, r.vel||0, dt, -r.pitch);
       r.label.position.set(r.pos.x, r.pos.y+(r.crouch?1.6:2.2), r.pos.z); r.label.visible=r.alive;
-      const spk=r.micOn && state.time-(r.voiceAt||-9)<0.4; if(spk!==r.spk){ r.spk=spk; scene.remove(r.label); r.label=makeLabel((spk?'🎙 ':'')+r.name,SCARF[r.color]); scene.add(r.label); }
+      const spk=r.micOn && state.time-(r.voiceAt||-9)<0.4; if(spk!==r.spk){ r.spk=spk; scene.remove(r.label); r.label=makeLabel((spk?'🎙 ':'')+r.name,this.tdm?(r.side===player.side?'#57e08a':'#ff5a40'):SCARF[r.color]); scene.add(r.label); }
     }
     this.push(false, dt);
   },
+  humanModel(side, col){ if(side==='vn') return buildSoldier({side:'vn',uniform:0x56603a,gear:0x6f5a3a,accent:new THREE.Color(col).getHex(),gun:'ak'});
+    const F=FACTIONS[MAPDEF.enemy]||FACTIONS.us; return buildSoldier({side:F.side, uniform:F.uniform, gear:F.gear, gun:'m16'}); },
+  hostId(){ if(!this.room) return null; let ids=[]; for(const pe of this.room.peers()){ if(pe.sameTab){ if(this.side) ids.push(this.my||pe.peer); continue; } const sd=pe.presence&&pe.presence.sd; if(sd) ids.push(pe.peer); } ids=ids.filter(Boolean).sort(); return ids[0]||this.my; },
+  isHost(){ return !!this.my && this.hostId()===this.my; },
+  snapBots(){ const out=[]; for(const a of allies) out.push([a.bid,0,Math.round(a.pos.x*10),Math.round(a.pos.z*10),Math.round(a.yaw*100),a.alive?1:0,a.shotSeq|0,Math.round((a.aimPitch||0)*100),0]);
+    for(const e of enemies) out.push([e.bid,1,Math.round(e.pos.x*10),Math.round(e.pos.z*10),Math.round(e.yaw*100),e.alive?1:0,e.shotSeq|0,Math.round((e.aimPitch||0)*100),['rifle','shotgun','mg'].indexOf(e.type)]); return out; },
+  teamUpdate(dt){
+    const host=this.isHost();
+    if(host){ if(!this.wasHost){ this.wasHost=true; this.clearPuppets(); } this.hostSim(dt); }
+    else { if(this.wasHost){ this.wasHost=false; for(const a of allies){ scene.remove(a.model.group); } allies.length=0; enemies.forEach(removeEnemy); enemies.length=0; }
+      const hp=this.room.peers().find(pe=>pe.peer===this.hostId()); const pr=hp&&hp.presence||{};
+      if(Array.isArray(pr.ts)) this.ts=pr.ts; if(typeof pr.hr==='number' && pr.hr!==this.hr){ this.hr=pr.hr; this.k=0; this.d=0; showMsg('VÒNG MỚI','Đội nào đạt '+TEAM_LIMIT+' điểm hạ trước sẽ thắng',3); }
+      if(pr.tw && pr.tw!==this.twSeen){ this.twSeen=pr.tw; this.showWin(pr.tw); } if(!pr.tw) this.twSeen=null;
+      if(Array.isArray(pr.bots)) this.syncPuppets(pr.bots, dt);
+      const bd=(pr.bd&&this.my&&pr.bd[this.my])|0; if(bd>this.seenBD){ const dm=bd-this.seenBD; this.seenBD=bd; let src=null, sd=1e9; for(const b of this.puppets.values()){ if(b.side===player.side||!b.alive) continue; const d=b.pos.distanceTo(player.pos); if(d<sd){ sd=d; src=b.pos; } } damagePlayer(dm, src, 'bot'); } else if(bd<this.seenBD) this.seenBD=bd; }
+    this.animPuppets(dt);
+  },
+  showWin(side){ const me=side===player.side; showMsg(me?'ĐỘI TA THẮNG!':'ĐỘI BẠN THUA', me?'Vinh quang thuộc về những người lính giữ nước!':'Củng cố đội hình — vòng mới bắt đầu sau ít giây',6); AU.play(me?'win':'wave'); },
+  hostSim(dt){
+    state.mission='tdm';
+    // quân số mỗi bên = max(5, số người thật bên đông nhất); bot lấp chỗ trống
+    let hv=player.side==='vn'?1:0, hu=player.side==='us'?1:0; for(const r of this.remotes.values()){ if(r.side==='us') hu++; else hv++; }
+    const size=Math.max(5,hv,hu), wantV=size-hv, wantU=size-hu;
+    while(allies.length>wantV){ const a=allies.pop(); scene.remove(a.model.group); }
+    while(allies.length<wantV){ const a=spawnAlly(allies.length); a.bid='v'+(++this.botSeq); a.role='hunt'; const s=pick(spawnP); a.pos.set(s.x+rand(-1,1),0,s.z+rand(-1,1)); collideCircle(a.pos,0.36); }
+    const aliveU=enemies.filter(e=>e.alive).length; while(enemies.filter(e=>e.alive).length>wantU){ const e=enemies.find(x=>x.alive); removeEnemy(e); enemies.splice(enemies.indexOf(e),1); }
+    if(aliveU+this.tdQ.length<wantU) this.tdQ.push(enemies.length<wantU?0.2:RESPAWN_T);
+    for(let i=this.tdQ.length-1;i>=0;i--){ this.tdQ[i]-=dt; if(this.tdQ[i]<=0){ this.tdQ.splice(i,1); const c=pick(spawnE); const e=spawnEnemy(pick(['rifle','rifle','rifle','shotgun','mg']), {x:c.x+rand(-1,1),z:c.z+rand(-1,1)}, true); e.bid='u'+(++this.botSeq); e.role='hunt'; } }
+    // sát thương người chơi khác gây ra cho bot
+    for(const r of this.remotes.values()){ const pe=this.room.peers().find(x=>x.peer===r.peer); const bm=pe&&pe.presence&&pe.presence.bdm; if(!bm) continue; const seen=this.seenB[r.peer]||(this.seenB[r.peer]={});
+      for(const id in bm){ const tot=bm[id]|0, dm=tot-(seen[id]|0); if(dm<=0){ seen[id]=tot; continue; } seen[id]=tot; const b=allies.find(a=>a.bid===id)||enemies.find(e=>e.bid===id); if(!b||!b.alive) continue;
+        if(b.kind==='enemy') damageEnemy(b, dm, false, null, true); else damageUnit(b, dm, null); } }
+    // điểm đội: bot ngã
+    for(const a of allies){ if(!a.alive && !a._cnt){ a._cnt=1; this.ts[1]++; } else if(a.alive) a._cnt=0; }
+    for(const e of enemies){ if(!e.alive && !e._cnt){ e._cnt=1; this.ts[0]++; } }
+    updateEnemies(dt); updateAllies(dt); updateProjectiles(dt);
+    if(!this.tw && (this.ts[0]>=TEAM_LIMIT || this.ts[1]>=TEAM_LIMIT)){ this.tw=this.ts[0]>=TEAM_LIMIT?'vn':'us'; this.twT=8; this.showWin(this.tw); }
+    if(this.tw){ this.twT-=dt; if(this.twT<=0){ this.tw=null; this.ts=[0,0]; this.hr++; this.k=0; this.d=0; showMsg('VÒNG MỚI','Đội nào đạt '+TEAM_LIMIT+' điểm hạ trước sẽ thắng',3); } }
+  },
+  syncPuppets(list, dt){ const seen=new Set(); const F=FACTIONS[MAPDEF.enemy]||FACTIONS.us;
+    for(const b of list){ const [id,sd,x,z,yaw,al,sq,pt,ty]=b; seen.add(id); let p=this.puppets.get(id);
+      if(!p){ const side=sd?'us':'vn'; const T=ETYPES[['rifle','shotgun','mg'][ty]||'rifle']||{};
+        const model = side==='vn' ? buildSoldier({side:'vn', uniform:MAPDEF.year==='1954'?0x7a7452:0x6f7046, gear:0x6f5a3a, accent:0xc8302a, gun:MAPDEF.year==='1954'?'mas36':'ak'})
+          : buildSoldier({side:F.side, uniform:ty===2?F.mgUniform:F.uniform, gear:F.gear, gun:(F.types[['rifle','shotgun','mg'][ty]]||{}).gun||T.gun||'m16'});
+        p={id, side, model, pos:new V3(x/10,0,z/10), tpos:new V3(x/10,0,z/10), yaw:yaw/100, tyaw:yaw/100, alive:!!al, sq, deadT:0, fallDir:Math.random()<0.5?-1:1, speed:0, pitch:0, snd:side==='vn'?(MAPDEF.year==='1954'?'k54':'ak'):(T.snd||'m16')};
+        scene.add(model.group); this.puppets.set(id,p); }
+      p.tpos.set(x/10,0,z/10); p.tyaw=yaw/100; p.pitch=pt/100;
+      if(p.alive && !al){ p.alive=false; p.deadT=0; p.dustDone=false; if(p.hitAt && state.time-p.hitAt<2.5){ this.k++; feed(`<b>Bạn</b> ✛ ${p.side==='vn'?'bộ đội (bot)':'lính đối phương (bot)'}`); botKillFx(p.hitHead); } }
+      else if(!p.alive && al){ p.alive=true; p.pos.copy(p.tpos); p.model.group.rotation.x=0; p.model.group.position.y=0; if(p.model.sk){ skPlay(p.model,'aim',0.1); } }
+      if((sq|0)>(p.sq|0)){ p.sq=sq; if(p.alive) this.puppetShot(p); } else p.sq=sq; }
+    for(const [id,p] of this.puppets){ if(!seen.has(id)){ scene.remove(p.model.group); this.puppets.delete(id); } } },
+  puppetShot(p){ soldierShot(p.model); const m=p.model; m.group.updateMatrixWorld(true); const o=m.gun.localToWorld(m.muzzle.clone());
+    const cp=Math.cos(p.pitch); const d=new V3(Math.sin(p.yaw)*cp, Math.sin(p.pitch), Math.cos(p.yaw)*cp);
+    const w=raycast(o.x,o.y,o.z,d.x,d.y,d.z,150); const end=o.clone().addScaledVector(d,Math.min(w.t,60)); addTracer(o,end); if(w.t<60) impactFx(end,w.n); AU.play(p.snd,o); },
+  animPuppets(dt){ for(const p of this.puppets.values()){ const m=p.model;
+      if(!p.alive){ deathAnim(p,dt); continue; }
+      const ox=p.pos.x, oz=p.pos.z; p.pos.lerp(p.tpos, Math.min(1,dt*8)); if(p.pos.distanceTo(p.tpos)>6) p.pos.copy(p.tpos);
+      p.speed=Math.hypot(p.pos.x-ox,p.pos.z-oz)/Math.max(dt,1e-4); p.yaw+=angDiff(p.yaw,p.tyaw)*Math.min(1,dt*10);
+      m.group.position.set(p.pos.x,0,p.pos.z); m.group.rotation.y=p.yaw; animateSoldier(m, p.speed, dt, p.pitch); } },
   remoteShot(r,w){
     soldierShot(r.model);
     const wpn=WEAPONS[w]||WEAPONS[2]; if(wpn.melee){ AU.play('knife',r.pos); return; }
@@ -3540,8 +3908,12 @@ const net = {
     const mz=o.clone().addScaledVector(d,0.8); addTracer(mz,end); impactFx(end,w2.n);
     fxLight2.position.copy(mz); fxLight2.intensity=6; fxLight2.userData.t=0.05; AU.play(wpn.snd,o);
   },
-  hud(){ $('obj').textContent=`PHÒNG "${this.code.toUpperCase()}" · ${this.remotes.size+1} NGƯỜI · ĐẠT ${KILL_LIMIT} MẠNG ĐỂ THẮNG`; $('scoreV').textContent=this.k; $('scoreL').textContent=`HẠ · ${this.d} LẦN HY SINH`; },
-  boardHTML(){ const rows=[{name:settings.nick+' (bạn)',k:this.k,d:this.d,me:1}, ...[...this.remotes.values()].map(r=>({name:r.name,k:r.rd===this.rd?r.k:0,d:r.d}))].sort((a,b)=>b.k-a.k);
+  hud(){ if(this.tdm){ const me=player.side==='vn'?0:1; $('obj').textContent=`ĐẤU ĐỘI · TA ${this.ts[me]} – ${this.ts[1-me]} ĐỊCH · ĐẠT ${TEAM_LIMIT} ĐỂ THẮNG`; $('scoreV').textContent=this.k; $('scoreL').textContent=`HẠ · ${this.d} LẦN HY SINH`; return; }
+    $('obj').textContent=`PHÒNG "${this.code.toUpperCase()}" · ${this.remotes.size+1} NGƯỜI · ĐẠT ${KILL_LIMIT} MẠNG ĐỂ THẮNG`; $('scoreV').textContent=this.k; $('scoreL').textContent=`HẠ · ${this.d} LẦN HY SINH`; },
+  boardHTML(){ if(this.tdm){ const L=[{name:settings.nick+' (bạn)',k:this.k,d:this.d,me:1,side:player.side}, ...[...this.remotes.values()].map(r=>({name:r.name,k:r.k|0,d:r.d,side:r.side}))];
+      const tb=sd=>`<h3 style="color:${sd==='vn'?'#ff6a50':'#7aa0ff'}">${sd==='vn'?'VIỆT NAM':(FACTIONS[MAPDEF.enemy]||FACTIONS.us).label.toUpperCase()} · ${this.ts[sd==='vn'?0:1]} điểm</h3><table>${L.filter(x=>x.side===sd).sort((a,b)=>b.k-a.k).map(r=>`<tr class="${r.me?'me':''}"><td>${esc(r.name)}</td><td>${r.k}</td><td>${r.d}</td></tr>`).join('')||'<tr><td style="color:var(--dim)">(chỉ có bot)</td></tr>'}</table>`;
+      return tb('vn')+tb('us'); }
+    const rows=[{name:settings.nick+' (bạn)',k:this.k,d:this.d,me:1}, ...[...this.remotes.values()].map(r=>({name:r.name,k:r.rd===this.rd?r.k:0,d:r.d}))].sort((a,b)=>b.k-a.k);
     return `<h3>BẢNG ĐIỂM · PHÒNG ${esc(this.code.toUpperCase())}</h3><table><tr style="color:var(--dim)"><td>Tên</td><td>Hạ</td><td>Hy sinh</td></tr>${rows.map(r=>`<tr class="${r.me?'me':''}"><td>${esc(r.name)}</td><td>${r.k}</td><td>${r.d}</td></tr>`).join('')}</table>`; }
 };
 /* ================= CHAT & VOICE ================= */
@@ -3622,7 +3994,9 @@ async function loadMap(id, variant='orig'){
 async function startCampaign(){
   const mapId=settings.map, MD=MAPS[mapId];
   const mission = MD.bunker ? 'bunker' : (settings.mode==='rescue' && MD.grid.some(r=>r.includes('Q')) ? 'rescue' : 'base');
+  state.defend = mission==='base' && settings.mode==='defend';
   clearWorld(); net.leave(); await loadMap(mapId, mission==='base'?'base':'orig');
+  state.support=[]; state.supN=0; for(const st of strikes) if(st.plane) scene.remove(st.plane); strikes.length=0; $('bSup').classList.add('hidden');
   state.mode='campaign'; state.mission=mission; Object.assign(state,{wave:0,waveT:0,queue:[],score:0,kills:0,hs:0,shots:0,hits:0,roundEnd:0,freed:0,reinf:false,reinfT:30});
   resetWeapons(); Object.assign(player,{hp:100,armor:25,alive:true,cur:2,prev:1,crouch:false,flash:false,invuln:0});
   startModeExtras(mission);
@@ -3638,34 +4012,130 @@ async function startCampaign(){
     const pts=[...spawnE]; for(let i=0;i<state.enMax;i++){ const c=mission==='bunker'?pts[i%pts.length]:pick(pts); const e=spawnEnemy(pick(ET), {x:c.x+rand(-1,1), z:c.z+rand(-1,1)}, true); e.cap=c.cap; assignRole(e,'en',i); }
   }
   assignArtGunners();
+  await playIntro(mapId, mission);
   enterPlay();
   const F=FACTIONS[MAPDEF.enemy];
-  showMsg(MAPDEF.name.toUpperCase()+' · '+MAPDEF.year, mission==='base' ? 'Phá huỷ xe chỉ huy của '+F.label+' · bảo vệ xe của ta' : mission==='bunker' ? 'Đánh chiếm lần lượt '+capCells.length+' lô cốt của '+F.label : 'Giải cứu '+hostCells.length+' đồng chí bị bắt, đưa về điểm sơ tán', 4.5);
+  showMsg(MAPDEF.name.toUpperCase()+' · '+MAPDEF.year, mission==='base' && state.defend ? 'TỬ THỦ: giữ xe chỉ huy 5 phút trước '+F.label : mission==='base' ? 'Phá huỷ xe chỉ huy của '+F.label+' · bảo vệ xe của ta' : mission==='bunker' ? 'Đánh chiếm lần lượt '+capCells.length+' lô cốt của '+F.label : 'Giải cứu '+hostCells.length+' đồng chí bị bắt, đưa về điểm sơ tán', 4.5);
+}
+// ---- v4.8: đoạn mở đầu lịch sử trước mỗi trận
+const MAP_INTRO={
+  cuchi:{when:'MẬU THÂN · 1968', lines:[
+    'Củ Chi — <b>"đất thép thành đồng"</b>, cửa ngõ tây bắc Sài Gòn.',
+    'Dưới lớp đất đỏ là <b>hơn 200 cây số địa đạo</b>, quân và dân ta đào bằng tay qua nhiều năm: có hầm ở, bếp Hoàng Cầm, trạm quân y, giếng nước.',
+    'Bom rải thảm, chất độc, chó săn, lính "chuột cống" — kẻ thù dùng mọi cách để san phẳng Củ Chi, nhưng <b>đất vẫn sống, người vẫn bám đất</b>.',
+    'Tết Mậu Thân, từ lòng đất này các mũi tiến công thọc sâu vào Sài Gòn.']},
+  a1:{when:'ĐIỆN BIÊN PHỦ · 1954', lines:[
+    'Đồi A1 — cứ điểm then chốt phía đông tập đoàn cứ điểm <b>Điện Biên Phủ</b>.',
+    'Từ cuối tháng Ba, ta và địch giằng co <b>từng mét hào, từng ụ đất</b> — trận đánh dai dẳng và ác liệt nhất cả chiến dịch.',
+    'Đêm 6/5/1954, khối bộc phá gần <b>một tấn thuốc nổ</b> do bộ đội ta đào hầm đưa vào lòng đồi rung chuyển cả lòng chảo.',
+    'Rạng sáng 7/5 ta làm chủ A1. Chiều hôm ấy, lá cờ <b>"Quyết chiến quyết thắng"</b> tung bay trên nóc hầm De Castries.']},
+  khesanh:{when:'ĐƯỜNG 9 – KHE SANH · 1968', lines:[
+    'Đầu năm 1968, quân ta mở chiến dịch <b>Đường 9 – Khe Sanh</b>, vây hãm căn cứ Tà Cơn.',
+    'Đối phương dồn máy bay B-52 ném bom ngày đêm, biến cao nguyên thành biển lửa.',
+    'Bộ đội ta đào hào áp sát, <b>bám trụ giữa mưa bom</b> suốt nhiều tháng trời.',
+    'Giữa năm 1968, quân Mỹ buộc phải <b>rút khỏi Khe Sanh</b> — "cái mốc" mà họ từng thề giữ bằng mọi giá.']},
+  himlam:{when:'MỞ MÀN ĐIỆN BIÊN PHỦ · 13/3/1954', lines:[
+    'Chiều 13/3/1954, pháo binh ta đồng loạt khai hoả — <b>chiến dịch Điện Biên Phủ</b> bắt đầu.',
+    'Him Lam: cứ điểm mạnh với ba lớp hàng rào, lô cốt và hoả điểm dày đặc, được coi là "cánh cửa thép" phía bắc.',
+    'Anh hùng <b>Phan Đình Giót</b> lấy thân mình lấp lỗ châu mai, mở đường cho đồng đội xung phong.',
+    'Chỉ sau một đêm, <b>Him Lam bị xoá sổ</b> — trận đầu thắng lợi, mở ra con đường tới chiến thắng lịch sử.']},
+  bachuc:{when:'BIÊN GIỚI TÂY NAM · 1978', lines:[
+    'Từ năm 1977, quân Khmer Đỏ của tập đoàn Pol Pot liên tục <b>đánh sang biên giới Tây Nam</b>, tàn sát dân thường các tỉnh An Giang, Kiên Giang, Tây Ninh.',
+    'Tháng 4/1978, chúng gây ra <b>vụ thảm sát Ba Chúc</b> — hơn ba nghìn đồng bào bị giết hại, nhiều người ngay trong chùa và trường học.',
+    'Không thể để <b>máu đồng bào</b> đổ thêm một giọt nào nữa.',
+    'Bộ đội ta phản công, <b>quét sạch quân xâm lược</b> khỏi từng thửa ruộng, từng mái chùa biên cương.']},
+  phnompenh:{when:'TÂY NAM · 7/1/1979', lines:[
+    'Cuối năm 1978, quân tình nguyện Việt Nam cùng <b>Mặt trận đoàn kết dân tộc cứu nước Campuchia</b> mở cuộc tổng tiến công.',
+    'Các mũi tiến công thần tốc vượt sông Mê Kông, đánh tan các sư đoàn Khmer Đỏ.',
+    'Ngày <b>7/1/1979</b>, thủ đô Phnôm Pênh được giải phóng.',
+    'Chế độ diệt chủng sụp đổ — nhân dân Campuchia <b>được hồi sinh</b> sau những năm tháng địa ngục.']},
+  langson:{when:'BIÊN GIỚI PHÍA BẮC · 17/2/1979', lines:[
+    'Rạng sáng 17/2/1979, quân Trung Quốc ồ ạt <b>tiến công toàn tuyến biên giới phía Bắc</b>, từ Phong Thổ đến Móng Cái.',
+    'Tại Đồng Đăng, bộ đội biên phòng, dân quân và bộ đội địa phương <b>bám trụ từng hang đá, từng điểm cao</b> trước quân đông gấp nhiều lần.',
+    'Quân và dân Lạng Sơn chiến đấu kiên cường, khiến đối phương <b>thương vong nặng nề</b>.',
+    'Ngày 5/3/1979, phía Trung Quốc tuyên bố rút quân. <b>Biên cương Tổ quốc vẫn vẹn nguyên.</b>']},
+  caobang:{when:'BIÊN GIỚI PHÍA BẮC · 1979', lines:[
+    'Cao Bằng là một trong những hướng tiến công chính của quân Trung Quốc tháng 2/1979.',
+    'Giữa núi đá và thung lũng, <b>dân quân, du kích và bộ đội địa phương</b> đánh địch ngay từ cửa nhà, đầu bản.',
+    'Từng đoàn xe tăng, bộ binh đối phương bị chặn đánh dọc <b>đường số 3</b>.',
+    '<b>"Thà hy sinh tất cả chứ nhất định không chịu mất nước"</b> — lời thề ấy lại vang lên nơi địa đầu.']},
+  vixuyen:{when:'VỊ XUYÊN · HÀ GIANG · 1984–1989', lines:[
+    'Từ năm 1984, mặt trận Vị Xuyên trở thành nơi giao tranh <b>ác liệt và dai dẳng</b> nhất biên giới phía Bắc.',
+    'Các cao điểm 1509, 772, 685… đổi chủ nhiều lần; đất đá bị pháo cày nát đến mức được gọi là <b>"lò vôi thế kỷ"</b>.',
+    'Hàng nghìn chiến sĩ đã <b>nằm lại</b> giữa núi đá tai mèo để giữ từng mét đất biên cương.',
+    'Họ đã sống, chiến đấu và hy sinh với tinh thần: <b>"Sống bám đá, chết kiên cường, không rời trận địa"</b>.']},
+  contien:{when:'QUẢNG TRỊ · 1967', lines:[
+    'Cồn Tiên – Dốc Miếu nằm trên <b>"hàng rào điện tử McNamara"</b> chạy dọc giới tuyến Quảng Trị.',
+    'Bãi mìn, dây thép gai, cảm biến điện tử, lô cốt và pháo đài — đối phương tin rằng không ai vượt qua được.',
+    'Năm 1967, pháo binh và bộ binh ta <b>liên tục tiến công</b>, đánh sập từng cụm cứ điểm.',
+    'Hàng rào "không thể xuyên thủng" bị <b>xé toạc</b> bởi ý chí của những người lính giữ nước.']}
+};
+const INTRO_HEART=[
+  ['Sau lưng ta là <b>quê hương</b>: là mẹ già tựa cửa, là em thơ, là luỹ tre làng.','<b>Không có gì quý hơn độc lập, tự do.</b> — Chủ tịch Hồ Chí Minh'],
+  ['Mỗi tấc đất hôm nay thấm <b>máu xương cha ông</b> — không thể để rơi vào tay giặc.','Anh em ơi, <b>còn người là còn trận địa!</b>'],
+  ['Ta đánh vì <b>những người ở lại</b>: vì ánh đèn dầu bên bếp lửa, vì câu hát ru con.','<b>Quyết tử cho Tổ quốc quyết sinh!</b>'],
+  ['Đồng đội bên ta là <b>anh em ruột thịt</b> — sống cùng hầm, chết cùng chiến hào.','<b>Vì độc lập dân tộc, vì thống nhất non sông!</b>']];
+function playIntro(mapId, mission){
+  return new Promise(res=>{
+    if((navigator.webdriver && !window.__forceIntro) || window.__noIntro){ res(); return; }
+    const I=MAP_INTRO[mapId]; if(!I){ res(); return; }
+    const MD=MAPS[mapId], F=FACTIONS[MD.enemy]||FACTIONS.us;
+    const mis = mission==='base' && state.defend ? `NHIỆM VỤ: <b>TỬ THỦ 5 PHÚT</b> — giữ vững xe chỉ huy trước các đợt xung phong ngày càng đông của ${F.label}.`
+      : mission==='base' ? `NHIỆM VỤ: phá huỷ <b>xe chỉ huy</b> của ${F.label}, bảo vệ xe chỉ huy của ta.`
+      : mission==='bunker' ? `NHIỆM VỤ: đánh chiếm lần lượt <b>từng lô cốt</b> của ${F.label}, cắm cờ trên cứ điểm.`
+      : `NHIỆM VỤ: giải cứu <b>các đồng chí bị bắt</b>, đưa về điểm sơ tán an toàn.`;
+    const H=INTRO_HEART[(Math.random()*INTRO_HEART.length)|0];
+    const el=$('intro'); el.querySelector('.iv').style.backgroundImage=`url(assets/maps/${mapId}.jpg)`;
+    el.querySelector('.iy').textContent=I.when; el.querySelector('.it').textContent=MD.name.toUpperCase();
+    const ps=[...I.lines.map(t=>`<p>${t}</p>`), `<p class="mis">${mis}</p>`, `<p class="q">${H[0]}</p>`, `<p class="hero">${H[1]}</p>`];
+    el.querySelector('.ip').innerHTML=ps.join(''); const go=el.querySelector('.go'); go.classList.remove('on');
+    el.classList.remove('hidden'); $('menu').classList.add('hidden'); $('loading').classList.add('hidden'); AU.init(); AU.play('wave');
+    const P=[...el.querySelectorAll('.ip p')]; let k=0, done=false, tm=null;
+    const next=()=>{ if(k<P.length){ P[k].classList.add('on'); k++; tm=setTimeout(next, k===P.length-1?2600:2300); } else { go.classList.add('on'); tm=setTimeout(finish, 6000); } };
+    const finish=()=>{ if(done) return; done=true; clearTimeout(tm); el.classList.add('hidden'); el.onclick=null; $('introSkip').onclick=null; res(); };
+    el.onclick=e=>{ if(e.target.id==='introSkip') return; if(k<P.length){ clearTimeout(tm); P.forEach(p=>p.classList.add('on')); k=P.length; go.classList.add('on'); tm=setTimeout(finish,8000); } else finish(); };
+    $('introSkip').onclick=e=>{ e.stopPropagation(); finish(); };
+    tm=setTimeout(next, 1300);
+  });
 }
 function roomSlug(t){ return String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d').replace(/Đ/g,'d').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,18)||'phong'; }
 async function startOnline(key, joinTitle){
   settings.nick=($('nick').value||settings.nick).trim().slice(0,14)||settings.nick; store.set('nick',settings.nick);
   let mapId=settings.netMap, code, title;
   if(key){ const m=/^tl-([a-z0-9]+)-(.+)$/.exec(key); if(!m || !MAPS[m[1]]) return; mapId=m[1]; code=m[2]; title=joinTitle||code; }
-  else { title=($('roomCode').value||('Phòng của '+settings.nick)).trim().slice(0,30); code = roomSlug(title) + (net.kind==='ws' ? '-'+Math.random().toString(36).slice(2,6) : ''); }
+  else { title=($('roomCode').value||('Phòng của '+settings.nick)).trim().slice(0,30); code = (settings.netMode==='tdm'?'td-':'') + roomSlug(title) + (net.kind==='ws' ? '-'+Math.random().toString(36).slice(2,6) : ''); }
+  const tdm = /^td-/.test(code);
   $('netStatus').textContent='Đang vào phòng…';
   net.mapId=mapId; try{ await net.join(mapId+'-'+code, title); }catch(e){ $('netStatus').innerHTML='<span style="color:#ff7a66">Không vào được phòng. Thử lại sau giây lát.</span>'; return; }
-  clearWorld(); await loadMap(net.mapId||'cuchi'); state.mode='online'; state.mission=null; Object.assign(state,{score:0,kills:0,roundEnd:0});
-  resetWeapons(); Object.assign(player,{hp:100,armor:0,alive:true,cur:2,prev:1,crouch:false,prone:false,onArt:null,flash:false}); net.respawn(); spawnPickups(); enterPlay();
-  showMsg('ĐẤU ONLINE','Phòng: '+title.toUpperCase()+' · hạ '+KILL_LIMIT+' mạng để thắng',3.5);
+  clearWorld(); await loadMap(net.mapId||'cuchi'); state.mode='online'; state.mission=tdm?'tdm':null; Object.assign(state,{score:0,kills:0,roundEnd:0});
+  net.tdm=tdm; player.side='vn';
+  if(tdm){ const side=await pickSide(); player.side=side; net.side=side; net.push(true); }
+  resetWeapons(); Object.assign(player,{hp:100,armor:tdm?50:0,alive:true,cur:2,prev:1,crouch:false,prone:false,onArt:null,flash:false}); net.respawn(); spawnPickups(); enterPlay();
+  showMsg(tdm?'ĐẤU ĐỘI ONLINE':'ĐẤU ONLINE', tdm ? `Bạn ở phe ${player.side==='vn'?'VIỆT NAM':(FACTIONS[MAPDEF.enemy]||FACTIONS.us).label.toUpperCase()} · đội nào đạt ${TEAM_LIMIT} điểm hạ trước sẽ thắng` : 'Phòng: '+title.toUpperCase()+' · hạ '+KILL_LIMIT+' mạng để thắng',4);
 }
+const TEAM_LIMIT=40;
+function sideCounts(){ const c={vn:0,us:0}; if(!net.room) return c; for(const pe of net.room.peers()){ if(pe.sameTab) continue; const sd=pe.presence&&pe.presence.sd; if(sd==='vn'||sd==='us') c[sd]++; } return c; }
+function pickSide(){ return new Promise(res=>{ const el=$('sidePick'); const F=FACTIONS[MAPDEF.enemy]||FACTIONS.us;
+  $('sideSub').textContent=MAPDEF.name+' · '+MAPDEF.year;
+  const draw=()=>{ const c=sideCounts(); el.querySelector('.sd.vn').innerHTML=`${FLAG_SVG.vn}<b>QUÂN ĐỘI VIỆT NAM</b><span>${c.vn} người đang chơi</span>`;
+    el.querySelector('.sd.us').innerHTML=`${FLAG_SVG[MAPDEF.enemy]||FLAG_SVG.us}<b>${F.label.toUpperCase()}</b><span>${c.us} người đang chơi</span>`; };
+  draw(); const iv=setInterval(draw,700); el.classList.remove('hidden'); $('menu').classList.add('hidden');
+  if(navigator.webdriver){ clearInterval(iv); el.classList.add('hidden'); res(window.__autoSide||'vn'); return; }
+  el.onclick=e=>{ const b=e.target.closest('.sd'); if(!b) return; clearInterval(iv); el.classList.add('hidden'); el.onclick=null; AU.init(); AU.play('swap'); res(b.dataset.s); }; }); }
 let roomPoll=null;
 async function loadRooms(){
   if($('pOnline').classList.contains('hidden') || $('menu').classList.contains('hidden')){ clearInterval(roomPoll); roomPoll=null; return; }
   if(net.kind!=='ws'){ $('roomList').innerHTML='<div class="roomEmpty">Chế độ này không có danh sách phòng — bấm ＋ TẠO PHÒNG và dùng cùng một tên phòng với bạn bè.</div>'; return; }
   try{ const r=await fetch('/rooms',{cache:'no-store'}); const list=await r.json();
     $('roomList').innerHTML = list.length ? list.map(x=>{ const m=/^tl-([a-z0-9]+)-/.exec(x.room); const mp=m&&MAPS[m[1]]; if(!mp) return '';
-      return `<button class="roomc" data-k="${esc(x.room)}" data-t="${esc(x.title||'')}"><img src="assets/maps/${m[1]}.jpg" alt="" loading="lazy"><div class="rt">${esc(x.title||x.room)}</div><span class="go">VÀO</span><div class="rb"><span>${esc(mp.name.split(' – ')[0])}</span><b>👤 ${x.n}/16</b></div></button>`; }).join('') : '<div class="roomEmpty">Chưa có phòng nào đang mở.<br>Bấm <b>＋ TẠO PHÒNG</b> — phòng của bạn sẽ hiện ở đây cho mọi người cùng thấy.</div>';
+      return `<button class="roomc" data-k="${esc(x.room)}" data-t="${esc(x.title||'')}"><img src="assets/maps/${m[1]}.jpg" alt="" loading="lazy"><div class="rt">${esc(x.title||x.room)}</div><span class="md ${/^tl-[a-z0-9]+-td-/.test(x.room)?'':'ffa'}">${/^tl-[a-z0-9]+-td-/.test(x.room)?'ĐẤU ĐỘI':'TỰ DO'}</span><span class="go">VÀO</span><div class="rb"><span>${esc(mp.name.split(' – ')[0])}</span><b>👤 ${x.n}/16</b></div></button>`; }).join('') : '<div class="roomEmpty">Chưa có phòng nào đang mở.<br>Bấm <b>＋ TẠO PHÒNG</b> — phòng của bạn sẽ hiện ở đây cho mọi người cùng thấy.</div>';
   }catch(e){ $('roomList').innerHTML='<div class="note">Không tải được danh sách phòng.</div>'; }
 }
 const FLAG_SVG={
   vn:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#da251d"/><polygon fill="#ffde00" points="15,3.6 16.4,8 21,8 17.3,10.7 18.7,15.1 15,12.4 11.3,15.1 12.7,10.7 9,8 13.6,8"/></svg>',
   us:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#fff"/>'+[0,2,4,6,8,10,12].map(i=>`<rect y="${(i*20/13).toFixed(2)}" width="30" height="${(20/13).toFixed(2)}" fill="#b22234"/>`).join('')+'<rect width="12.5" height="10.8" fill="#3c3b6e"/><g fill="#fff">'+[[2,2],[5,2],[8,2],[3.5,4.5],[6.5,4.5],[9.5,4.5],[2,7],[5,7],[8,7]].map(([x,y])=>`<circle cx="${x+0.6}" cy="${y+0.4}" r="0.55"/>`).join('')+'</g></svg>',
+  kh:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#cf2a27"/><g fill="#f5d33a"><rect x="7" y="11" width="16" height="3"/><rect x="8.5" y="8" width="3" height="3"/><rect x="13.5" y="6" width="3" height="5"/><rect x="18.5" y="8" width="3" height="3"/><polygon points="10,5.5 11.5,8 8.5,8"/><polygon points="15,3 16.5,6 13.5,6"/><polygon points="20,5.5 21.5,8 18.5,8"/></g></svg>',
+  cn:'<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#de2910"/><g fill="#ffde00"><polygon points="5,2 6.2,5.6 10,5.6 6.9,7.8 8.1,11.4 5,9.2 1.9,11.4 3.1,7.8 0,5.6 3.8,5.6"/><circle cx="10.5" cy="2.5" r="0.9"/><circle cx="12" cy="4.5" r="0.9"/><circle cx="12" cy="7.2" r="0.9"/><circle cx="10.5" cy="9.2" r="0.9"/></g></svg>',
   fr:'<svg viewBox="0 0 30 20"><rect width="10" height="20" fill="#0055a4"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ef4135"/></svg>' };
 function enterPlay(){
   AU.init(); state.phase='playing'; $('menu').classList.add('hidden'); $('hud').classList.remove('hidden'); $('dead').classList.add('hidden');
@@ -3894,7 +4364,7 @@ $('chips').addEventListener('click',e=>{ const i=e.target.dataset.i; if(i==null)
 function segInit(id,key,cb){ const el=$(id); const set=()=>[...el.children].forEach(b=>b.classList.toggle('on',String(settings[key])===b.dataset.v)); set();
   el.addEventListener('click',e=>{ const v=e.target.dataset.v; if(v==null) return; settings[key]= key==='diff'?+v:v; store.set(key,settings[key]); set(); cb&&cb(); }); }
 segInit('segQ','quality',()=>{ store.set('quality4',settings.quality); if(state.phase==='menu'){ $('loading').classList.remove('hidden'); setLoad(0.05,'ĐANG ÁP DỤNG CHẤT LƯỢNG ĐỒ HOẠ MỚI…'); setTimeout(()=>location.reload(),150); } else toast('Chất lượng mới áp dụng khi về menu chính'); });
-segInit('segD','diff'); segInit('segFps','fps',()=>store.set('fps5',settings.fps));
+segInit('segNetMode','netMode',()=>store.set('netMode',settings.netMode)); segInit('segD','diff'); segInit('segFps','fps',()=>store.set('fps5',settings.fps));
 segInit('segMode','mode');
 // segNetMap: renderNetMaps()
 $('sens').value=settings.sens; $('sens').oninput=e=>{ settings.sens=+e.target.value; store.set('sens',settings.sens); };
@@ -3928,7 +4398,7 @@ async function refreshNet(){
   window.__gameReady=true; requestAnimationFrame(frame);
   net.probe().then(()=>{ netProbed=true; });
   // test hooks
-  window.__game={CELL,applyEnvMix,shellCam,shells,state,player,enemies,allies,hostages,hqs,arts,crates,capCells,damageEnemy,damageUnit,plantCharge,V3,supplyDrop,playerThrow,playerCharge,shopBuy,shopOpen,shopClose,toggleProne,mountArt,damageHQ,startCampaign,startOnline,net,spawnEnemy,switchWeapon,camera,renderer,Q,settings,loadMap,MAPS,get MAPID(){return MAPID;}};
+  window.__game={explode,net,pickSide,teamSupply,callSupport,openSupMap,playIntro,strikes,CELL,applyEnvMix,shellCam,shells,state,player,enemies,allies,hostages,hqs,arts,crates,capCells,damageEnemy,damageUnit,plantCharge,V3,supplyDrop,playerThrow,playerCharge,shopBuy,shopOpen,shopClose,toggleProne,mountArt,damageHQ,startCampaign,startOnline,net,spawnEnemy,switchWeapon,camera,renderer,Q,settings,loadMap,MAPS,get MAPID(){return MAPID;}};
 })();
 </script>
 </body>
