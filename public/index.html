@@ -321,7 +321,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.5</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.6</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -468,6 +468,41 @@ const scene = new THREE.Scene();
 const FOG_COL = 0x0c0b09;
 scene.background = new THREE.Color(FOG_COL);
 scene.fog = new THREE.FogExp2(FOG_COL, 0.032);
+// v4.6: sương mù khí quyển theo độ cao (kiểu Exponential Height Fog của UE/Frostbite) + nắng tán xạ hướng mặt trời
+// + biến thiên màu nền đất cỡ lớn (chống lặp vân) + bóng mây trôi. Dùng uniform chia sẻ theo tham chiếu (object thường).
+const FOGX={sun:{x:0.55,y:0.74,z:0.38}, sunCol:{x:0,y:0,z:0}, h:{x:0,y:0,z:0}, cloud:{x:0,y:0,z:0}};
+for(const k in THREE.ShaderLib){ const u=THREE.ShaderLib[k].uniforms; if(u && u.fogColor){ u.fogSunDir={value:FOGX.sun}; u.fogSunCol={value:FOGX.sunCol}; u.fogH={value:FOGX.h}; u.fogCloud={value:FOGX.cloud}; } }
+THREE.ShaderChunk.fog_pars_vertex='#ifdef USE_FOG\n varying float vFogDepth; varying vec3 vFogView;\n#endif';
+THREE.ShaderChunk.fog_vertex='#ifdef USE_FOG\n vFogDepth = - mvPosition.z; vFogView = mvPosition.xyz;\n#endif';
+THREE.ShaderChunk.fog_pars_fragment=`#ifdef USE_FOG
+ uniform vec3 fogColor; varying float vFogDepth; varying vec3 vFogView; uniform vec3 fogSunDir, fogSunCol, fogH, fogCloud;
+ #ifdef FOG_EXP2
+  uniform float fogDensity;
+ #else
+  uniform float fogNear; uniform float fogFar;
+ #endif
+ float fxHash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+ float fxNoise(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
+   return mix(mix(fxHash(i),fxHash(i+vec2(1,0)),f.x), mix(fxHash(i+vec2(0,1)),fxHash(i+vec2(1,1)),f.x), f.y); }
+#endif`;
+THREE.ShaderChunk.fog_fragment=`#ifdef USE_FOG
+ vec3 fWd = (vec4(vFogView,0.0)*viewMatrix).xyz; float fDist=length(fWd); vec3 fDir=fWd/max(fDist,1e-4); vec3 fWp=cameraPosition+fWd;
+ #ifdef MACRO_VAR
+  float mn=fxNoise(fWp.xz*0.045)*0.6+fxNoise(fWp.xz*0.19)*0.4; gl_FragColor.rgb*=mix(0.7,1.2,mn)*mix(vec3(1.04,0.98,0.94),vec3(0.95,1.0,1.04),fxNoise(fWp.xz*0.013+7.0));
+ #endif
+ if(fogCloud.x>0.0){ vec2 cp=fWp.xz*0.011+vec2(fogCloud.y*0.012,fogCloud.y*0.006); float cn=fxNoise(cp)*0.65+fxNoise(cp*2.3)*0.35;
+   gl_FragColor.rgb*=1.0-fogCloud.x*smoothstep(0.48,0.72,cn); }
+ #ifdef FOG_EXP2
+  float fogFactor;
+  if(fogH.x>0.0){ float k=fogH.x; float dy=fDir.y*k*fDist; float integ = abs(dy)>1e-3 ? (1.0-exp(-dy))/dy : 1.0-0.5*dy;
+    float od=fogDensity*exp(-k*max(cameraPosition.y-fogH.y,0.0))*fDist*integ; fogFactor=1.0-exp(-od); }
+  else fogFactor = 1.0 - exp( - fogDensity * fogDensity * vFogDepth * vFogDepth );
+ #else
+  float fogFactor = smoothstep( fogNear, fogFar, vFogDepth );
+ #endif
+ vec3 fCol=fogColor+fogSunCol*pow(max(dot(fDir,fogSunDir),0.0),6.0);
+ gl_FragColor.rgb = mix( gl_FragColor.rgb, fCol, fogFactor );
+#endif`;
 const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.05, 160);
 camera.rotation.order = 'YXZ';
 scene.add(camera);
@@ -513,6 +548,17 @@ const SanitizeShader = { uniforms:{tDiffuse:{value:null}},
   fragmentShader:`uniform sampler2D tDiffuse; varying vec2 vUv; void main(){ vec4 c=texture2D(tDiffuse,vUv);
     if(any(isnan(c.rgb))||any(isinf(c.rgb))) c.rgb=vec3(0.0);
     c.rgb=clamp(c.rgb,0.0,24.0); gl_FragColor=vec4(c.rgb,1.0); }` };
+// v4.6: tia nắng xuyên tán lá (god rays) — làm mờ toả tia trong không gian màn hình từ vị trí mặt trời; trời có alpha=0 làm mặt nạ
+const GodRayShader = { uniforms:{tDiffuse:{value:null}, sunUv:{value:new THREE.Vector2(0.5,0.5)}, sunOn:{value:0}, col:{value:new THREE.Color(1,0.86,0.66)}},
+  vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0); }`,
+  fragmentShader:`uniform sampler2D tDiffuse; uniform vec2 sunUv; uniform float sunOn; uniform vec3 col; varying vec2 vUv;
+  void main(){ vec4 c=texture2D(tDiffuse,vUv); vec3 o=clamp(c.rgb,0.0,24.0);
+    if(sunOn>0.001){ vec2 d=(vUv-sunUv)*(0.85/28.0); vec2 uv=vUv; float dec=1.0; vec3 acc=vec3(0.0);
+      for(int i=0;i<28;i++){ uv-=d; vec4 sm=texture2D(tDiffuse,clamp(uv,0.001,0.999)); float m=(1.0-sm.a)*smoothstep(0.45,1.1,dot(min(sm.rgb,vec3(2.0)),vec3(0.3333)))*exp(-length(uv-sunUv)*2.6);
+        acc+=min(sm.rgb,vec3(2.0))*m*dec; dec*=0.955; }
+      o+=acc*(1.0/28.0)*col*sunOn*1.25; }
+    gl_FragColor=vec4(o,1.0); }` };
+let godPass=null;
 let composer=null, bloomPass=null, finalPass=null, aoPass=null;
 let renderScale=1;
 function basePR(){ return Math.min(devicePixelRatio||1, Q.dpr) * (IS_TOUCH && settings.quality==='low' ? 0.85 : 1); }
@@ -524,6 +570,7 @@ function setupPost(){
   const rt=new THREE.WebGLRenderTarget(innerWidth*pr, innerHeight*pr, {type:THREE.HalfFloatType, samples:Q.samples});
   composer = new EffectComposer(renderer, rt);
   composer.addPass(new RenderPass(scene, camera));
+  if(Q.shadows){ godPass=new ShaderPass(GodRayShader); composer.addPass(godPass); }
   composer.addPass(new ShaderPass(SanitizeShader));
   if(Q.ao){
     aoPass = new GTAOPass(scene, camera, innerWidth, innerHeight);
@@ -1206,6 +1253,15 @@ function buildMaterials(){
 let envTex=null;
 // ---- ảnh chất liệu chụp thật (Poly Haven, CC0) — tải nếu có, không có thì giữ chất liệu tự tạo
 const texCache={}; let hdrEnv=null;
+// v4.6: bầu trời ảnh HDRI thật (Poly Haven CC0 'kloofendal_48d_partly_cloudy_puresky', 'kloppenheim_06_puresky')
+const SKYT={}; let skyMat=null;
+async function loadSky(kind){ if(SKYT[kind]) return SKYT[kind];
+  const big = settings.quality==='high'||settings.quality==='ultra';
+  const tex = await new THREE.TextureLoader().loadAsync(`assets/tex/sky_${kind}${big?'':'_2k'}.jpg`).catch(()=>null); if(!tex) return null;
+  tex.colorSpace=THREE.SRGBColorSpace; tex.generateMipmaps=false; tex.minFilter=THREE.LinearFilter; tex.wrapS=THREE.RepeatWrapping;
+  let env=null; try{ const hdr=await new RGBELoader().loadAsync(`assets/tex/sky_${kind}_env.hdr`); const pm=new THREE.PMREMGenerator(renderer); env=pm.fromEquirectangular(hdr).texture; hdr.dispose(); pm.dispose(); }catch(e){}
+  return SKYT[kind]={tex,env}; }
+function skyKind(){ return MAPDEF.dusk?'dusk':'day'; }
 const _tl=new THREE.TextureLoader();
 const _load=(url,srgb)=>new Promise(res=>_tl.load(url,t=>{ t.wrapS=t.wrapT=THREE.RepeatWrapping; t.anisotropy=maxAniso; if(srgb) t.colorSpace=THREE.SRGBColorSpace; res(t); },undefined,()=>res(null)));
 async function loadSet(key){
@@ -1233,6 +1289,7 @@ async function loadRealTextures(){
     jobs.push(loadSet('cloth').then(st=>{ if(!st) return; const [d,n,o]=st.map(t=>{ if(!t) return null; const c=t.clone(); c.wrapS=c.wrapT=THREE.RepeatWrapping; c.repeat.set(7,7); c.needsUpdate=true; return c; }); if(d){ TEX.fabric.map=d; } if(n) TEX.fabric.normal=n; if(o) TEX.fabric.orm=o; }));
     try{ const hdr=await new RGBELoader().loadAsync('assets/tex/env_1k.hdr'); const pm=new THREE.PMREMGenerator(renderer); hdrEnv=pm.fromEquirectangular(hdr).texture; hdr.dispose(); pm.dispose(); }catch(e){}
   }
+  if(D_.outdoor) jobs.push(loadSky(skyKind()).then(k=>{ if(k && skyMat){ skyMat.uniforms.map.value=k.tex; skyMat.uniforms.uInt.value=MAPDEF.dusk?1.0:1.15; skyMat.uniforms.uHz.value=1; } if(k && state.phase!=='menu' || k){ applyEnvMix(nightAt(state.tod||0)); } return !!k; }));
   const tw = D_.outdoor ? [1,1] : [1,1.2];
   jobs.push(applyTex(M.ceil,'ceil',COLS,ROWS,{color:0xb8a890}),
     applyTex(M.concrete,T.w1,D_.outdoor?1.4:1,D_.outdoor?1.2:1.2,{color:tint.w1||0xffffff}).then(ok=>{ if(!ok) procTex(M.concrete, D_.outdoor?'floor':'concrete'); return ok; }),
@@ -1478,7 +1535,8 @@ function buildOutdoorSurroundings(){
   buildGrass(); rain=null; skyN=null; skyD=null; if(MAPDEF.night) buildRain();
   const W=COLS*CELL, D=ROWS*CELL, cx=W/2, cz=D/2;
   // outer ground
-  const og=new THREE.Mesh(new THREE.PlaneGeometry(900,900), new THREE.MeshStandardMaterial({color: 0x6a3b26, roughness:1}));
+  const ogm=new THREE.MeshStandardMaterial({color: 0x6a3b26, roughness:1}); ogm.defines={MACRO_VAR:1};
+  const og=new THREE.Mesh(new THREE.PlaneGeometry(900,900), ogm);
   og.rotation.x=-Math.PI/2; og.position.set(cx,-0.02,cz); level.add(og);
   // tree line
   const n = settings.quality==='low'?70:170;
@@ -1503,8 +1561,17 @@ function buildOutdoorSurroundings(){
   }
   level.add(trunk, crown);
   // distant hills
-  const hm=new THREE.MeshStandardMaterial({color:0x55645a, roughness:1, flatShading:true});
-  for(let i=0;i<14;i++){ const a=i/14*Math.PI*2+rand(-.1,.1), r=rand(170,260); const h=new THREE.Mesh(new THREE.ConeGeometry(rand(60,110),rand(30,70),7,1), hm); h.position.set(cx+Math.cos(a)*r, 0, cz+Math.sin(a)*r); h.position.y=h.geometry.parameters.height/2-5; h.rotation.y=rand(0,6); level.add(h); }
+  const hm=new THREE.MeshStandardMaterial({color:0xffffff, vertexColors:true, roughness:1});
+  // đồi rừng xa: vòm thấp, mép gợn như tán cây, màu xanh rừng đậm (sương mù khí quyển sẽ làm nhạt dần theo khoảng cách)
+  for(let i=0;i<22;i++){ const a=i/22*Math.PI*2+rand(-.12,.12), r=rand(185,300), H=rand(26,62), R=rand(60,120), ph=rand(0,9);
+    const g=new THREE.SphereGeometry(1,56,14,0,Math.PI*2,0,Math.PI/2); const pa=g.attributes.position, cl=new Float32Array(pa.count*3);
+    for(let j=0;j<pa.count;j++){ const x=pa.getX(j), y=pa.getY(j), z=pa.getZ(j), an=Math.atan2(z,x);
+      const n=Math.sin(an*3+ph)*0.18+Math.sin(an*7+ph*1.7)*0.08+Math.sin(an*19+ph)*0.025;
+      const bump=(Math.sin(an*41+y*9+ph)*0.5+Math.sin(an*67-y*13)*0.5)*0.035*y; // tán cây lô nhô
+      const rr=(1+n)*(1+bump); pa.setXYZ(j, x*R*rr, y*H*(1+n*0.6)+bump*H*0.6, z*R*rr);
+      const v=0.8+0.2*Math.sin(an*29+y*11+ph); cl[j*3]=0.11*v; cl[j*3+1]=0.17*v; cl[j*3+2]=0.1*v; }
+    g.setAttribute('color',new THREE.BufferAttribute(cl,3)); g.computeVertexNormals();
+    const h=new THREE.Mesh(g, hm); h.position.set(cx+Math.cos(a)*r, -4, cz+Math.sin(a)*r); h.rotation.y=rand(0,6); h.userData.noAO=true; level.add(h); }
   // sky dome
   const c=document.createElement('canvas'); c.width=1024; c.height=512; const x=c.getContext('2d');
   const gr=x.createLinearGradient(0,0,0,512);
@@ -1519,7 +1586,20 @@ function buildOutdoorSurroundings(){
     const mg=x.createRadialGradient(760,90,0,760,90,60); mg.addColorStop(0,'rgba(230,236,255,1)'); mg.addColorStop(0.12,'rgba(220,228,255,.9)'); mg.addColorStop(1,'rgba(120,140,200,0)'); x.fillStyle=mg; x.fillRect(680,20,160,160);
     const fg=x.createLinearGradient(0,330,0,512); fg.addColorStop(0,'rgba(255,120,40,0)'); fg.addColorStop(1,'rgba(255,110,40,.18)'); x.fillStyle=fg; x.fillRect(0,330,1024,182); }
   const st=new THREE.CanvasTexture(c); st.colorSpace=THREE.SRGBColorSpace;
-  const sky=new THREE.Mesh(new THREE.SphereGeometry(420,40,20), new THREE.MeshBasicMaterial({map:st, side:THREE.BackSide, fog:false, depthWrite:false}));
+  let sky;
+  if(NIGHTSKY) sky=new THREE.Mesh(new THREE.SphereGeometry(420,40,20), new THREE.MeshBasicMaterial({map:st, side:THREE.BackSide, fog:false, depthWrite:false}));
+  else { const k=SKYT[skyKind()];
+    skyMat=new THREE.ShaderMaterial({ side:THREE.BackSide, depthWrite:false, fog:false,
+      uniforms:{ map:{value:k?k.tex:st}, uInt:{value:k?(MAPDEF.dusk?1.0:1.15):1}, uHz:{value:k?1:0}, uHaze:{value:new THREE.Color(0xa9aca4)}, uDim:{value:1} },
+      vertexShader:'varying vec3 vD; varying vec2 vUv0; void main(){ vD=position; vUv0=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+      fragmentShader:`uniform sampler2D map; uniform float uInt,uHz,uDim; uniform vec3 uHaze; varying vec3 vD; varying vec2 vUv0;
+        void main(){ vec3 d=normalize(vD); vec2 uv=mix(vUv0, vec2(atan(d.z,d.x)*0.1591549+0.5, asin(clamp(d.y,-1.,1.))*0.3183099+0.5), uHz);
+          vec3 c=texture2D(map,uv).rgb*uInt; float hz=smoothstep(-0.02,0.2,d.y); c=mix(uHaze, c, mix(1.0,hz,uHz)); c*=uDim;
+          gl_FragColor=vec4(c,0.0);
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
+        }` });
+    sky=new THREE.Mesh(new THREE.SphereGeometry(420,48,24), skyMat); }
   sky.position.set(cx,0,cz); sky.renderOrder=-10; sky.userData.noAO=true; level.add(sky);
   if(!NIGHTSKY){ window.__nightSky=true; const nm=buildSkyOnly(); window.__nightSky=false; nm.position.set(cx,0,cz); nm.scale.setScalar(0.98); nm.material.transparent=true; nm.material.opacity=0; nm.renderOrder=-9; level.add(nm); skyN=nm; skyD=sky; }
 }
@@ -1551,10 +1631,10 @@ function makeEnv(key, top, bottom, spots){
   const pm=new THREE.PMREMGenerator(renderer); const t=pm.fromScene(es,0.04).texture; pm.dispose(); envCache[key]=t; return t;
 }
 const ENVP={
-  night:{bg:0x05070d,fog:0x111624,fd:0.013,hc:0x6274a6,hg:0x2a2018,hi:1.1,ex:1.9,sc:0xa8b8ff,si:1.5,sp:[40,90,-50]},
-  dusk:{bg:0x8a6a58,fog:0x9a7462,fd:0.011,hc:0xe8bc9a,hg:0x5a3a26,hi:1.2,ex:1.45,sc:0xffb070,si:2.4,sp:[-90,28,20]},
-  day:{bg:0xa9aca4,fog:0xa9aca4,fd:0.028,hc:0xd4d8d4,hg:0x6a4030,hi:1.05,ex:1.05,sc:0xfff0d8,si:1.7,sp:[-60,55,35]},
-  clear:{bg:0xa8b8c4,fog:0xb3bec6,fd:0.012,hc:0xdfe6ec,hg:0x6a4030,hi:1.1,ex:1.0,sc:0xfff2dc,si:2.1,sp:[-50,70,30]} };
+  night:{bg:0x05070d,fog:0x111624,fd:0.016,hc:0x6274a6,hg:0x2a2018,hi:1.1,ex:1.9,sc:0xa8b8ff,si:1.5,sp:[40,90,-50]},
+  dusk:{bg:0xa08a7c,fog:0xa58f80,fd:0.0075,hc:0xd8c0b0,hg:0x5a3a26,hi:0.9,ex:1.3,sc:0xffb478,si:2.6,sp:[68,25,54]},
+  day:{bg:0x9fa9b4,fog:0xa4adb6,fd:0.0065,hc:0xc8d4e2,hg:0x6a4a30,hi:0.75,ex:1.0,sc:0xfff0d6,si:2.4,sp:[44,59,30]},
+  clear:{bg:0x9fb0c2,fog:0xa8b6c4,fd:0.006,hc:0xd0dcea,hg:0x6a4a30,hi:0.8,ex:0.95,sc:0xfff2dc,si:2.5,sp:[44,59,30]} };
 const _c1=new THREE.Color(), _c2=new THREE.Color();
 function envFor(kind){
   return kind==='night' ? makeEnv('night',0x0d1426,0x2a160c,[[6,3,4,'#ff7a30',1.2],[-7,2,-5,'#ff8a40',1],[0,9,0,'#7d8ab0',3]])
@@ -1571,21 +1651,29 @@ function applyEnvMix(nf){
   col(sun.color,A.sc,B.sc); sun.intensity=L(A.si,B.si); sunOff.set(L(A.sp[0],B.sp[0]),L(A.sp[1],B.sp[1]),L(A.sp[2],B.sp[2]));
   sun.target.position.set(cx,0,cz); sun.position.copy(sun.target.position).add(sunOff);
   scene.environment = envFor(nf>0.5?'night':(D_.dusk?'dusk':'day'));
-  if(skyN){ skyN.material.opacity=nf; skyN.visible=nf>0.01; } if(skyD) skyD.material.color.setScalar(1-0.75*nf);
+  if(skyN){ skyN.material.opacity=nf; skyN.visible=nf>0.01; } if(skyD){ if(skyD.material.uniforms){ skyD.material.uniforms.uDim.value=1-0.8*nf; skyD.material.uniforms.uHaze.value.copy(scene.fog.color); } else skyD.material.color.setScalar(1-0.75*nf); }
+  const sk=SKYT[skyKind()], sd=MAPDEF.dusk;
+  FOGX.sun.x=sd?0.777:0.555; FOGX.sun.y=sd?0.136:0.742; FOGX.sun.z=sd?0.618:0.377; FOGX.h.x=0.03; FOGX.h.y=0;
+  const sc=(sd?[0.5,0.28,0.13]:[0.36,0.31,0.22]).map(v=>v*(1-nf)); FOGX.sunCol.x=sc[0]; FOGX.sunCol.y=sc[1]; FOGX.sunCol.z=sc[2];
+  FOGX.cloud.x = (Q.shadows && sk && !sd) ? 0.3*(1-nf) : 0;
+  if(sk && sk.env && nf<=0.5) scene.environment=sk.env;
   state.nightF=nf;
 }
-function updateDayNight(dt){ if(!MAPDEF.outdoor || state.phase==='menu') return; state.tod=(state.tod||0)+dt; const nf=nightAt(state.tod);
+function updateDayNight(dt){ if(!MAPDEF.outdoor || state.phase==='menu') return; state.tod=(state.tod||0)+dt; FOGX.cloud.y=state.tod; const nf=nightAt(state.tod);
   if(Math.abs(nf-(state.nightF??-1))>0.004){ applyEnvMix(nf); if(sun.castShadow) renderer.shadowMap.needsUpdate=true; } }
 function applyMapEnv(){
   const D_=MAPDEF, cx=COLS*CELL/2, cz=ROWS*CELL/2;
+  camera.far = D_.outdoor ? 700 : 160; camera.updateProjectionMatrix(); // v4.6: ngoài trời nhìn thấy trời/núi xa
   if(!D_.outdoor){
     scene.background.setHex(FOG_COL); scene.fog.color.setHex(FOG_COL); scene.fog.density=0.032;
     hemi.color.setHex(0xa8a290); hemi.groundColor.setHex(0x3a2f22); hemi.intensity=0.6; renderer.toneMappingExposure=1.45; sun.intensity=0;
     scene.environment = hdrEnv || envTex; state.nightF=0;
+    FOGX.h.x=0; FOGX.sunCol.x=FOGX.sunCol.y=FOGX.sunCol.z=0; FOGX.cloud.x=0;
   } else {
     // bản đồ đêm (Đồi A1) bắt đầu lúc trời tối rồi sáng dần; bản đồ khác bắt đầu ban ngày
     state.tod = D_.night ? DAYC.day+DAYC.fade : 0; state.nightF=-1; applyEnvMix(nightAt(state.tod)); if(D_.night) flare.next=1.5;
   }
+  for(const m of [M.floor,M.trench]){ if(!(m.defines&&m.defines.MACRO_VAR)){ m.defines=Object.assign({},m.defines,{MACRO_VAR:1}); m.needsUpdate=true; } }
   const wet = !!(D_.outdoor && D_.night);
   M.floor.roughness = wet?0.42:1; M.trench.roughness = wet?0.62:1; M.concrete.roughness = wet?0.7:1; M.planks.roughness = wet?0.75:1; M.sandbag.roughness = wet?0.8:1;
   AU.rain && AU.rain(wet);
@@ -3729,7 +3817,13 @@ function drs(dt){
   if(ns!==renderScale){ renderScale=ns; applyScale(); }
 }
 function updatePlayerPhysicsOnly(dt){ player.vel.x*=0.8; player.vel.z*=0.8; }
+const _sunV=new V3();
+function updateGodRays(){ if(!godPass) return; let on=0;
+  if(MAPDEF.outdoor && state.phase!=='menu' && skyD && skyD.material.uniforms){ _sunV.set(FOGX.sun.x,FOGX.sun.y,FOGX.sun.z).multiplyScalar(300).add(camera.position).project(camera);
+    if(_sunV.z<1){ const ox=Math.max(0,Math.abs(_sunV.x)-1), oy=Math.max(0,Math.abs(_sunV.y)-1); on=Math.max(0,1-Math.hypot(ox,oy)*1.2)*(1-(state.nightF||0)); godPass.uniforms.sunUv.value.set(_sunV.x*0.5+0.5,_sunV.y*0.5+0.5); } }
+  godPass.uniforms.sunOn.value=on; godPass.enabled=on>0.001; }
 function render(){
+  updateGodRays();
   if(composer){ composer.render(); }
   else { renderer.autoClear=true; renderer.render(scene,camera); renderer.autoClear=false; renderer.clearDepth(); renderer.render(vmScene,vmCam); renderer.autoClear=true; }
 }

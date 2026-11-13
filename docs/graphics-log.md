@@ -63,3 +63,14 @@
 - Pháo: hố nổ (decal canvas), mảnh đất văng, lửa hãm nòng, rung camera theo khoảng cách; hiệu ứng chết (súng/mũ văng, bụi khi ngã).
 - Hiệu năng: giới hạn FPS tuỳ chọn, bóng cập nhật thưa.
 - Backlog đồ hoạ lớn: TAA + upscale, bake lightmap Blender theo từng map, heightmap địa hình thật, texture da/mặt chi tiết hơn, thử WebGPURenderer khi ổn định.
+
+## 2026-11-13 — v4.6: bước nhảy bầu trời & khí quyển
+- **Dọn kho:** xoá bộ ảnh `burnt` không dùng; nén lại toàn bộ ảnh chất liệu (diff q84 4:2:0, nor q86/arm q80 4:4:4, progressive) → thư mục ảnh 138MB → ~50MB, PSNR ~32–34dB.
+- **Bầu trời HDRI thật (Poly Haven CC0):** `kloofendal_48d_partly_cloudy_puresky` (ngày), `kloppenheim_06_puresky` (hoàng hôn – Him Lam). Nền 4K (2K cho Thấp/Vừa) + HDR 1K làm ánh sáng môi trường; vị trí nắng khớp mặt trời trong ảnh. Shader trời tự hoà vào màu sương ở chân trời.
+- **Phát hiện lỗi cũ:** camera.far=160 nên trời (bán kính 420) và núi xa (170–270m) chưa từng hiện. Ngoài trời giờ far=700.
+- **Sương mù khí quyển theo độ cao** (kiểu Exponential Height Fog của Unreal/Frostbite) + tán xạ nắng về phía mặt trời, viết đè ShaderChunk fog dùng uniform chia sẻ.
+- **Tia nắng (god rays)** hậu kỳ cho Cao/Siêu nhất: làm mờ toả tia từ vị trí mặt trời, trời có alpha=0 làm mặt nạ (tham khảo GPU Gems 3 ch.13 "Volumetric Light Scattering as a Post-Process").
+- **Bóng mây trôi** trên mặt đất (Cao/Siêu nhất) và **biến thiên màu đất cỡ lớn** chống lặp vân (MACRO_VAR) cho nền, hào, đất ngoài bản đồ.
+- **Đồi rừng xa** dạng vòm gợn tán cây thay cho hình nón.
+- Test: check low/high ĐẠT, `tools/skytest.py` (mới) chụp khesanh/himlam.
+- Backlog: thay tán cây "nấm" low-poly bằng cây GLB; súng góc nhìn thứ nhất dựng lại bằng Blender + vân gỗ/kim loại thật; da mặt nhân vật; TAA.
