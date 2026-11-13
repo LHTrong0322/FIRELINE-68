@@ -1315,11 +1315,11 @@ const std = o => new THREE.MeshStandardMaterial(o);
 function mkCanvas(w,h){ const c=document.createElement('canvas'); c.width=w; c.height=h||w; return c; }
 const MACRO_GLSL = `
 varying vec3 vWP;
-uniform sampler2D bakeMap; uniform vec3 bakeXf;
+uniform sampler2D bakeMap; uniform vec3 bakeXf; uniform float reflNorm;
 float mh(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
 float mn(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f); return mix(mix(mh(i),mh(i+vec2(1,0)),u.x),mix(mh(i+vec2(0,1)),mh(i+vec2(1,1)),u.x),u.y); }
 `;
-const BAKE_U={ bakeMap:{value:null}, bakeXf:{value:new THREE.Vector3(1,1,0)} };
+const BAKE_U={ bakeMap:{value:null}, bakeXf:{value:new THREE.Vector3(1,1,0)}, reflNorm:{value:0} };
 // ---- TÍNH SẴN ÁNH SÁNG cho cả bản đồ (chạy 1 lần khi dựng map): AO góc tường + ánh sáng của mọi đèn/lửa có che khuất theo lưới
 function bakeLighting(){
   const R=4, W=COLS*R, H=ROWS*R, data=new Uint8Array(W*H*4), OUT=!!MAPDEF.outdoor;
@@ -1361,6 +1361,7 @@ function addMacro(mat, kind){
         float puddle = smoothstep(0.67,0.71,pn);
         float damp = smoothstep(0.56,0.69,pn);
         diffuseColor.rgb *= mix(1.0,0.55,damp);
+        diffuseColor.rgb *= mix(1.0,0.6,puddle); // nước đọng: nền dưới vũng sẫm hơn, phản chiếu nổi bật
         diffuseColor.rgb *= 0.85+0.3*mn(vWP.xz*0.07+11.0);
       #endif
       #ifdef MACRO_WALL
@@ -1385,8 +1386,15 @@ function addMacro(mat, kind){
         vec4 bk = texture2D(bakeMap, (vWP.xz + bN.xz*0.5) * bakeXf.xy);
         float hk = clamp(1.0 - vWP.y*0.16, 0.45, 1.0);
         float bao = mix(1.0, bk.a, hk);
-        reflectedLight.indirectDiffuse *= bao; reflectedLight.indirectSpecular *= bao; reflectedLight.directDiffuse *= mix(1.0, bao, 0.6);
+        reflectedLight.indirectDiffuse *= bao; reflectedLight.directDiffuse *= mix(1.0, bao, 0.6);
         reflectedLight.indirectDiffuse += diffuseColor.rgb * bk.rgb * bakeXf.z * (0.55 + 0.45*hk);
+        // v4.11: che khuất phản chiếu (specular occlusion, Lagarde) thay cho nhân AO tuyến tính
+        float sNV = saturate(dot(normal, normalize(vViewPosition)));
+        reflectedLight.indirectSpecular *= saturate(pow(sNV + bao, exp2(-16.0*roughnessFactor - 1.0)) - 1.0 + bao);
+        // v4.11: chuẩn hoá ảnh phản chiếu theo ánh sáng tính sẵn (CoD Black Ops II, Lazarov 2013):
+        // HDRI chỉ có một, nên nơi tối trong hầm vũng nước không được phản chiếu "căn phòng sáng" -> hết loé trắng
+        float bLum = dot(bk.rgb, vec3(0.2126,0.7152,0.0722)) * bakeXf.z * 2.0 + 0.05;
+        reflectedLight.indirectSpecular *= mix(1.0, clamp(bLum / 0.8, 0.04, 0.7), reflNorm);
       }`);
     Object.assign(sh.uniforms, BAKE_U);
   };
@@ -1851,6 +1859,7 @@ function applyEnvMix(nf){
   const sc=(sd?[0.5,0.28,0.13]:[0.36,0.31,0.22]).map(v=>v*(1-nf)); FOGX.sunCol.x=sc[0]; FOGX.sunCol.y=sc[1]; FOGX.sunCol.z=sc[2];
   FOGX.cloud.x = (Q.shadows && sk && !sd) ? 0.3*(1-nf) : 0;
   if(sk && sk.env && nf<=0.5) scene.environment=sk.env;
+  BAKE_U.reflNorm.value=0.7*nf; // ban đêm ngoài trời: vũng nước chỉ sáng gần đèn/lửa
   state.nightF=nf;
 }
 function updateDayNight(dt){ if(!MAPDEF.outdoor || state.phase==='menu') return; state.tod=(state.tod||0)+dt; FOGX.cloud.y=state.tod; const nf=nightAt(state.tod);
@@ -1861,7 +1870,7 @@ function applyMapEnv(){
   if(!D_.outdoor){
     scene.background.setHex(FOG_COL); scene.fog.color.setHex(FOG_COL); scene.fog.density=0.032;
     hemi.color.setHex(0xa8a290); hemi.groundColor.setHex(0x3a2f22); hemi.intensity=0.6; renderer.toneMappingExposure=1.45; sun.intensity=0;
-    scene.environment = hdrEnv || envTex; state.nightF=0;
+    scene.environment = hdrEnv || envTex; state.nightF=0; BAKE_U.reflNorm.value=1;
     FOGX.h.x=0; FOGX.sunCol.x=FOGX.sunCol.y=FOGX.sunCol.z=0; FOGX.cloud.x=0;
   } else {
     // bản đồ đêm (Đồi A1) bắt đầu lúc trời tối rồi sáng dần; bản đồ khác bắt đầu ban ngày

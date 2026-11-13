@@ -83,3 +83,10 @@
 - Tán cây: khối lô nhô nhiều cụm thay khối 20 mặt; đồi xa lùi ra xa, thấp và sẫm hơn.
 - Test: `tools/portrait.py` (mới), check low/high, playtest.
 - Backlog: mũ cối/mũ sắt dựng Blender có vân vải/sơn thật; quân phục có đường may, túi, nếp nhăn bake; súng góc nhìn thứ nhất.
+
+## 2026-11-13 — v4.11: phản chiếu chuẩn hoá theo ánh sáng tính sẵn (sửa vũng nước loé trắng)
+- **Kỹ thuật:** "environment map normalization" của Call of Duty: Black Ops II — một ảnh phản chiếu chung được nhân theo độ sáng khuếch tán tại chỗ (lấy từ lightmap), nên nơi tối không phản chiếu "căn phòng sáng". Kèm **specular occlusion** kiểu Lagarde (che khuất phản chiếu theo AO + độ nhám + góc nhìn) thay cho nhân AO tuyến tính.
+- **Nguồn:** Lazarov, "Getting More Physical in Call of Duty: Black Ops II" (SIGGRAPH 2013) https://blog.selfshadow.com/publications/s2013-shading-course/lazarov/s2013_pbs_black_ops_2_notes.pdf ; Lagarde & de Rousiers, "Moving Frostbite to PBR" (2014, công thức computeSpecOcclusion).
+- **Thay đổi (`addMacro`):** uniform mới `reflNorm` trong `BAKE_U` (trong hầm = 1, ngoài trời = 0,7×độ tối đêm, ban ngày = 0). `indirectSpecular *= mix(1, clamp(lum(bakeMap)/0.8, 0.04, 0.7), reflNorm)`; nền dưới vũng nước sẫm thêm 40%. Không thêm lượt vẽ/texture nào — chi phí vài lệnh shader, tier low không nặng hơn.
+- **Kết quả:** Địa đạo Củ Chi: vũng nước ở chỗ tối thành mảng ướt sẫm thay vì mảng trắng đục (lỗi số 3 trong báo cáo cố vấn); vũng gần đèn vẫn bóng loáng phản chiếu. check.py low/high ĐẠT, 0 lỗi JS; modetest cuchi ĐẠT; so sánh trước/sau cùng góc máy.
+- **Backlog:** gợn sóng mưa trên vũng (Đồi A1 đêm mưa); cỏ gần camera mờ dần (dither) khi nằm bò; súng góc nhìn thứ nhất dựng lại bằng Blender; xe tải chỉ huy dựng Blender; reflection probe riêng cho hầm (render cubemap 1 lần khi dựng map) thay HDRI boiler_room.
