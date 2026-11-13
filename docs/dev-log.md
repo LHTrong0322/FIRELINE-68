@@ -87,3 +87,7 @@
 ## 2026-11-13 — v4.5
 - Thêm chế độ Khung hình "Tự động" (mặc định, khoá `fps5`): máy tính 60, điện thoại 45; pin <30% không sạc hoặc máy đuối (độ phân giải động đã xuống đáy mà vẫn chậm 3 lần liên tiếp) thì hạ 30 cho mát và đều khung hình. Hàm `fpsCap()`.
 - Test: check low/high ĐẠT.
+
+## 2026-11-13 — v4.6 / v4.7
+- v4.6: trời HDRI, sương mù theo độ cao, tia nắng, bóng mây; dọn+nén ảnh 142MB → 54MB. Lỗi phát hiện: camera.far=160 làm trời/núi không bao giờ hiện (đã sửa: ngoài trời 700).
+- v4.7: dựng lại khuôn mặt/da/mắt nhân vật (xem graphics-log). Script mới: `tools/portrait.py`, `tools/skytest.py`.

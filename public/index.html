@@ -321,7 +321,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.6</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.7</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -1238,7 +1238,7 @@ function buildMaterials(){
   M.shade = pbr('paint',{side:THREE.DoubleSide, envMapIntensity:0.6});
   M.wire = new THREE.MeshStandardMaterial({color:0x111111, roughness:0.7});
   M.redLamp = new THREE.MeshStandardMaterial({color:0x330000, emissive:0xff2a14, emissiveIntensity:6});
-  M.skin = pbr('skin',{color:0xb98a64, metalness:0, envMapIntensity:0.25});
+  M.skin = pbr('skin',{color:0xd2a47e, metalness:0, envMapIntensity:0.25});
   M.boot = pbr('leather',{envMapIntensity:0.4});
   M.star = new THREE.MeshStandardMaterial({color:0xd62b1f, emissive:0x8a0d05, emissiveIntensity:0.5, roughness:0.3, metalness:0.4});
   M.rocketHead = pbr('paint',{color:0xd0d6c0, envMapIntensity:0.6});
@@ -1541,7 +1541,15 @@ function buildOutdoorSurroundings(){
   // tree line
   const n = settings.quality==='low'?70:170;
   const trunk=new THREE.InstancedMesh(new THREE.CylinderGeometry(0.18,0.32,9,6), M.charred, n);
-  const crown=new THREE.InstancedMesh(new THREE.IcosahedronGeometry(3.2,1), new THREE.MeshStandardMaterial({color:0x2f4a28, roughness:0.95, flatShading:true}), n);
+  // v4.7: tán cây lô nhô nhiều cụm lá (thay khối 20 mặt phẳng), đổ bóng mềm, sắc xanh loang
+  const cg=new THREE.IcosahedronGeometry(3.2,4); { const pa=cg.attributes.position, cl=new Float32Array(pa.count*3), v=new V3();
+    for(let j=0;j<pa.count;j++){ v.fromBufferAttribute(pa,j); const d=v.clone().normalize();
+      const n=Math.sin(d.x*7.1+d.y*3.3)*Math.sin(d.z*6.7-d.y*5.1)*0.16+Math.sin(d.x*17+d.z*13+d.y*11)*0.07+Math.sin(d.y*23-d.x*19)*0.04;
+      v.multiplyScalar(1+n); v.y*= d.y<0 ? 0.55 : 0.9; pa.setXYZ(j,v.x,v.y,v.z);
+      const sh=0.55+0.45*(d.y*0.5+0.5)+n*1.2; cl[j*3]=0.75*sh; cl[j*3+1]=1.0*sh; cl[j*3+2]=0.62*sh; }
+    cg.setAttribute('color',new THREE.BufferAttribute(cl,3)); cg.computeVertexNormals();
+    const nr=cg.attributes.normal; for(let j=0;j<pa.count;j++){ v.fromBufferAttribute(pa,j).normalize(); const fn=new V3().fromBufferAttribute(nr,j); fn.lerp(v,0.7).normalize(); nr.setXYZ(j,fn.x,fn.y,fn.z); } }
+  const crown=new THREE.InstancedMesh(cg, new THREE.MeshStandardMaterial({color:0x34522a, vertexColors:true, roughness:0.9}), n);
   const dm=new THREE.Object3D();
   for(let i=0;i<n;i++){ let x,z; do{ x=rand(-45,W+45); z=rand(-45,D+45); }while(x>-6&&x<W+6&&z>-6&&z<D+6);
     const s=rand(0.7,1.5); dm.position.set(x,4.5*s,z); dm.rotation.set(0,rand(0,6),0); dm.scale.set(s,s,s); dm.updateMatrix(); trunk.setMatrixAt(i,dm.matrix);
@@ -1563,13 +1571,13 @@ function buildOutdoorSurroundings(){
   // distant hills
   const hm=new THREE.MeshStandardMaterial({color:0xffffff, vertexColors:true, roughness:1});
   // đồi rừng xa: vòm thấp, mép gợn như tán cây, màu xanh rừng đậm (sương mù khí quyển sẽ làm nhạt dần theo khoảng cách)
-  for(let i=0;i<22;i++){ const a=i/22*Math.PI*2+rand(-.12,.12), r=rand(185,300), H=rand(26,62), R=rand(60,120), ph=rand(0,9);
+  for(let i=0;i<22;i++){ const a=i/22*Math.PI*2+rand(-.12,.12), r=rand(250,380), H=rand(22,52), R=rand(70,140), ph=rand(0,9);
     const g=new THREE.SphereGeometry(1,56,14,0,Math.PI*2,0,Math.PI/2); const pa=g.attributes.position, cl=new Float32Array(pa.count*3);
     for(let j=0;j<pa.count;j++){ const x=pa.getX(j), y=pa.getY(j), z=pa.getZ(j), an=Math.atan2(z,x);
       const n=Math.sin(an*3+ph)*0.18+Math.sin(an*7+ph*1.7)*0.08+Math.sin(an*19+ph)*0.025;
       const bump=(Math.sin(an*41+y*9+ph)*0.5+Math.sin(an*67-y*13)*0.5)*0.035*y; // tán cây lô nhô
       const rr=(1+n)*(1+bump); pa.setXYZ(j, x*R*rr, y*H*(1+n*0.6)+bump*H*0.6, z*R*rr);
-      const v=0.8+0.2*Math.sin(an*29+y*11+ph); cl[j*3]=0.11*v; cl[j*3+1]=0.17*v; cl[j*3+2]=0.1*v; }
+      const v=0.7+0.3*Math.sin(an*29+y*11+ph)*Math.sin(an*7+ph); cl[j*3]=0.07*v; cl[j*3+1]=0.12*v; cl[j*3+2]=0.07*v; }
     g.setAttribute('color',new THREE.BufferAttribute(cl,3)); g.computeVertexNormals();
     const h=new THREE.Mesh(g, hm); h.position.set(cx+Math.cos(a)*r, -4, cz+Math.sin(a)*r); h.rotation.y=rand(0,6); h.userData.noAO=true; level.add(h); }
   // sky dome
@@ -1894,6 +1902,8 @@ function buildGun3P(type){
 function clothMat(color){ const t=TEX.fabric; const o={map:t.map,normalMap:t.normal,roughnessMap:t.orm,aoMap:t.orm,roughness:1,metalness:0,color,envMapIntensity:.4};
   if(settings.quality==='low') return new THREE.MeshStandardMaterial(o);
   return new THREE.MeshPhysicalMaterial(Object.assign(o,{sheen:0.7, sheenRoughness:0.5, sheenColor:new THREE.Color(color).lerp(new THREE.Color(0xfff2dc),0.45)})); }
+// v4.7: nhân vật có ảnh da vẽ sẵn -> màu ở đây chỉ là hệ số nhân nhẹ để mỗi người một sắc
+const SKIN_MUL={vn:[0xffffff,0xf7efe8,0xeee3d8,0xfff8f0,0xe8dccf], us:[0xffffff,0xf6ece4,0xe9dace,0xa58470,0x7d604e], fr:[0xffffff,0xf6ece4,0xe9dace,0xd8c4b4]};
 const SKIN_TONES={vn:[0xc69772,0xb98a64,0xa87a55,0xc9a07a], us:[0xd8ac88,0xc89a76,0xb98a64,0x8d5f3e,0x6b4630], fr:[0xd8ac88,0xc89a76,0xb98a64,0x8d5f3e,0xc39069]};
 let BLOB=null;
 // ---- người lính dựng bằng Blender (có xương + hoạt ảnh thật). Nếu tải lỗi -> dùng mô hình thủ tục cũ
@@ -1908,15 +1918,18 @@ async function loadVegGLB(){ try{ const gl=await new GLTFLoader().loadAsync('ass
     (VEG[key]=VEG[key]||[]).push({geo:g, mat:o.material}); }); }catch(e){ console.warn('veg',e); VEG=null; } }
 function vegInst(key, mats){ const parts=VEG&&VEG[key]; if(!parts) return null; const out=parts.map(p=>{ const im=new THREE.InstancedMesh(p.geo,p.mat,mats.length); mats.forEach((m,i)=>im.setMatrixAt(i,m)); im.castShadow=key!=='fern'; im.receiveShadow=true; level.add(im); return im; }); return out; }
 async function loadPropsGLB(){ try{ const gl=await new GLTFLoader().loadAsync('assets/models/sandbags.glb'); gl.scene.traverse(o=>{ if(o.isMesh && !BAG_GEO) BAG_GEO=o.geometry; }); }catch(e){ console.warn('sandbags',e); } }
-const SKM={ vn:{gun:[-0.055,1.2275,0.2224], head:[1.539,0.035], torso:[0.90,0.8], scale:1.1},
+const SKM={ vn:{gun:[-0.055,1.219,0.2219], head:[1.533,0.035], torso:[0.90,0.8], scale:1.1},
             us:{gun:[-0.055,1.325,0.2234], head:[1.64,0.045], torso:[0.97,0.855], scale:1.04} };
 async function loadSoldierGLB(){
   const L=new GLTFLoader(), out={};
   for(const k of ['vn','us']){ try{ const gl=await L.loadAsync(`assets/models/soldier_${k}.glb`);
       const meshes=[]; gl.scene.traverse(o=>{ if(o.isSkinnedMesh) meshes.push(o); });
       if(!meshes.length || !gl.animations.length) continue;
-      const done=new Set(); for(const sm of meshes){ const uv=sm.geometry.attributes.uv; if(uv && !done.has(uv) && sm.material.name!=='skin' && sm.material.name!=='eye'){ done.add(uv); for(let i=0;i<uv.count;i++) uv.setXY(i,uv.getX(i)*5,uv.getY(i)*5); uv.needsUpdate=true; } }
-      out[k]={scene:gl.scene, clips:Object.fromEntries(gl.animations.map(c=>[c.name,c])), meta:SKM[k]};
+      const done=new Set(); for(const sm of meshes){ const uv=sm.geometry.attributes.uv; if(uv && !done.has(uv) && sm.material.name!=='skin' && sm.material.name!=='eye' && sm.material.name!=='hair'){ done.add(uv); for(let i=0;i<uv.count;i++) uv.setXY(i,uv.getX(i)*5,uv.getY(i)*5); uv.needsUpdate=true; } }
+      const tex={}; for(const sm of meshes){ const m=sm.material, n=m.name;
+        if(n==='skin' && m.map){ tex.skin=m.map; tex.skinN=m.normalMap; m.map.anisotropy=4; }
+        if(n==='eye' && m.map){ tex.eye=new THREE.MeshStandardMaterial({map:m.map, roughness:0.12, metalness:0, envMapIntensity:0.9}); } }
+      out[k]={scene:gl.scene, clips:Object.fromEntries(gl.animations.map(c=>[c.name,c])), meta:SKM[k], tex};
     }catch(e){ console.warn('soldier '+k, e); } }
   if(out.vn && !out.us) out.us=out.vn; if(out.us && !out.vn) out.vn=out.us;
   SKEL = out.vn ? out : null; return SKEL?1:0;
@@ -1933,15 +1946,18 @@ function buildSoldier(opt){
 function buildSoldierSK(opt){
   const g=new THREE.Group(); g.rotation.order='YXZ';
   const uni=clothMat(opt.uniform), gear=clothMat(opt.gear);
-  const skin=pbr('skin',{color:pick(SKIN_TONES[opt.side]), metalness:0, envMapIntensity:.3});
+  const SK0=SKEL[opt.side==='vn'?'vn':'us'], TX=SK0.tex||{};
+  const skin = TX.skin ? new THREE.MeshStandardMaterial({map:TX.skin, normalMap:TX.skinN||null, normalScale:new THREE.Vector2(0.8,0.8), roughness:0.56, metalness:0, envMapIntensity:0.35, color:pick(SKIN_MUL[opt.side]||SKIN_MUL.us)})
+    : pbr('skin',{color:pick(SKIN_TONES[opt.side]), metalness:0, envMapIntensity:.3});
   const mats=[uni,gear,skin];
   const SK=SKEL[opt.side==='vn'?'vn':'us'], MT=SK.meta;
   const body=SkeletonUtils.clone(SK.scene); g.add(body);
   const bones={}; const pants=clothMat(new THREE.Color(opt.uniform).multiplyScalar(0.86).getHex()); mats.push(pants);
-  const hair=new THREE.MeshStandardMaterial({color:0x15110d, roughness:0.85, normalMap:TEX.fabric.normal, normalScale:new THREE.Vector2(0.6,0.6)});
+  const hair = TX.skin ? new THREE.MeshStandardMaterial({map:TX.skin, normalMap:TX.skinN||null, roughness:0.72, metalness:0, envMapIntensity:0.3})
+    : new THREE.MeshStandardMaterial({color:0x15110d, roughness:0.85, normalMap:TEX.fabric.normal, normalScale:new THREE.Vector2(0.6,0.6)});
   mats.push(hair);
   body.traverse(o=>{ if(o.isBone) bones[o.name]=o;
-    if(o.isSkinnedMesh){ const n=o.material.name; o.material = n==='skin'?skin : n==='boots'?M.boot : n==='hair'?hair : n==='eye'?M.eye : n==='pants'?pants : uni; o.castShadow=true; o.receiveShadow=true; } });
+    if(o.isSkinnedMesh){ const n=o.material.name; o.material = n==='skin'?skin : n==='boots'?M.boot : n==='hair'?hair : n==='eye'?(TX.eye||M.eye) : n==='pants'?pants : uni; o.castShadow=true; o.receiveShadow=true; } });
   g.updateMatrixWorld(true);
   const A=(geo,mat,parent,x,y,z,cast=false)=>{ const m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); m.castShadow=cast; m.receiveShadow=true; parent.add(m); return m; };
   // thân trên: toạ độ giống mô hình cũ (gốc ở hông y=.95), nén nhẹ chiều sâu cho ôm sát thân mới

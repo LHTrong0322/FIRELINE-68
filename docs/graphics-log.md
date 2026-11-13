@@ -74,3 +74,12 @@
 - **Đồi rừng xa** dạng vòm gợn tán cây thay cho hình nón.
 - Test: check low/high ĐẠT, `tools/skytest.py` (mới) chụp khesanh/himlam.
 - Backlog: thay tán cây "nấm" low-poly bằng cây GLB; súng góc nhìn thứ nhất dựng lại bằng Blender + vân gỗ/kim loại thật; da mặt nhân vật; TAA.
+
+## 2026-11-13 — v4.7: "đại phẫu" nhân vật
+- **Khuôn mặt:** thêm ~20 target chi tiết CC0 của MakeHuman (mpfb2, chép vào `tools/blender/mh/face/`): gò má, cằm, sống mũi, cánh mũi, mắt, lông mày, môi. Lính VN mặt Á Đông rõ (asian 1.0), lính Mỹ mặt vuông, cằm nhô.
+- **Da vẽ bằng thuật toán** (`tools/blender/skintex.py`): rải màu theo toạ độ 3D lên lưới UV 2048: sắc da loang, má/mũi/tai hồng nhẹ, quầng mắt, môi, râu lún phún, lông mày vẽ hình học theo cung mắt, chân tóc mềm, kèm bản đồ pháp tuyến lỗ chân lông. Tông da VN sáng ấm (214,168,132) — sửa lỗi "da đen".
+- **Mắt thật:** nhãn cầu tròn đều + ảnh mống mắt CC0 MakeHuman (brown_eye.png), VN nâu đen, Mỹ xanh xám; vật liệu bóng ướt.
+- Trong game dùng ảnh da/mắt từ GLB, mỗi lính nhân hệ số sắc da nhẹ (`SKIN_MUL`). Cập nhật `SKM.vn` theo khung xương mới.
+- Tán cây: khối lô nhô nhiều cụm thay khối 20 mặt; đồi xa lùi ra xa, thấp và sẫm hơn.
+- Test: `tools/portrait.py` (mới), check low/high, playtest.
+- Backlog: mũ cối/mũ sắt dựng Blender có vân vải/sơn thật; quân phục có đường may, túi, nếp nhăn bake; súng góc nhìn thứ nhất.
