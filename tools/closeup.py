@@ -7,7 +7,7 @@ async def run():
     shots=f'{check.ROOT}/tools/shots'; errs=[]
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path='/usr/bin/google-chrome' if os.path.exists('/usr/bin/google-chrome') else None, args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'])
-        ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality3', JSON.stringify('{check.Q}'))}}catch(e){{}}")
+        ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality4', JSON.stringify('{check.Q}'))}}catch(e){{}}")
         pg=await ctx.new_page(); pg.set_default_timeout(240000); pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('http://127.0.0.1:8799/'); await pg.wait_for_function('window.__gameReady===true', timeout=300000)
         await pg.evaluate("window.__game.settings.mode='rescue'; window.__game.startCampaign(); window.__game.state.waveT=999"); await pg.wait_for_timeout(2500)

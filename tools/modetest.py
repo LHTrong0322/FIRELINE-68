@@ -7,7 +7,7 @@ async def run():
     shots=f'{check.ROOT}/tools/shots'; errs=[]; rep={}
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path='/usr/bin/google-chrome' if os.path.exists('/usr/bin/google-chrome') else None, args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'])
-        ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality3', JSON.stringify('{check.Q}'))}}catch(e){{}}")
+        ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality4', JSON.stringify('{check.Q}'))}}catch(e){{}}")
         pg=await ctx.new_page(); pg.set_default_timeout(300000)
         pg.on('pageerror', lambda e: errs.append('pageerror: '+str(e)))
         pg.on('console', lambda m: errs.append('console: '+m.text) if m.type=='error' and '404' not in m.text else None)

@@ -13,7 +13,7 @@ AIMBOT="""(()=>{const g=window.__game,p=g.player; if(!p.alive) return 'dead'; co
  if(e){ const dx=e.pos.x-p.pos.x, dz=e.pos.z-p.pos.z, dy=(e.pos.y+1.2)-(p.pos.y+p.eye); p.yaw=Math.atan2(-dx,-dz); p.pitch=Math.atan2(dy,Math.hypot(dx,dz)); p.fireHeld=true; } else p.fireHeld=false;
  return JSON.stringify({hp:Math.round(p.hp),wave:g.state.wave,kills:g.state.kills,alive:g.enemies.filter(e=>e.alive).length}); })()"""
 async def new_page(b, errs, tag, **kw):
-    q=kw.pop('q','med'); ctx=await b.new_context(**kw); await ctx.add_init_script("try{localStorage.setItem('tl_quality3', JSON.stringify('%s'))}catch(e){}" % q)
+    q=kw.pop('q','med'); ctx=await b.new_context(**kw); await ctx.add_init_script("try{localStorage.setItem('tl_quality4', JSON.stringify('%s'))}catch(e){}" % q)
     pg=await ctx.new_page(); pg.set_default_timeout(300000)
     pg.on('pageerror', lambda e: errs.append(f'[{tag}] pageerror: {e}'))
     pg.on('console', lambda m: errs.append(f'[{tag}] console: {m.text}') if m.type=='error' and '404' not in m.text else None)

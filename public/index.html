@@ -233,6 +233,12 @@ button{font-family:inherit;cursor:pointer}
 @media (pointer:coarse){#ammobox{right:auto!important;left:50%!important;transform:translateX(-50%);bottom:calc(4px + env(safe-area-inset-bottom))!important;flex-direction:row!important;align-items:baseline;gap:10px!important}#ammo{font-size:24px!important}#wname{font-size:10px}#inv{margin:0;font-size:12px}#money{font-size:12px}
  #bKit{bottom:calc(112px + env(safe-area-inset-bottom))!important;right:calc(196px + env(safe-area-inset-right))!important}#kitMenu{bottom:calc(166px + env(safe-area-inset-bottom))!important}}
 
+/* v4.4: ba lô + quân nhu đứng cạnh nhau, dưới nút bắn */
+#bShop{--s:38px;width:38px!important;height:38px!important;right:calc(52px + env(safe-area-inset-right))!important;bottom:calc(24px + env(safe-area-inset-bottom))!important;top:auto!important}
+#bKit{--s:38px;width:38px!important;height:38px!important;right:calc(8px + env(safe-area-inset-right))!important;bottom:calc(24px + env(safe-area-inset-bottom))!important}
+#bKit small{bottom:-12px!important;font-size:8px!important}
+#kitMenu{right:calc(106px + env(safe-area-inset-right))!important;bottom:calc(92px + env(safe-area-inset-bottom))!important;z-index:9}
+
 #killIco{position:absolute;left:50%;top:58%;transform:translate(-50%,0);text-align:center;pointer-events:none;opacity:0;z-index:7}
 #killIco .k{display:inline-flex;align-items:center;gap:8px;padding:4px 14px;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.6) 20%,rgba(0,0,0,.6) 80%,rgba(0,0,0,0));font-weight:900;letter-spacing:2px;font-size:15px;color:#fff;text-shadow:0 2px 3px #000}
 #killIco .k b{display:inline-block;width:26px;height:26px;border-radius:50%;background:#c8302a;border:2px solid #ffb0a0;line-height:22px;font-size:15px;color:#fff}
@@ -315,7 +321,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.3</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.4</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -424,7 +430,7 @@ const store = {
 const settings = {
   nick: store.get('nick','ChienSi'+Math.floor(100+Math.random()*900)),
   color: store.get('color',0), sens: store.get('sens',1.0), vol: store.get('vol',0.7),
-  quality: store.get('quality3', 'ultra'), fps: store.get('fps', IS_TOUCH?'45':'60'), diff: store.get('diff',1),
+  quality: store.get('quality4', 'high'), fps: store.get('fps4', '60'), diff: store.get('diff',1),
   map: store.get('map','cuchi'), mode: store.get('mode','base')==='rescue'?'rescue':'base', netMap: store.get('netMap','cuchi'), portrait: false,
 };
 const QT = {
@@ -434,8 +440,9 @@ const QT = {
   ultra:{tex:1024, small:512, lights:8, shadows:2, smap:1024, post:true,  ao:1, bloom:true,  dpr:1.75, samples:4},
 };
 const Q = QT[settings.quality] || QT.high;
+if(IS_TOUCH && settings.quality==='high') Q.dpr=1.4; // v4.4: điện thoại mức Cao vẫn mượt
 const QDOWN={ultra:'high',high:'med',med:'low',low:'low'};
-function qualityFallback(why){ const q=QDOWN[settings.quality]||'low'; if(q===settings.quality) return; try{ localStorage.setItem('tl_quality3', JSON.stringify(q)); localStorage.setItem('tl_qfall', JSON.stringify(why)); }catch(e){} location.reload(); }
+function qualityFallback(why){ const q=QDOWN[settings.quality]||'low'; if(q===settings.quality) return; try{ localStorage.setItem('tl_quality4', JSON.stringify(q)); localStorage.setItem('tl_qfall', JSON.stringify(why)); }catch(e){} location.reload(); }
 const SCARF = ['#c8302a','#e2b23c','#3b8fd1','#4cae4f','#d65fb0','#f07c2c','#e8e8e8','#7e5bd6'];
 
 const setLoad = (p,t) => { $('loadBar').style.width=(p*100)+'%'; if(t) $('loadTxt').textContent=t; };
@@ -3670,7 +3677,7 @@ let lookSwayX=0, lookSwayY=0;
 /* ================= MAIN LOOP ================= */
 let last=performance.now(), menuT=0;
 let fpsWatch={t:0,n:0,done:false};
-function watchFps(dt){ if(fpsWatch.done || state.phase!=='playing') return; fpsWatch.t+=dt; fpsWatch.n++; if(fpsWatch.t>20){ fpsWatch.done=true; const fps=fpsWatch.n/fpsWatch.t; if(fps<22 && settings.quality!=='low' && !navigator.webdriver){ const q=QDOWN[settings.quality]; try{ localStorage.setItem('tl_quality3', JSON.stringify(q)); }catch(e){} toast(`Máy hơi yếu (${Math.round(fps)} FPS) — lần mở sau tự dùng đồ hoạ ${({high:'Cao',med:'Vừa',low:'Thấp'})[q]}`); } } }
+function watchFps(dt){ if(fpsWatch.done || state.phase!=='playing') return; fpsWatch.t+=dt; fpsWatch.n++; if(fpsWatch.t>20){ fpsWatch.done=true; const fps=fpsWatch.n/fpsWatch.t; if(fps<22 && settings.quality!=='low' && !navigator.webdriver){ const q=QDOWN[settings.quality]; try{ localStorage.setItem('tl_quality4', JSON.stringify(q)); }catch(e){} toast(`Máy hơi yếu (${Math.round(fps)} FPS) — lần mở sau tự dùng đồ hoạ ${({high:'Cao',med:'Vừa',low:'Thấp'})[q]}`); } } }
 let lastDraw=0;
 function frame(now){
   requestAnimationFrame(frame);
@@ -3771,8 +3778,8 @@ $('chips').innerHTML=SCARF.map((c,i)=>`<i data-i="${i}" style="background:${c}" 
 $('chips').addEventListener('click',e=>{ const i=e.target.dataset.i; if(i==null) return; settings.color=+i; store.set('color',settings.color); [...$('chips').children].forEach((c,k)=>c.classList.toggle('on',k===settings.color)); });
 function segInit(id,key,cb){ const el=$(id); const set=()=>[...el.children].forEach(b=>b.classList.toggle('on',String(settings[key])===b.dataset.v)); set();
   el.addEventListener('click',e=>{ const v=e.target.dataset.v; if(v==null) return; settings[key]= key==='diff'?+v:v; store.set(key,settings[key]); set(); cb&&cb(); }); }
-segInit('segQ','quality',()=>{ store.set('quality3',settings.quality); if(state.phase==='menu'){ $('loading').classList.remove('hidden'); setLoad(0.05,'ĐANG ÁP DỤNG CHẤT LƯỢNG ĐỒ HOẠ MỚI…'); setTimeout(()=>location.reload(),150); } else toast('Chất lượng mới áp dụng khi về menu chính'); });
-segInit('segD','diff'); segInit('segFps','fps');
+segInit('segQ','quality',()=>{ store.set('quality4',settings.quality); if(state.phase==='menu'){ $('loading').classList.remove('hidden'); setLoad(0.05,'ĐANG ÁP DỤNG CHẤT LƯỢNG ĐỒ HOẠ MỚI…'); setTimeout(()=>location.reload(),150); } else toast('Chất lượng mới áp dụng khi về menu chính'); });
+segInit('segD','diff'); segInit('segFps','fps',()=>store.set('fps4',settings.fps));
 segInit('segMode','mode');
 // segNetMap: renderNetMaps()
 $('sens').value=settings.sens; $('sens').oninput=e=>{ settings.sens=+e.target.value; store.set('sens',settings.sens); };

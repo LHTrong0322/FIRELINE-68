@@ -8,7 +8,7 @@ async def run():
     out=f'{check.ROOT}/public/assets/maps'; os.makedirs(out,exist_ok=True)
     async with async_playwright() as p:
         b=await p.chromium.launch(executable_path='/usr/bin/google-chrome' if os.path.exists('/usr/bin/google-chrome') else None, args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'])
-        ctx=await b.new_context(viewport={'width':800,'height':450}); await ctx.add_init_script("try{localStorage.setItem('tl_quality3', JSON.stringify('high'))}catch(e){}")
+        ctx=await b.new_context(viewport={'width':800,'height':450}); await ctx.add_init_script("try{localStorage.setItem('tl_quality4', JSON.stringify('high'))}catch(e){}")
         pg=await ctx.new_page(); pg.set_default_timeout(300000)
         await pg.goto('http://127.0.0.1:8799/'); await pg.wait_for_function('window.__gameReady===true', timeout=300000)
         ids=await pg.evaluate("Object.keys(window.__game.MAPS)")

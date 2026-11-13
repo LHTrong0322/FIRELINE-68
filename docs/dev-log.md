@@ -78,3 +78,8 @@
 - Pháo chân thật: nòng xoay có giới hạn tốc độ (0,55/0,35 rad/s), đạn bay theo hướng nòng, nạp đạn 3,2s có vỏ đạn văng, bắn từ bản đồ thì xếp lệnh chờ nòng xoay xong; lửa hai bên hãm nòng; tiếng nổ xa đến trễ theo khoảng cách; hố đạn trên đất; đất đá văng; rung máy theo khoảng cách.
 - Giảm nóng máy/mượt hơn: cài đặt Khung hình 60/45/30 (điện thoại mặc định 45), bóng cập nhật thưa hơn, độ phân giải động theo mức khung hình, dấu đơn vị cập nhật cách khung.
 - Test: arttest high ĐẠT, check low/high ĐẠT, ảnh điện thoại kiểm tra bố cục nút.
+
+## 2026-11-13 — v4.4
+- Nút Ba lô chuyển xuống cạnh nút Quân nhu (dưới nút bắn, 38px); menu ba lô mở sang trái nút bắn, không che nút bắn.
+- Mặc định khi vào game: đồ hoạ Cao + 60 khung hình (khoá lưu mới `tl_quality4`/`fps4` để người cũ đang Siêu nhất cũng về Cao). Điện thoại ở mức Cao dùng mật độ điểm ảnh 1.4 cho mượt.
+- Test: check low/high ĐẠT, ảnh điện thoại kiểm tra bố cục.
