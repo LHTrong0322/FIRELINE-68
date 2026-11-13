@@ -83,3 +83,7 @@
 - Nút Ba lô chuyển xuống cạnh nút Quân nhu (dưới nút bắn, 38px); menu ba lô mở sang trái nút bắn, không che nút bắn.
 - Mặc định khi vào game: đồ hoạ Cao + 60 khung hình (khoá lưu mới `tl_quality4`/`fps4` để người cũ đang Siêu nhất cũng về Cao). Điện thoại ở mức Cao dùng mật độ điểm ảnh 1.4 cho mượt.
 - Test: check low/high ĐẠT, ảnh điện thoại kiểm tra bố cục.
+
+## 2026-11-13 — v4.5
+- Thêm chế độ Khung hình "Tự động" (mặc định, khoá `fps5`): máy tính 60, điện thoại 45; pin <30% không sạc hoặc máy đuối (độ phân giải động đã xuống đáy mà vẫn chậm 3 lần liên tiếp) thì hạ 30 cho mát và đều khung hình. Hàm `fpsCap()`.
+- Test: check low/high ĐẠT.
