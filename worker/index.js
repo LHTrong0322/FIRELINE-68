@@ -14,7 +14,7 @@ export class GameRoom extends DurableObject {
     }
     if (url.pathname === "/lobby/list") {
       const rooms = (await this.ctx.storage.get("rooms")) || {}; const now = Date.now(); let changed = false;
-      for (const k in rooms) if (now - rooms[k].t > 30 * 60 * 1000) { delete rooms[k]; changed = true; }
+      for (const k in rooms) if (now - rooms[k].t > 2 * 60 * 1000) { delete rooms[k]; changed = true; }  // phòng không báo danh 2 phút = đã đóng
       if (changed) await this.ctx.storage.put("rooms", rooms);
       const list = Object.entries(rooms).map(([room, r]) => ({ room, n: r.n, title: r.title })).sort((a, b) => b.n - a.n).slice(0, 40);
       return new Response(JSON.stringify(list), { headers: { "content-type": "application/json", "cache-control": "no-store" } });
@@ -31,7 +31,14 @@ export class GameRoom extends DurableObject {
     const room = (url.searchParams.get("room") || "").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60), title = (url.searchParams.get("title") || "").replace(/[<>]/g, "").slice(0, 40);
     if (room) { const old = (await this.ctx.storage.get("meta")) || {}; await this.ctx.storage.put("meta", { room, title: old.title || title }); }
     await this.report(sockets.length + 1);
+    if (!(await this.ctx.storage.getAlarm())) await this.ctx.storage.setAlarm(Date.now() + 45000);
     return new Response(null, { status: 101, webSocket: client });
+  }
+  // nhịp báo danh mỗi 45 giây: giữ phòng trong sảnh khi còn người, tự gỡ khi hết người
+  async alarm() {
+    const n = this.ctx.getWebSockets().filter((w) => w.readyState === 1).length;
+    await this.report(n);
+    if (n > 0) await this.ctx.storage.setAlarm(Date.now() + 45000);
   }
   async report(n) {
     try {

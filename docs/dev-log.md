@@ -49,3 +49,13 @@
 - **Đồ hoạ**: ánh sáng tính sẵn `bakeLighting()` (AO góc tường + ánh đèn/lửa xa có che khuất), bóng mặt trời đi theo người chơi, trời hoàng hôn cho Him Lam.
 - Test mới: `tools/modetest.py` (các chế độ), `tools/featuretest.py` (nhặt tiền, cứu đồng đội, bộc phá, pháo, tiếp tế, hồi sinh, chiếm lô cốt — chờ theo thời gian trong game vì SwiftShader chậm). playtest online giờ kiểm tra danh sách phòng.
 - Backlog: lính địch cũng nằm/bò; chỉ huy đồng đội bằng lệnh nhanh; xe chỉ huy di chuyển được; bản đồ chiếm lô cốt phe Mỹ phòng thủ trên đồi cao (có độ dốc); chế độ online đồng đội 2 phe.
+
+## 2026-11-13 — v4.1
+- Sửa: nút rời pháo (trước đây giữ E bị chiếm lại ngay) → nút RỜI PHÁO riêng + khoá 1,6s; bản đồ nã pháo xa (chọn điểm, đạn bay vòng cầu, không hiện địch).
+- Bỏ tạm dừng: nút cửa ở góc mở MENU (Tiếp tục / Cài đặt / Rời trận hoặc Rời phòng), trận vẫn chạy. Quân nhu cũng không dừng trận.
+- Chat điện thoại có nút ✕ đóng và ➤ gửi.
+- Sảnh online kiểu thẻ phòng (ảnh bản đồ, tên, số người), nút TẠO PHÒNG mở hộp chọn bản đồ có ảnh. Worker báo danh phòng 45 giây/lần, phòng im 2 phút tự biến mất (sửa phòng "không thoát được" vẫn hiện trong danh sách).
+- Mỗi bên 8 người (người chơi + 7 đồng đội; địch 8). Thanh máu XE TA / XE ĐỊCH có %, thanh nhiệm vụ ghi khoảng cách tới căn cứ địch, bản đồ nhỏ tô vùng căn cứ và xe chỉ huy màu đỏ.
+- Tiếp tế có băng rôn lớn giữa màn hình + dấu ✈/▣ chỉ vị trí gói.
+- Nút cứu nhỏ lại, cờ chữ thập đỏ cắm cạnh đồng đội khi cứu. Nút đổi súng hiện hình súng kế tiếp.
+- Ảnh đại diện bản đồ: `tools/thumbs.py` → `public/assets/maps/*.jpg`.

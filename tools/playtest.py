@@ -50,6 +50,7 @@ async def run():
             await pg.evaluate("document.getElementById('mOnline').click()"); await pg.wait_for_timeout(3000)
             await pg.wait_for_function("!document.getElementById('mJoin').disabled && document.getElementById('netStatus').textContent.includes('Sẵn sàng')", timeout=60000)
         # A tạo phòng, B thấy phòng trong danh sách và bấm vào (không nhập mã)
+        await a.evaluate("document.getElementById('mCreate').click()"); await a.wait_for_timeout(500); await a.screenshot(path=f'{shots}/playtest_create.png')
         await a.fill('#roomCode','QA Kiểm thử'); await a.evaluate("document.getElementById('mJoin').click()")
         await a.wait_for_function("window.__game.state.mode==='online'", timeout=60000)
         await c.wait_for_function("[...document.querySelectorAll('#roomList .roomc')].some(b=>b.textContent.includes('QA Kiểm thử'))", timeout=60000)

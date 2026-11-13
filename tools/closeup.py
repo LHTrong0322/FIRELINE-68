@@ -10,7 +10,7 @@ async def run():
         ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality2', JSON.stringify('{check.Q}'))}}catch(e){{}}")
         pg=await ctx.new_page(); pg.set_default_timeout(240000); pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('http://127.0.0.1:8799/'); await pg.wait_for_function('window.__gameReady===true', timeout=300000)
-        await pg.evaluate("window.__game.startCampaign(); window.__game.state.waveT=999"); await pg.wait_for_timeout(2500)
+        await pg.evaluate("window.__game.settings.mode='rescue'; window.__game.startCampaign(); window.__game.state.waveT=999"); await pg.wait_for_timeout(2500)
         setup="""(()=>{const g=window.__game; const p=g.player; p.pos.set(13.5*3,0,8.5*3); p.yaw=0; p.pitch=-0.12; window.__closeT=performance.now();
           g.allies.forEach((a,i)=>{ if(i) a.model.group.scale.setScalar(0.0001); });
           ['rifle','mg','shotgun'].forEach(t=>g.spawnEnemy(t)); g.enemies.forEach((e,i)=>{ e.pos.set(13.5*3-1.3+i*1.3,0,8.5*3-3.4); e.yaw=[0.5,0,-0.6][i]||0; e.react=99; e.cool=99; e.state='guard'; });

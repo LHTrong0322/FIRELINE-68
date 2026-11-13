@@ -49,3 +49,12 @@
 - Bóng mặt trời giờ đi theo người chơi (`followSun`, khung 96 m, bám lưới 4 m để không rung) → bóng nét hơn trên bản đồ rộng.
 - Trời hoàng hôn mới (Him Lam) với mặt trời thấp, bầu trời cam.
 - Backlog: dựng lại khuôn mặt bằng Blender; nếp gấp quân phục; ánh sáng tính sẵn cho cả trần hầm và vật thể.
+
+## 2026-11-13 — v4.1: đại tu nhân vật + biểu tượng bằng Blender
+- **Nhân vật mới** (`tools/blender/build_soldier_mh.py`): thân người thật từ MakeHuman (CC0, kèm khung xương "game_engine" và trọng số da CC0 lấy từ repo makehumancommunity/mpfb2 — `tools/blender/mh/LICENSE.ASSETS.md`). Có khuôn mặt thật (Á cho bộ đội, Âu cho lính Mỹ/Pháp), mắt, tóc cắt ngắn, ngón tay nắm báng súng. Quân phục may thành lớp vỏ riêng phồng theo dáng người, có nếp gấp ở khuỷu tay, đầu gối, eo; quần túm ống; lính Mỹ có giày cao cổ, bộ đội đi dép. Hai file: `soldier_vn.glb`, `soldier_us.glb` (~0,9MB mỗi file, ~7–9k đỉnh).
+- **Vải thật**: quân phục dùng ảnh chụp vải lanh (Poly Haven `rough_linen`, CC0), bao cát dùng vải bố (`hessian_230`).
+- **Bao cát dựng từng bao** trong Blender (`build_sandbags.py`, `sandbags.glb`), xếp so le — thay khối hộp cũ (từ mức đồ hoạ Vừa).
+- **Biểu tượng nút cảm ứng** dựng 3D và render bằng Cycles (`build_icons.py`): viên đạn, mũi tên nhảy, người nằm, băng đạn + chữ R, lựu đạn, bộc phá, hộp cứu thương, xe đẩy quân nhu, bàn tay, cửa thoát…
+- **Chu kỳ ngày – đêm** ngoài trời: ngày 5 phút, đêm 1,5 phút, chuyển 25 giây; Đồi A1 bắt đầu ban đêm rồi sáng dần.
+- **Nhận diện ta/địch**: mũi tên xanh trên đầu đồng đội, dấu đỏ trên địch đang lộ, chữ thập đỏ trên đồng đội gục; bộ đội mặc màu ô-liu sáng hơn lính Mỹ.
+- Backlog: lính Pháp riêng (mũ, quân phục); biểu cảm khuôn mặt; vật thể khác bằng Blender (xe, lô cốt, cây cối); ảnh chụp da người.
