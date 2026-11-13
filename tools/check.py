@@ -29,7 +29,7 @@ async def run():
     async with async_playwright() as p:
         exe='/usr/bin/google-chrome' if os.path.exists('/usr/bin/google-chrome') else None
         b=await p.chromium.launch(executable_path=exe, args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'])
-        ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality2', JSON.stringify('{Q}'))}}catch(e){{}}")
+        ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality3', JSON.stringify('{Q}'))}}catch(e){{}}")
         pg=await ctx.new_page(); pg.set_default_timeout(240000)
         pg.on('pageerror', lambda e: errs.append('pageerror: '+str(e)))
         pg.on('console', lambda m: errs.append('console: '+m.text) if m.type=='error' and '404' not in m.text else None)
@@ -37,8 +37,8 @@ async def run():
         await pg.wait_for_timeout(1500); await pg.screenshot(path=f'{shots}/menu.png')
         await pg.evaluate("window.__game.startCampaign(); window.__game.state.waveT=999")
         await pg.wait_for_timeout(2500); await pg.screenshot(path=f'{shots}/play.png')
-        await pg.evaluate("""(()=>{const g=window.__game; const p=g.player; p.pos.set(13.5*3,0,8.5*3); p.yaw=0; p.pitch=-0.03;
-          ['rifle','mg','shotgun'].forEach(t=>g.spawnEnemy(t)); g.enemies.forEach((e,i)=>{ e.pos.set(13.5*3-1.4+i*1.4,0,8.5*3-3.2-i*0.6); e.react=99; e.cool=99; });})()""")
+        await pg.evaluate("""(()=>{const g=window.__game; const p=g.player; p.pos.set(13.5*g.CELL,0,8.5*g.CELL); p.yaw=0; p.pitch=-0.03;
+          ['rifle','mg','shotgun'].forEach(t=>g.spawnEnemy(t)); g.enemies.forEach((e,i)=>{ e.pos.set(13.5*g.CELL-1.4+i*1.4,0,8.5*g.CELL-3.2-i*0.6); e.react=99; e.cool=99; });})()""")
         await pg.wait_for_timeout(2500); await pg.screenshot(path=f'{shots}/enemies.png')
         await pg.evaluate("window.__game.player.fireHeld=true"); await pg.wait_for_timeout(400); await pg.screenshot(path=f'{shots}/fire.png')
         from PIL import Image, ImageStat

@@ -59,3 +59,14 @@
 - Tiếp tế có băng rôn lớn giữa màn hình + dấu ✈/▣ chỉ vị trí gói.
 - Nút cứu nhỏ lại, cờ chữ thập đỏ cắm cạnh đồng đội khi cứu. Nút đổi súng hiện hình súng kế tiếp.
 - Ảnh đại diện bản đồ: `tools/thumbs.py` → `public/assets/maps/*.jpg`.
+
+## 2026-11-13 — v4.2
+- Bắn pháo kiểu thật: lửa đầu nòng kéo dài loé ngắn, sóng bụi mặt đất, nòng giật lùi rồi về, khói tỏa sau bắn, đạn có vệt sáng + khói, tiếng nổ trầm vang dài, tiếng rít khi đạn rơi, nổ có loé trắng + cột đất + vòng sóng xung kích. Camera bám theo đạn của người chơi, chậm lại lúc gần chạm đất (chạm/E để bỏ qua). Test: `tools/arttest.py`.
+- Bố cục cảm ứng gọn: nút phụ (bộc phá, cứu thương, đèn, quân nhu) gom vào BA LÔ; nút NGỒI giữ 0,4s = nằm bò; đổi súng + menu lên góc trên; số đạn xuống giữa đáy màn hình. Sửa nút quân nhu đè nút R.
+- Mặc định đồ hoạ Siêu (khoá lưu mới `quality3`); Siêu giảm bộ nhớ (nướng chất liệu 1024px thay 2048px — bản cũ có thể hết bộ nhớ GPU nên không vào được game), mất ngữ cảnh WebGL thì tự hạ một bậc và tải lại; 20 giây đầu dưới 22 FPS thì lần sau tự hạ.
+- Bản đồ to hơn 20% (CELL 3,6m), lính cao hơn (~1,8m), tầm mắt người chơi 1,66m, hộp trúng đạn khớp chiều cao mới.
+- Cây cọ, dương xỉ, bụi cây, đá từ mô hình chụp thật Poly Haven (CC0, đã giảm đa giác trong Blender — `tools/blender/build_vegetation.py`).
+- Trận tối thiểu 5 phút: xe chỉ huy 6000 máu và được "gia cố" (không xuống dưới 15%) trong 5 phút đầu; lô cốt 2 mở sau 100 giây, lô cốt 3 sau 200 giây, chiếm mất 18 giây.
+- Chữ "XE ĐỊCH" nhỏ, mờ, nằm cao hơn và gần như trong suốt khi ở gần tâm ngắm (không che địch). Chữ tiếp tế nhỏ lại.
+- Chế độ con tin: chưa tái hiện được lỗi cụ thể (bắt đầu, quỳ, giải cứu đều chạy); đã sửa đồng đội xuất hiện chồng lên người chơi.
+- Bot cố vấn mới (lịch hằng ngày 17:19): chỉ review và ghi `docs/advisor/YYYY-MM-DD.md`, không sửa code.
