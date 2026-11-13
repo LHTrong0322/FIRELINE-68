@@ -58,3 +58,8 @@
 - **Chu kỳ ngày – đêm** ngoài trời: ngày 5 phút, đêm 1,5 phút, chuyển 25 giây; Đồi A1 bắt đầu ban đêm rồi sáng dần.
 - **Nhận diện ta/địch**: mũi tên xanh trên đầu đồng đội, dấu đỏ trên địch đang lộ, chữ thập đỏ trên đồng đội gục; bộ đội mặc màu ô-liu sáng hơn lính Mỹ.
 - Backlog: lính Pháp riêng (mũ, quân phục); biểu cảm khuôn mặt; vật thể khác bằng Blender (xe, lô cốt, cây cối); ảnh chụp da người.
+
+## 2026-11-13 — v4.3 (phiên tương tác)
+- Pháo: hố nổ (decal canvas), mảnh đất văng, lửa hãm nòng, rung camera theo khoảng cách; hiệu ứng chết (súng/mũ văng, bụi khi ngã).
+- Hiệu năng: giới hạn FPS tuỳ chọn, bóng cập nhật thưa.
+- Backlog đồ hoạ lớn: TAA + upscale, bake lightmap Blender theo từng map, heightmap địa hình thật, texture da/mặt chi tiết hơn, thử WebGPURenderer khi ổn định.

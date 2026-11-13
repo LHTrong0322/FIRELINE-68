@@ -219,7 +219,8 @@ button{font-family:inherit;cursor:pointer}
 #bKit{--s:46px;right:calc(192px + env(safe-area-inset-right));bottom:calc(92px + env(safe-area-inset-bottom));background:rgba(70,60,30,.55);border-color:#c8a650}
 #bSwap{--s:58px;width:64px!important;height:46px!important;border-radius:8px!important;right:calc(64px + env(safe-area-inset-right))!important;top:calc(10px + env(safe-area-inset-top))!important;bottom:auto!important}
 #bPause{right:calc(10px + env(safe-area-inset-right))!important;top:calc(10px + env(safe-area-inset-top))!important;width:44px!important;height:44px!important}
-#bProne,#bCharge,#bHeal,#bShop,#bLight{display:none!important}
+#bProne,#bCharge,#bHeal,#bLight{display:none!important}
+#bShop{--s:40px;top:auto!important;right:calc(44px + env(safe-area-inset-right))!important;bottom:calc(30px + env(safe-area-inset-bottom))!important;border-radius:50%!important}
 #kitMenu{position:absolute;right:calc(186px + env(safe-area-inset-right));bottom:calc(144px + env(safe-area-inset-bottom));display:flex;gap:18px;padding-bottom:16px!important;pointer-events:auto;z-index:6;padding:6px;background:rgba(10,10,6,.55);border:1px solid rgba(200,166,80,.6);border-radius:30px}
 #kitMenu .tb{position:relative!important;right:auto!important;bottom:auto!important;--s:46px}
 #kitMenu .tb small{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;color:#fff;text-shadow:0 1px 2px #000;white-space:nowrap}
@@ -231,6 +232,13 @@ button{font-family:inherit;cursor:pointer}
 #score{top:calc(60px + env(safe-area-inset-top))!important}
 @media (pointer:coarse){#ammobox{right:auto!important;left:50%!important;transform:translateX(-50%);bottom:calc(4px + env(safe-area-inset-bottom))!important;flex-direction:row!important;align-items:baseline;gap:10px!important}#ammo{font-size:24px!important}#wname{font-size:10px}#inv{margin:0;font-size:12px}#money{font-size:12px}
  #bKit{bottom:calc(112px + env(safe-area-inset-bottom))!important;right:calc(196px + env(safe-area-inset-right))!important}#kitMenu{bottom:calc(166px + env(safe-area-inset-bottom))!important}}
+
+#killIco{position:absolute;left:50%;top:58%;transform:translate(-50%,0);text-align:center;pointer-events:none;opacity:0;z-index:7}
+#killIco .k{display:inline-flex;align-items:center;gap:8px;padding:4px 14px;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(0,0,0,.6) 20%,rgba(0,0,0,.6) 80%,rgba(0,0,0,0));font-weight:900;letter-spacing:2px;font-size:15px;color:#fff;text-shadow:0 2px 3px #000}
+#killIco .k b{display:inline-block;width:26px;height:26px;border-radius:50%;background:#c8302a;border:2px solid #ffb0a0;line-height:22px;font-size:15px;color:#fff}
+#killIco.hs .k b{background:#e2b23c;border-color:#fff2c0}#killIco .s{font-size:11px;color:#ffd34a;margin-top:2px;font-weight:700}
+#killIco.on{animation:killPop 1.4s ease-out forwards}@keyframes killPop{0%{opacity:0;transform:translate(-50%,8px) scale(1.4)}10%{opacity:1;transform:translate(-50%,0) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-10px)}}
+#hitm.kill{transform:translate(-50%,-50%) rotate(45deg) scale(1.5)}#hitm.kill i{background:#ff3a2a!important}
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 </head>
@@ -265,7 +273,7 @@ button{font-family:inherit;cursor:pointer}
   <div id="micInd" class="hidden">● MIC ĐANG BẬT</div>
   <div id="usePrompt" class="hidden"><div>GIỮ <kbd>E</kbd> ĐỂ GIẢI CỨU</div><div class="ub"><i id="useBar"></i></div></div>
   <div id="objMark" class="hidden"><b>◆</b><span></span></div>
-  <div id="marks"></div><div id="banner" class="hidden"><div class="t"></div><div class="s"></div></div>
+  <div id="marks"></div><div id="killIco"><div class="k"><b>✕</b><span class="t">HẠ GỤC</span></div><div class="s"></div></div><div id="banner" class="hidden"><div class="t"></div><div class="s"></div></div>
   <div id="shellHud" class="hidden"><div class="lb t"></div><div class="lb b"></div><span class="sk">CHẠM / NHẤN E ĐỂ BỎ QUA</span><span class="tx"></span></div>
   <div id="artBtns" class="hidden"><button id="artMapB">🗺 BẢN ĐỒ BẮN XA (M)</button><button class="x" id="artExitB">✕ RỜI PHÁO (E)</button></div>
   <div id="artMap" class="hidden"><div class="hd">CHỌN ĐIỂM TRÊN BẢN ĐỒ ĐỂ NÃ PHÁO · địch không hiện — hãy phán đoán!</div><canvas id="artCv"></canvas><div id="artInfo" class="hd" style="color:#fff;font-size:13px"></div><button class="mbtn" id="artMapClose" style="text-align:center;width:auto;padding:8px 30px">ĐÓNG BẢN ĐỒ</button></div>
@@ -290,7 +298,6 @@ button{font-family:inherit;cursor:pointer}
       <div class="tb" id="kCharge"><img class="ico" src="assets/ui/charge.png" alt=""><small>BỘC PHÁ</small></div>
       <div class="tb" id="kHeal"><img class="ico" src="assets/ui/heal.png" alt=""><small>CỨU THƯƠNG</small></div>
       <div class="tb" id="kLight"><img class="ico" src="assets/ui/light.png" alt=""><small>ĐÈN</small></div>
-      <div class="tb" id="kShop"><img class="ico" src="assets/ui/shop.png" alt=""><small>QUÂN NHU</small></div>
     </div>
     <div class="tb hidden" id="bUse" aria-label="Giải cứu"><img class="ico" src="assets/ui/use.png" alt="" draggable="false"><i class="ring"></i></div>
     <div class="tb net-only" id="bChat" aria-label="Chat"><img class="ico" src="assets/ui/chat.png" alt="" draggable="false"></div>
@@ -308,7 +315,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.2</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.3</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -344,6 +351,7 @@ button{font-family:inherit;cursor:pointer}
       <div id="pSettings" class="hidden">
         <h2>CÀI ĐẶT</h2>
         <div class="row"><label>Đồ hoạ</label><div class="seg" id="segQ"><button data-v="low">Thấp</button><button data-v="med">Vừa</button><button data-v="high">Cao</button><button data-v="ultra">Siêu</button></div></div>
+        <div class="row"><label>Khung hình</label><div class="seg" id="segFps"><button data-v="60">Mượt 60</button><button data-v="45">Cân bằng 45</button><button data-v="30">Mát máy 30</button></div></div>
         <div class="row"><label>Độ khó</label><div class="seg" id="segD"><button data-v="0">Dễ</button><button data-v="1">Thường</button><button data-v="2">Khó</button></div></div>
         <div class="row"><label>Độ nhạy</label><input type="range" id="sens" min="0.3" max="3" step="0.05"></div>
         <div class="row"><label>Âm lượng</label><input type="range" id="vol" min="0" max="1" step="0.05"></div>
@@ -416,7 +424,7 @@ const store = {
 const settings = {
   nick: store.get('nick','ChienSi'+Math.floor(100+Math.random()*900)),
   color: store.get('color',0), sens: store.get('sens',1.0), vol: store.get('vol',0.7),
-  quality: store.get('quality3', 'ultra'), diff: store.get('diff',1),
+  quality: store.get('quality3', 'ultra'), fps: store.get('fps', IS_TOUCH?'45':'60'), diff: store.get('diff',1),
   map: store.get('map','cuchi'), mode: store.get('mode','base')==='rescue'?'rescue':'base', netMap: store.get('netMap','cuchi'), portrait: false,
 };
 const QT = {
@@ -1618,7 +1626,7 @@ function assignLights(dt, t){
     l.position.set(lp.x+(lp.fire?0:Math.sin(t*0.9+lp.phase)*0.04), lp.y, lp.z-(lp.fire?0:Math.cos(t*0.7+lp.phase)*0.03)); l.intensity = lp.power*lp.f*(state.shake>0.3?rand(0.6,1):1); }
   if(genFan) genFan.rotation.z += dt*14;
   M.redLamp.emissiveIntensity = (Math.sin(t*5)>0)?6:0.3;
-  if(Q.shadows){ shadowFrame++; if(shadowFrame%2===0) renderer.shadowMap.needsUpdate=true; }
+  if(Q.shadows){ shadowFrame++; if(shadowFrame%(+settings.fps<=30?4:IS_TOUCH?3:2)===0) renderer.shadowMap.needsUpdate=true; }
 }
 function localLight(p){ const nf=MAPDEF.outdoor?(state.nightF||0):0; if(MAPDEF.outdoor && nf<0.5) return 1.25-0.5*nf; if(nf>=0.5 && flare.on) return 1.0; let s=nf>=0.5?0.35:0.2; for(const lp of lamps){ const d2=(lp.x-p.x)**2+(lp.z-p.z)**2; s+=lp.f*9/(4+d2); } return clamp(s,0.2,1.6); }
 
@@ -1666,6 +1674,7 @@ const AU = {
       case 'whistle': { const c=this.ctx, t=c.currentTime, os=c.createOscillator(), g=c.createGain(); os.type='sine'; os.frequency.setValueAtTime(1550,t); os.frequency.exponentialRampToValueAtTime(420,t+1.7);
         g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.32,t+1.2); g.gain.exponentialRampToValueAtTime(0.0001,t+1.75); os.connect(g); g.connect(o); os.start(t); os.stop(t+1.8);
         this.noise(o,1.7,'bandpass',2600,4,.12,1.2); break; }
+      case 'kill': this.tone(o,'square',880,880,.06,.18); this.tone(o,'square',1320,1320,.12,.16,.07); break;
       case 'boom': this.noise(o,1.6,'lowpass',500,.6,1.6,.005,60); this.tone(o,'sine',70,22,1.1,1.2); this.noise(o,.3,'highpass',2000,.5,.4); break;
       case 'knife': this.noise(o,.16,'bandpass',2500,2,.35,.03,900); break;
       case 'hit': this.tone(o,'square',1150,1100,.045,.12); break;
@@ -2222,6 +2231,7 @@ function moveUnit(u, mx, mz, spd, dt, others){
 }
 function deathAnim(u, dt){ const m=u.model; u.deadT+=dt; const t=Math.min(1,u.deadT/0.7), te=t*t*(3-2*t);
   m.group.rotation.x = -u.fallDir*te*Math.PI/2*0.96; m.group.position.y = Math.sin(t*Math.PI)*0.08;
+  if(t>=1 && !u.dustDone){ u.dustDone=true; for(let i=0;i<12;i++) dustFx.emit(new V3(u.pos.x+rand(-.6,.6),0.1,u.pos.z+rand(-.6,.6)),[rand(-1.5,1.5),rand(0.3,1.2),rand(-1.5,1.5)],rand(0.8,1.5),[0.5,0.44,0.36]); AU.play('land',u.pos); }
   if(m.sk){ if(m.cur!=='death'){ m.body.position.y=0; skPlay(m,'death',.12); } if(u.deadT<2) m.mixer.update(dt); m.flash.material.opacity=0; return; }
   m.shins.forEach(s=>s.rotation.x=te*1.1); m.legs.forEach((l,i)=>l.rotation.x=-te*0.5*(i?1:0.6)); m.head.rotation.x=-te*0.4*u.fallDir; m.flash.material.opacity=0; }
 function unitEye(u){ return new V3(u.pos.x, u.pos.y+1.6*((u.T&&u.T.scale)||1), u.pos.z); }
@@ -2590,6 +2600,7 @@ function fireShell(o, v, owner, art){
   // lửa đầu nòng: quả cầu lửa kéo dài theo hướng bắn, chỉ loé 1-2 khung hình
   const d=v.clone().normalize(); AU.play('cannon',o); fxLight2.position.copy(o); fxLight2.intensity=60; fxLight2.userData.t=0.12;
   for(let i=0;i<34;i++){ const k=rand(0,1); fire.emit(o.clone().addScaledVector(d,k*1.6),[d.x*rand(6,22)+rand(-2,2),d.y*rand(6,22)+rand(-1,2),d.z*rand(6,22)+rand(-2,2)],rand(0.08,0.22),[1,rand(0.6,0.85),0.3]); }
+  { const sd=new V3(-d.z,0,d.x); for(const sg of [-1,1]) for(let i=0;i<10;i++) fire.emit(o.clone(),[sd.x*sg*rand(8,16)+d.x*2,rand(-.5,1.5),sd.z*sg*rand(8,16)+d.z*2],rand(0.06,0.15),[1,0.75,0.35]); }
   for(let i=0;i<26;i++) smoke.emit(o.clone().addScaledVector(d,rand(0,2)),[d.x*rand(2,7)+rand(-1.2,1.2),d.y*rand(1,4)+rand(0,1),d.z*rand(2,7)+rand(-1.2,1.2)],rand(2,4),[0.55,0.52,0.48]);
   // sóng bụi mặt đất toả tròn quanh khẩu pháo
   const gp=art?new V3(art.x,0.15,art.z):new V3(o.x,0.15,o.z);
@@ -2619,7 +2630,22 @@ function updateShellCam(dt){
   vmModels.forEach(m=>m.visible=false); return true;
 }
 let RING_GEO=null;
+const debris=[], craters=[]; let CRATER_TEX=null, CLOD_GEO=null;
+function craterTex(){ const c=mkCanvas(128,128), x=c.getContext('2d'); const g=x.createRadialGradient(64,64,4,64,64,64); g.addColorStop(0,'rgba(8,6,4,.95)'); g.addColorStop(0.45,'rgba(30,22,14,.85)'); g.addColorStop(0.7,'rgba(60,44,28,.5)'); g.addColorStop(1,'rgba(60,44,28,0)'); x.fillStyle=g; x.fillRect(0,0,128,128);
+  for(let i=0;i<60;i++){ const a=Math.random()*6.28, r=rand(30,62); x.fillStyle=`rgba(20,14,8,${rand(.2,.6)})`; x.beginPath(); x.arc(64+Math.cos(a)*r,64+Math.sin(a)*r,rand(1,4),0,7); x.fill(); }
+  const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t; }
+function addCrater(p){ if(!CRATER_TEX) CRATER_TEX=craterTex(); const m=new THREE.Mesh(new THREE.PlaneGeometry(5,5),new THREE.MeshStandardMaterial({map:CRATER_TEX,transparent:true,depthWrite:false,roughness:1,polygonOffset:true,polygonOffsetFactor:-2}));
+  m.rotation.x=-Math.PI/2; m.rotation.z=rand(0,6); m.position.set(p.x,0.03,p.z); m.receiveShadow=true; m.userData.noAO=true; scene.add(m); craters.push(m); if(craters.length>14){ const o=craters.shift(); scene.remove(o); o.material.dispose(); o.geometry.dispose(); } }
+function spawnDebris(p,n){ if(!CLOD_GEO) CLOD_GEO=new THREE.DodecahedronGeometry(0.12,0); const mat=M.bag||M.charred;
+  for(let i=0;i<n;i++){ const m=new THREE.Mesh(CLOD_GEO,mat); m.scale.setScalar(rand(0.5,1.6)); m.position.copy(p).add(new V3(rand(-.5,.5),0.3,rand(-.5,.5))); m.castShadow=true; scene.add(m);
+    debris.push({m, v:new V3(rand(-7,7),rand(6,13),rand(-7,7)), w:new V3(rand(-9,9),rand(-9,9),rand(-9,9)), t:rand(3,5)}); } }
+function updateDebris(dt){ for(let i=debris.length-1;i>=0;i--){ const d=debris[i]; d.t-=dt; d.v.y-=14*dt; d.m.position.addScaledVector(d.v,dt); d.m.rotation.x+=d.w.x*dt; d.m.rotation.z+=d.w.z*dt;
+    if(d.m.position.y<0.08){ d.m.position.y=0.08; d.v.multiplyScalar(0.3); d.v.y=Math.abs(d.v.y)*0.5; d.w.multiplyScalar(0.4); if(Math.random()<0.4) dustFx.emit(d.m.position,[0,0.4,0],0.5,[0.45,0.36,0.26]); }
+    if(d.t<=0){ scene.remove(d.m); debris.splice(i,1); } } }
 function shellImpactFx(p){
+  addCrater(p); spawnDebris(p, settings.quality==='low'?6:14);
+  { const dd=p.distanceTo(player.pos); if(dd>40) setTimeout(()=>AU.play('cannon',p), Math.min(2500,dd/340*1000)); }
+  const dist=p.distanceTo(camera.position); if(!shellCam.on){ state.shake=Math.max(state.shake, clamp(1.4-dist/40,0,1.2)); }
   // loé trắng + cột đất + sóng xung kích + bụi đọng lại
   fxLight.position.copy(p).add(new V3(0,1.5,0)); fxLight.intensity=140; fxLight.userData.t=0.25;
   for(let i=0;i<70;i++) dustFx.emit(p.clone(),[rand(-3.5,3.5),rand(8,19),rand(-3.5,3.5)],rand(1.2,2.4),[0.38,0.27,0.18]);
@@ -2665,7 +2691,18 @@ function updateProjectiles(dt){
 // ---- PHÁO: ai đứng cạnh và chiếm được thì dùng để bắn
 function buildArts(){ if(!medFlag) medFlag=buildMedFlag(); arts.length=0; for(const h of howitzers){ arts.push({x:h.x,z:h.z,g:h.g,barrel:h.g.userData.barrel,gunner:null,cool:rand(2,5),yaw:h.g.rotation.y}); } }
 function artFree(a){ return !a.gunner || (a.gunner!==PLAYER_T && (!a.gunner.alive || Math.hypot(a.gunner.pos.x-a.x,a.gunner.pos.z-a.z)>3.2)) || (a.gunner===PLAYER_T && player.onArt!==a); }
-function aimArt(a, yaw, pitch){ a.yaw=yaw; a.g.rotation.y=yaw; if(a.barrel) a.barrel.rotation.x=-clamp(pitch,0.05,0.9); }
+function aimArt(a, yaw, pitch){ a.yaw=yaw; a.g.rotation.y=yaw; a.pitch=clamp(pitch,0.05,0.9); if(a.barrel) a.barrel.rotation.x=-a.pitch; }
+// xoay nòng có quán tính: tối đa 0,55 rad/s ngang, 0,35 rad/s dọc
+function slewArt(a, yaw, pitch, dt){ const dy=angDiff(a.yaw??a.g.rotation.y, yaw), dp=clamp(pitch,0.05,0.9)-(a.pitch??0.2);
+  const ny=(a.yaw??a.g.rotation.y)+clamp(dy,-0.55*dt,0.55*dt), np=(a.pitch??0.2)+clamp(dp,-0.35*dt,0.35*dt);
+  if(Math.abs(dy)>0.002||Math.abs(dp)>0.002){ a.slewSnd=(a.slewSnd||0)-dt; if(a.slewSnd<=0){ a.slewSnd=0.35; AU.play('reload',a.g.position); } }
+  aimArt(a, ny, np); return Math.abs(dy)<0.02 && Math.abs(dp)<0.02; }
+function barrelDir(a){ const d=new V3(0,0,1); a.barrel.updateMatrixWorld(true); return d.transformDirection(a.barrel.matrixWorld).normalize(); }
+function artReload(a){ // vỏ đạn văng ra sau khoá nòng
+  a.g.updateMatrixWorld(true); const back=a.barrel? a.barrel.localToWorld(new V3(0,0,-0.7)) : a.g.position.clone().add(new V3(0,1,0));
+  const cm=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.45,10),M.brass); cm.position.copy(back); cm.castShadow=true; scene.add(cm);
+  const bd=a.barrel?barrelDir(a):new V3(0,0,1); flying.push({o:cm, v:new V3(-bd.x*2.2+rand(-.4,.4),1.6,-bd.z*2.2+rand(-.4,.4)), w:new V3(rand(-8,8),rand(-3,3),rand(-8,8)), life:40, rest:false});
+  setTimeout(()=>AU.play('impact',cm.position),600); setTimeout(()=>AU.play('reload',a.g.position),1400); }
 function artMuzzle(a){ a.g.updateMatrixWorld(true); return a.barrel ? a.barrel.localToWorld(new V3(0,0,2.5)) : a.g.localToWorld(new V3(0,1.25,2.45)); }
 function mountArt(a){ player.onArt=a; a.gunner=PLAYER_T; player.crouch=false; player.prone=false; player.needERelease=true; showMsg('ĐÃ CHIẾM PHÁO', IS_TOUCH?'Nút BẮN để bắn thẳng · BẢN ĐỒ để nã pháo xa':'Click bắn thẳng · M mở bản đồ nã pháo xa · E rời pháo', 3); AU.play('reload'); $('artBtns').classList.remove('hidden'); }
 // ---- bản đồ nã pháo: chọn điểm, đạn bay vòng cầu tới (không hiện vị trí địch)
@@ -2679,25 +2716,30 @@ function drawArtMap(){ const cv=$('artCv'), x=cv.getContext('2d'), k=+cv.dataset
   if(state.mission==='bunker') capCells.forEach((c,i)=>{ x.strokeStyle=i<state.capIdx?'#57e08a':'#ff5a40'; x.lineWidth=2; x.beginPath(); x.arc(c.x*k,c.z*k,6*k,0,7); x.stroke(); });
   for(const s of artShots){ const a=clamp(1-(state.time-s.t)/20,0,1); if(a<=0) continue; x.strokeStyle=`rgba(255,200,60,${a})`; x.lineWidth=2; x.beginPath(); x.arc(s.x*k,s.z*k,7*k,0,7); x.stroke(); x.beginPath(); x.moveTo(s.x*k-5,s.z*k-5); x.lineTo(s.x*k+5,s.z*k+5); x.moveTo(s.x*k+5,s.z*k-5); x.lineTo(s.x*k-5,s.z*k+5); x.stroke(); }
   const a=player.onArt; if(a){ x.fillStyle='#57e08a'; x.beginPath(); x.arc(a.x*k,a.z*k,6,0,7); x.fill(); x.strokeStyle='rgba(87,224,138,.35)'; x.beginPath(); x.arc(a.x*k,a.z*k,170*k,0,7); x.stroke(); }
-  $('artInfo').textContent = a ? (a.cool>0?`Đang nạp đạn pháo… ${a.cool.toFixed(1)}s`:'Sẵn sàng — chạm vào bản đồ để bắn') : ''; }
+  $('artInfo').textContent = a ? (a.queued?'Đang xoay nòng về mục tiêu…':a.cool>0?`Pháo thủ đang nạp đạn… ${a.cool.toFixed(1)}s`:'Sẵn sàng — chạm vào bản đồ để bắn') : ''; }
+function fireArtNow(a, v){ a.cool=3.2; fireShell(artMuzzle(a), v, 'p', a); state.shake=Math.max(state.shake,0.7); player.kick=1; setTimeout(()=>{ if(arts.includes(a)) artReload(a); },900); }
 function artMapFire(ev){ const a=player.onArt; if(!a) return; ev.preventDefault(); const cv=$('artCv'), r=cv.getBoundingClientRect(), k=+cv.dataset.k;
   const pt=ev.touches?ev.touches[0]:ev; const wx=(pt.clientX-r.left)*(cv.width/r.width)/k, wz=(pt.clientY-r.top)*(cv.height/r.height)/k;
   if(a.cool>0){ AU.play('empty'); return; } const d=Math.hypot(wx-a.x,wz-a.z); if(d<12){ toast('Quá gần khẩu pháo!'); return; } if(d>170){ toast('Ngoài tầm bắn (170m)'); return; }
   const tgt=new V3(wx+rand(-2.5,2.5),0.3,wz+rand(-2.5,2.5)); const o=artMuzzle(a); const t=clamp(d/32,1.4,5.5); const g=9.8;
-  const v=new V3((tgt.x-o.x)/t,(tgt.y-o.y+0.5*g*t*t)/t,(tgt.z-o.z)/t); aimArt(a, Math.atan2(v.x,v.z), Math.atan2(v.y,Math.hypot(v.x,v.z)));
-  fireShell(artMuzzle(a), v, 'p', a); a.cool=2.6; artShots.push({x:wx,z:wz,t:state.time}); if(artShots.length>8) artShots.shift(); state.shake=Math.max(state.shake,0.5); drawArtMap(); }
+  const v=new V3((tgt.x-o.x)/t,(tgt.y-o.y+0.5*g*t*t)/t,(tgt.z-o.z)/t);
+  a.queued={yaw:Math.atan2(v.x,v.z), pitch:Math.atan2(v.y,Math.hypot(v.x,v.z)), v:v.length()}; AU.play('swap');
+  artShots.push({x:wx,z:wz,t:state.time}); if(artShots.length>8) artShots.shift(); drawArtMap(); }
 function dismountArt(){ if(shellCam.on) endShellCam(); if(!player.onArt) return; player.onArt.gunner=null; player.onArt=null; player.artLock=state.time+1.6; player.needERelease=true; touch.use=false; keys.KeyE=false; $('artBtns').classList.add('hidden'); closeArtMap(); }
 function updateArts(dt){
   for(const a of arts){ a.cool-=dt; if(artFree(a)){ if(a.gunner && a.gunner!==PLAYER_T) a.gunner.onArt=null; a.gunner=null; }
-    if(a.gunner===PLAYER_T){ if(!$('artMap').classList.contains('hidden')){ if(Math.random()<0.1) drawArtMap(); continue; } aimArt(a, player.yaw+Math.PI, player.pitch+0.25);
-      if(player.fireHeld && a.cool<=0){ a.cool=2.2; const d=new V3(); camera.getWorldDirection(d); fireShell(artMuzzle(a), d.multiplyScalar(52), 'p', a); state.shake=Math.max(state.shake,0.5); player.kick=1; } continue; }
+    if(a.gunner===PLAYER_T){
+      if(a.queued){ const ok=slewArt(a, a.queued.yaw, a.queued.pitch, dt); if(ok && a.cool<=0){ const v=a.queued.v; a.queued=null; fireArtNow(a, barrelDir(a).multiplyScalar(v)); } if(!$('artMap').classList.contains('hidden') && Math.random()<0.15) drawArtMap(); continue; }
+      if(!$('artMap').classList.contains('hidden')){ if(Math.random()<0.1) drawArtMap(); continue; }
+      slewArt(a, player.yaw+Math.PI, player.pitch+0.25, dt);
+      if(player.fireHeld && a.cool<=0){ fireArtNow(a, barrelDir(a).multiplyScalar(52)); } continue; }
     const u=a.gunner; if(!u) continue; const side=u.kind==='enemy'?'en':'vn';
     if(a.cool<=0){ a.cool=rand(5,8);
       let tgt=null, bd=140; const cands = side==='en' ? [{pos:player.pos, alive:player.alive}, ...allies] : enemies;
       for(const t of cands){ if(!t.alive) continue; const d=Math.hypot(t.pos.x-a.x,t.pos.z-a.z); if(d>14 && d<bd){ bd=d; tgt=new V3(t.pos.x,0.3,t.pos.z); } }
       const fh=hqOf(foeSide(side)); if(state.mission==='base' && fh && !fh.dead && (!tgt || Math.random()<0.4)) tgt=new V3(fh.x,0.5,fh.z);
       if(tgt){ tgt.x+=rand(-4.5,4.5); tgt.z+=rand(-4.5,4.5); const o=artMuzzle(a); const v=ballistic(o,tgt,9.8,34);
-        aimArt(a, Math.atan2(v.x,v.z), Math.atan2(v.y,Math.hypot(v.x,v.z))); fireShell(artMuzzle(a), v, side==='en'?'e':'a', a); } } }
+        aimArt(a, Math.atan2(v.x,v.z), Math.atan2(v.y,Math.hypot(v.x,v.z))); fireShell(artMuzzle(a), v, side==='en'?'e':'a', a); setTimeout(()=>artReload(a),900); } } }
 }
 
 // ---- MÁY BAY TIẾP TẾ (mỗi 2 phút): gói áo giáp hoặc đạn pháo. Ai tới trước được; dậm lên gói của địch để phá.
@@ -2847,7 +2889,8 @@ const markPool=[]; let markN=0;
 function mark(cls, html, p){ let el=markPool[markN]; if(!el){ el=document.createElement('div'); $('marks').appendChild(el); markPool.push(el); } markN++;
   const v=p.clone().project(camera); if(v.z>1 || Math.abs(v.x)>1.05 || Math.abs(v.y)>1.05){ el.style.display='none'; return; }
   el.className='umark '+cls; if(el._h!==html){ el.innerHTML=html; el._h=html; } el.style.display=''; el.style.left=((v.x*0.5+0.5)*innerWidth)+'px'; el.style.top=((-v.y*0.5+0.5)*innerHeight)+'px'; }
-function updateUnitMarks(){ markN=0;
+let markTick=0;
+function updateUnitMarks(){ if((markTick++)&1) return; markN=0;
   if(state.phase==='playing' && state.mode==='campaign'){
     const P=player.pos;
     for(const a of allies){ const d=Math.hypot(a.pos.x-P.x,a.pos.z-P.z); if(d>70) continue;
@@ -2991,7 +3034,7 @@ $('artCv').addEventListener('touchstart',artMapFire,{passive:false}); $('artCv')
 function syncStance(){ $('bCrouch').classList.toggle('on',player.crouch); $('bCrouch').classList.toggle('prone',!!player.prone); }
 function toggleKit(force){ const m=$('kitMenu'); const show = force!==undefined?force:m.classList.contains('hidden'); m.classList.toggle('hidden',!show); $('bKit').classList.toggle('on',show); }
 tbtn('bKit',()=>toggleKit());
-tbtn('kCharge',()=>{ playerCharge(); toggleKit(false); }); tbtn('kHeal',()=>{ useMed(); toggleKit(false); }); tbtn('kLight',(t,el)=>{ toggleFlash(); toggleKit(false); }); tbtn('kShop',()=>{ toggleKit(false); shopOpen(); });
+tbtn('kCharge',()=>{ playerCharge(); toggleKit(false); }); tbtn('kHeal',()=>{ useMed(); toggleKit(false); }); tbtn('kLight',(t,el)=>{ toggleFlash(); toggleKit(false); }); 
 $('money').addEventListener('touchstart',e=>{ e.preventDefault(); shopOpen(); },{passive:false});
 tbtn('bLight',(t,el)=>{ toggleFlash(); el.classList.toggle('on',player.flash); });
 tbtn('bChat',()=>openChat());
@@ -3082,7 +3125,8 @@ function damageEnemy(e,dm,head,dir,byAlly){
   if(dir){ e.vel.x+=dir.x*1.5; e.vel.z+=dir.z*1.5; }
   if(e.hp<=0){ e.alive=false; e.deadT=0;
     if(byAlly){ feed(`Đồng đội hạ ${e.T.name}`); } else { state.kills++; const sc=e.T.score+(head?50:0); state.score+=sc; if(head) state.hs++;
-    feed(`${head?'⌖ ':''}Hạ ${e.T.name} <span style="color:var(--acc)">+${sc}</span>`); }
+    feed(`${head?'⌖ ':''}Hạ ${e.T.name} <span style="color:var(--acc)">+${sc}</span>`); killNotice(e,head); }
+    deathFx(e, head, dir);
     state.kVN=(state.kVN||0)+1; if(e.onArt){ e.onArt.gunner=null; e.onArt=null; }
     if(state.mode==='campaign'){ e.loot=lootValue(e,head); lootMarker(e); }
     if(Math.random()<0.18) dropPickup(e.pos.x+0.8,e.pos.z, Math.random()<0.6?'a':'h'); }
@@ -3152,6 +3196,26 @@ function die(killer){
 let feedEls=[];
 function feed(html){ const d=document.createElement('div'); d.innerHTML=html; $('feed').prepend(d); feedEls.push(d); setTimeout(()=>{ d.remove(); },4500); while($('feed').children.length>5) $('feed').lastChild.remove(); }
 function toast(t){ feed(`<span style="color:#cde">${t}</span>`); }
+let killStreak=0, killStreakT=0, killT=null;
+function killNotice(e, head){
+  killStreak = state.time-killStreakT<4 ? killStreak+1 : 1; killStreakT=state.time;
+  const el=$('killIco'); el.classList.toggle('hs',!!head);
+  el.querySelector('.t').textContent = killStreak>=5?'HUỶ DIỆT!':killStreak===4?'HẠ 4 LIÊN TIẾP':killStreak===3?'HẠ 3 LIÊN TIẾP':killStreak===2?'HẠ 2 LIÊN TIẾP':(head?'BẮN VÀO ĐẦU':'HẠ GỤC');
+  el.querySelector('.s').textContent = state.mode==='campaign' ? `${e.T.name} · chạy tới nhặt xác +${VND(lootValue(e,head))}` : e.T.name;
+  el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); AU.play('kill');
+  const h=$('hitm'); h.classList.add('kill'); clearTimeout(killT); killT=setTimeout(()=>h.classList.remove('kill'),300); }
+// địch ngã: súng văng khỏi tay, trúng đầu thì mũ bật ra, bụi bốc khi thân chạm đất
+const flying=[];
+function detachFly(obj, vel, spin, life){ if(!obj || !obj.parent) return; obj.updateMatrixWorld(true); const wm=obj.matrixWorld.clone(); obj.parent.remove(obj); wm.decompose(obj.position,obj.quaternion,obj.scale); scene.add(obj);
+  flying.push({o:obj, v:vel, w:spin, life, rest:false}); }
+function deathFx(e, head, dir){ const m=e.model; const d=dir||new V3(rand(-1,1),0,rand(-1,1)).normalize();
+  if(m.gun && m.gun.visible) detachFly(m.gun, new V3(d.x*2.5+rand(-1,1),rand(1.5,3),d.z*2.5+rand(-1,1)), new V3(rand(-6,6),rand(-6,6),rand(-6,6)), 30);
+  if(head && m.head) detachFly(m.head, new V3(d.x*3+rand(-.5,.5),rand(3,4.5),d.z*3+rand(-.5,.5)), new V3(rand(-9,9),rand(-9,9),rand(-9,9)), 30);
+  e.dustDone=false; }
+function updateFlying(dt){ for(let i=flying.length-1;i>=0;i--){ const f=flying[i]; f.life-=dt;
+    if(!f.rest){ f.v.y-=12*dt; f.o.position.addScaledVector(f.v,dt); f.o.rotation.x+=f.w.x*dt; f.o.rotation.y+=f.w.y*dt; f.o.rotation.z+=f.w.z*dt;
+      if(f.o.position.y<0.06){ f.o.position.y=0.06; if(Math.abs(f.v.y)<1.5){ f.rest=true; f.o.rotation.x=Math.PI/2*Math.sign(f.o.rotation.x||1)*0+f.o.rotation.x*0; f.o.rotation.z=Math.PI/2; } else { f.v.y=-f.v.y*0.3; f.v.x*=0.5; f.v.z*=0.5; f.w.multiplyScalar(0.5); AU.play('impact',f.o.position); } } }
+    if(f.life<=0){ scene.remove(f.o); flying.splice(i,1); } } }
 let hmT=0; function hitMarker(hs){ const h=$('hitm'); h.classList.toggle('hs',hs); h.style.transition='none'; h.style.opacity=1; hmT=0.12; AU.play(hs?'hs':'hit'); }
 function showMsg(big, small, dur=2.5){ $('msg').innerHTML=big+(small?`<small>${small}</small>`:''); $('msg').style.opacity=1; state.msgT=dur; }
 function updateWeaponHUD(){ try{ updateSwapIcon(); }catch(e){}
@@ -3178,7 +3242,7 @@ function updateHUD(dt){
   if(state.mode==='campaign'){
     const alive=enemies.filter(e=>e.alive).length + state.queue.length;
     if(state.mission==='rescue'){ const cap=hostages.filter(h=>h.alive&&h.state==='captive').length; $('obj').textContent = cap ? `GIẢI CỨU CON TIN · CÒN ${cap}/${hostages.length} · ĐỒNG ĐỘI ${allies.filter(a=>a.alive).length}` : 'ĐƯA CON TIN VỀ ĐIỂM SƠ TÁN (VÒNG XANH)'; }
-    else if(state.mission==='base'){ const hb=hqOf('en'); const d=hb?Math.round(Math.hypot(hb.x-player.pos.x,hb.z-player.pos.z)):0; $('obj').textContent = player.onArt ? 'ĐANG DÙNG PHÁO · MỞ BẢN ĐỒ ĐỂ BẮN XA' : `PHÁ XE CHỈ HUY ĐỊCH · CĂN CỨ ĐỊCH CÁCH ${d}m`; }
+    else if(state.mission==='base'){ const hb=hqOf('en'); const d=hb?Math.round(Math.hypot(hb.x-player.pos.x,hb.z-player.pos.z)):0; $('obj').textContent = player.onArt ? (player.onArt.queued?'PHÁO · ĐANG XOAY NÒNG':player.onArt.cool>0?`PHÁO · ĐANG NẠP ĐẠN ${player.onArt.cool.toFixed(1)}s`:'PHÁO · SẴN SÀNG BẮN') : `PHÁ XE CHỈ HUY ĐỊCH · CĂN CỨ ĐỊCH CÁCH ${d}m`; }
     else if(state.mission==='bunker'){ $('obj').textContent = `LÔ CỐT ${Math.min(state.capIdx+1,capCells.length)}/${capCells.length} · ${state.capLock>0?'ĐỊCH ĐANG TĂNG CƯỜNG · MỞ SAU '+Math.ceil(state.capLock)+'s':state.capCont?'ĐANG GIAO TRANH TRONG VÒNG':state.capProg>0?'ĐANG CHIẾM '+Math.round(state.capProg/18*100)+'%':'TIẾN VÀO VÒNG VÀNG'} · TIẾP VIỆN ${state.tickets}`; }
     else $('obj').textContent = state.waveT>0 ? `ĐỢT ${state.wave+1}/${TOTAL_WAVES} SAU ${Math.ceil(state.waveT)} GIÂY` : `ĐỢT ${state.wave}/${TOTAL_WAVES} · ĐỊCH CÒN ${alive} · ĐỒNG ĐỘI ${allies.filter(a=>a.alive).length}`;
     $('scoreV').textContent=state.score; $('scoreL').textContent=`ĐIỂM · ${state.kills} HẠ`;
@@ -3430,7 +3494,7 @@ function makeLabel(text,color){ const c=mkCanvas(256,64), x=c.getContext('2d'); 
 function placePlayer(s){ player.pos.set(s.x,0,s.z); player.vel.set(0,0,0);
   // face toward most open direction
   let best=0, bd=-1; for(let a=0;a<8;a++){ const ang=a*Math.PI/4; const d=raycast(s.x,1.6,s.z,-Math.sin(ang),0,-Math.cos(ang),40).t; if(d>bd){bd=d;best=ang;} } player.yaw=best; player.pitch=0; }
-function clearWorld(){ dismountArt(); endShellCam(); for(const r of shockRings) scene.remove(r); shockRings.length=0; for(const c of crates) scene.remove(c.mesh); crates.length=0; for(const n of nades) scene.remove(n.mesh); nades.length=0; for(const c of charges) scene.remove(c.mesh); charges.length=0; for(const x of shells){ scene.remove(x.mesh); scene.remove(x.trail); } shells.length=0; if(plane) plane.visible=false; if(capRing){ scene.remove(capRing); capRing=null; } $('shop').classList.add('hidden');
+function clearWorld(){ dismountArt(); endShellCam(); for(const f of flying) scene.remove(f.o); flying.length=0; for(const d of debris) scene.remove(d.m); debris.length=0; for(const c of craters) scene.remove(c); craters.length=0; for(const r of shockRings) scene.remove(r); shockRings.length=0; for(const c of crates) scene.remove(c.mesh); crates.length=0; for(const n of nades) scene.remove(n.mesh); nades.length=0; for(const c of charges) scene.remove(c.mesh); charges.length=0; for(const x of shells){ scene.remove(x.mesh); scene.remove(x.trail); } shells.length=0; if(plane) plane.visible=false; if(capRing){ scene.remove(capRing); capRing=null; } $('shop').classList.add('hidden');
   enemies.forEach(removeEnemy); enemies.length=0; rockets.forEach(r=>scene.remove(r.m)); rockets.length=0; clearNPCs(); $('usePrompt').classList.add('hidden'); $('objMark').classList.add('hidden'); }
 async function loadMap(id, variant='orig'){
   if(id===MAPID && variant===MAPVAR && level.children.length) return;
@@ -3607,8 +3671,10 @@ let lookSwayX=0, lookSwayY=0;
 let last=performance.now(), menuT=0;
 let fpsWatch={t:0,n:0,done:false};
 function watchFps(dt){ if(fpsWatch.done || state.phase!=='playing') return; fpsWatch.t+=dt; fpsWatch.n++; if(fpsWatch.t>20){ fpsWatch.done=true; const fps=fpsWatch.n/fpsWatch.t; if(fps<22 && settings.quality!=='low' && !navigator.webdriver){ const q=QDOWN[settings.quality]; try{ localStorage.setItem('tl_quality3', JSON.stringify(q)); }catch(e){} toast(`Máy hơi yếu (${Math.round(fps)} FPS) — lần mở sau tự dùng đồ hoạ ${({high:'Cao',med:'Vừa',low:'Thấp'})[q]}`); } } }
+let lastDraw=0;
 function frame(now){
   requestAnimationFrame(frame);
+  const cap=+settings.fps||60; if(cap<60 && now-lastDraw < 1000/cap-1.5) return; lastDraw=now;
   let dt=(now-last)/1000; last=now; if(dt>0.05) dt=0.05; if(dt<=0) return; const realDt=dt; watchFps(realDt); dt*=(state.timeScale||1);
   const t=now/1000;
   lookSwayX=lookDX; lookSwayY=lookDY;
@@ -3618,7 +3684,7 @@ function frame(now){
     if(state.mode==='campaign'){ if(state.phase!=='end') updateCampaign(dt); updateEnemies(dt); updateAllies(dt); updateHostages(dt); updateProjectiles(dt); if(state.phase==='playing') updateInteract(dt); updateObjMarker(); updateUnitMarks(); }
     updateDayNight(dt);
     if(state.mode==='online') net.update(dt);
-    updateRockets(dt); updatePickups(dt,t); updateFlare(dt); updateCamera(dt,t); updateArtFx(dt); updateShockRings(dt); updateShellCam(realDt); updateHUD(dt);
+    updateRockets(dt); updatePickups(dt,t); updateFlare(dt); updateCamera(dt,t); updateArtFx(dt); updateShockRings(dt); updateFlying(dt); updateDebris(dt); updateShellCam(realDt); updateHUD(dt);
   } else if(state.phase==='paused'){
     updateCamera(0.0001,t);
   } else {
@@ -3646,8 +3712,8 @@ function drs(dt){
   drsAcc+=dt; drsN++; drsT+=dt;
   if(drsT<2) return; const avg=drsAcc/drsN; drsT=0; drsAcc=0; drsN=0;
   let ns=renderScale;
-  if(avg>1/45 && renderScale>0.6) ns=Math.max(0.6, renderScale-0.1);
-  else if(avg<1/58 && renderScale<1) ns=Math.min(1, renderScale+0.05);
+  const tgt=+settings.fps||60; if(avg>1/(tgt-8) && renderScale>0.6) ns=Math.max(0.6, renderScale-0.1);
+  else if(avg<1/(tgt-1) && renderScale<1) ns=Math.min(1, renderScale+0.05);
   if(ns!==renderScale){ renderScale=ns; applyScale(); }
 }
 function updatePlayerPhysicsOnly(dt){ player.vel.x*=0.8; player.vel.z*=0.8; }
@@ -3706,7 +3772,7 @@ $('chips').addEventListener('click',e=>{ const i=e.target.dataset.i; if(i==null)
 function segInit(id,key,cb){ const el=$(id); const set=()=>[...el.children].forEach(b=>b.classList.toggle('on',String(settings[key])===b.dataset.v)); set();
   el.addEventListener('click',e=>{ const v=e.target.dataset.v; if(v==null) return; settings[key]= key==='diff'?+v:v; store.set(key,settings[key]); set(); cb&&cb(); }); }
 segInit('segQ','quality',()=>{ store.set('quality3',settings.quality); if(state.phase==='menu'){ $('loading').classList.remove('hidden'); setLoad(0.05,'ĐANG ÁP DỤNG CHẤT LƯỢNG ĐỒ HOẠ MỚI…'); setTimeout(()=>location.reload(),150); } else toast('Chất lượng mới áp dụng khi về menu chính'); });
-segInit('segD','diff');
+segInit('segD','diff'); segInit('segFps','fps');
 segInit('segMode','mode');
 // segNetMap: renderNetMaps()
 $('sens').value=settings.sens; $('sens').oninput=e=>{ settings.sens=+e.target.value; store.set('sens',settings.sens); };

@@ -70,3 +70,11 @@
 - Chữ "XE ĐỊCH" nhỏ, mờ, nằm cao hơn và gần như trong suốt khi ở gần tâm ngắm (không che địch). Chữ tiếp tế nhỏ lại.
 - Chế độ con tin: chưa tái hiện được lỗi cụ thể (bắt đầu, quỳ, giải cứu đều chạy); đã sửa đồng đội xuất hiện chồng lên người chơi.
 - Bot cố vấn mới (lịch hằng ngày 17:19): chỉ review và ghi `docs/advisor/YYYY-MM-DD.md`, không sửa code.
+
+## 2026-11-13 — v4.3 (theo yêu cầu người chơi)
+- Nút quân nhu chuyển xuống dưới nút bắn (nhỏ 40px), bỏ khỏi menu trang bị → không đè nút R nữa.
+- Thông báo hạ gục: biểu tượng bật lên giữa màn hình, âm "kill", chuỗi HẠ 2–4 LIÊN TIẾP / HUỶ DIỆT!, bắn đầu có chữ riêng, nhắc nhặt tiền.
+- Hiệu ứng địch chết: súng văng khỏi tay, mũ văng khi bắn đầu, bụi + tiếng khi xác chạm đất.
+- Pháo chân thật: nòng xoay có giới hạn tốc độ (0,55/0,35 rad/s), đạn bay theo hướng nòng, nạp đạn 3,2s có vỏ đạn văng, bắn từ bản đồ thì xếp lệnh chờ nòng xoay xong; lửa hai bên hãm nòng; tiếng nổ xa đến trễ theo khoảng cách; hố đạn trên đất; đất đá văng; rung máy theo khoảng cách.
+- Giảm nóng máy/mượt hơn: cài đặt Khung hình 60/45/30 (điện thoại mặc định 45), bóng cập nhật thưa hơn, độ phân giải động theo mức khung hình, dấu đơn vị cập nhật cách khung.
+- Test: arttest high ĐẠT, check low/high ĐẠT, ảnh điện thoại kiểm tra bố cục nút.

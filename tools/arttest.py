@@ -16,7 +16,7 @@ async def run():
             t0=await ev("window.__game.state.time"); await pg.wait_for_function(f"window.__game.state.time>{t0}+{sec}")
         await ev("(async()=>{ const g=window.__game; g.settings.map='khesanh'; g.settings.mode='base'; await g.startCampaign(); })()")
         await pg.wait_for_function("window.__game.state.phase==='playing'")
-        await ev("(()=>{ const g=window.__game; const a=g.arts.slice().sort((p,q)=>p.x-q.x)[0]; a.gunner=null; g.player.invuln=999; g.player.pos.set(a.x+2,0,a.z); g.mountArt(a); g.player.yaw=-Math.PI/2; g.player.pitch=0.35; a.cool=0; g.player.fireHeld=true; })()")
+        await ev("(()=>{ const g=window.__game; const a=g.arts.slice().sort((p,q)=>p.x-q.x)[0]; a.gunner=null; g.player.invuln=999; g.player.pos.set(a.x+2,0,a.z); g.mountArt(a); g.player.yaw=-Math.PI/2; g.player.pitch=0.55; a.cool=0; a.yaw=g.player.yaw+Math.PI; a.pitch=0.8; g.player.fireHeld=true; })()")
         await gwait(0.12); await ev("window.__game.player.fireHeld=false")
         await pg.screenshot(path=f'{shots}/art_1_fire.png')
         await gwait(0.5); await pg.screenshot(path=f'{shots}/art_2_flight.png')
