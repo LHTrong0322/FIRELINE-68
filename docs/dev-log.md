@@ -108,3 +108,7 @@
 - **Phe mới** `FACTIONS.kh` (áo đen, khăn krama kẻ ô, mũ mềm đen) và `FACTIONS.cn` (quân phục xanh, phù hiệu cổ đỏ, mũ mềm sao đỏ), dùng thân người Á Đông; cờ SVG + cờ cắm lô cốt.
 - **Chế độ mới TỬ THỦ 5 PHÚT** (`state.defend`, trên bản đồ căn cứ): xe chỉ huy địch không phá được, địch tăng quân mỗi 40 giây (tối đa 16), mỗi phút một đợt xung phong; giữ xe chỉ huy ta đủ 5 phút là thắng.
 - Test: modetest với `MODEMAPS=...` cho 5 bản đồ mới, portrait (`MAP=`) soi lính Khmer Đỏ / Trung Quốc.
+
+## 2026-11-13 — v4.9.1 / v4.10
+- v4.9.1: chữ vừa màn hình điện thoại ngang (media query `max-height:500px`): đoạn mở đầu lịch sử thu nhỏ + cuộn được, bảng tiếp tế, bản đồ chi viện, chọn phe, thông báo lớn, banner, dòng tin (feed) xuống dòng; nút CHI VIỆN trên cảm ứng chuyển sang trái dưới bản đồ nhỏ. Kiểm tra ở 844×390 và 740×360.
+- v4.10: **XUNG PHONG** (chỉ bộ đội VN, chiến dịch căn cứ/lô cốt/tử thủ): khi quét sạch quân địch trên trận địa → banner "XUNG PHONG!!!", toàn đội +30% máu (người chơi 130, đồng đội 195) trong 20 giây, đồng đội chạy nhanh hơn 25% và chuyển sang tấn công; viền màn hình ánh cam, thanh máu vàng. Hồi chiêu 75 giây. Test `tools/rushtest.py`.

@@ -170,6 +170,30 @@ button{font-family:inherit;cursor:pointer}
 #sidePick .sd.us:hover,#sidePick .sd.us:active{border-color:#5a8aff;box-shadow:0 0 24px rgba(90,138,255,.5)}
 .roomc .md{position:absolute;left:6px;top:28px;font-size:10px;font-weight:900;letter-spacing:1px;padding:2px 6px;border-radius:3px;background:#c8302a;color:#fff}
 .roomc .md.ffa{background:#555}
+/* v4.9.1: chữ vừa màn hình điện thoại ngang (màn thấp) */
+@media (max-height:500px){
+  #intro .ib{top:0;transform:translateX(-50%);max-height:100%;overflow-y:auto;padding:calc(10px + env(safe-area-inset-top)) 6px 12px;width:min(760px,86vw);-webkit-overflow-scrolling:touch}
+  #intro .iy{font-size:10px;letter-spacing:3px}
+  #intro .it{font-size:19px;margin:2px 0 6px;letter-spacing:1.5px} #intro .it:after{margin-top:5px;width:80px}
+  #intro .ip p{font-size:11.5px;line-height:1.38;margin:0 0 4px}
+  #intro .ip p.mis{margin-top:6px;padding:5px 10px} #intro .ip p.hero{font-size:13.5px}
+  #intro .go{margin-top:6px;padding:6px 22px;font-size:12px;letter-spacing:3px}
+  #introSkip{padding:5px 10px;font-size:11px}
+  #supPanel{top:30%} #supPanel .h{font-size:11px;letter-spacing:1px;padding:4px 18px;white-space:nowrap} #supPanel .g{gap:5px;margin-top:4px} #supPanel .g span{font-size:10px;padding:4px 7px}
+  #artMap{gap:4px;padding:4px 0} #artMap .hd{font-size:11px;letter-spacing:1px;padding:0 8px} #artMap canvas{max-height:58vh} #supSel button{padding:4px 10px;font-size:11px}
+  #artMapClose{padding:5px 22px!important;font-size:12px}
+  #sidePick{gap:8px} #sidePick h2{font-size:16px} #sidePick .sd{padding:8px} #sidePick .sd svg{width:60px;height:40px} #sidePick .sd b{font-size:13px} #sidePick .sub{font-size:11px}
+  #msg{font-size:20px!important} #msg small{font-size:11px!important}
+  #banner .t{font-size:13px;padding:4px 20px} #banner .s{font-size:10px}
+  #segMode button,#segNetMode button{font-size:11px;padding:6px 3px;line-height:1.2}
+  #feed{top:calc(84px + env(safe-area-inset-top));max-width:46vw} #feed div{font-size:11px;padding:2px 8px;line-height:1.3;text-align:right}
+}
+@media (pointer:coarse){ #bSup{right:auto;left:calc(10px + env(safe-area-inset-left));top:calc(132px + env(safe-area-inset-top));font-size:11px;padding:5px 9px} }
+/* v4.10: xung phong */
+#hpBar.rush{background:linear-gradient(90deg,#ffd34a,#ff7a2a)!important;box-shadow:0 0 10px #ffb030}
+#rushFx{position:absolute;inset:0;pointer-events:none;z-index:4;opacity:0;transition:opacity .4s;box-shadow:inset 0 0 90px rgba(255,170,40,.55);border:2px solid rgba(255,200,80,.35)}
+#rushFx.on{opacity:1;animation:rushPulse 1.2s infinite}
+@keyframes rushPulse{0%,100%{box-shadow:inset 0 0 70px rgba(255,160,40,.45)}50%{box-shadow:inset 0 0 120px rgba(255,190,60,.7)}}
 #banner{position:absolute;left:50%;top:15%;transform:translateX(-50%);text-align:center;pointer-events:none;z-index:8}
 #banner .t{display:inline-block;font-size:clamp(15px,2.4vw,22px);font-weight:900;letter-spacing:2px;color:#ffd34a;background:linear-gradient(90deg,rgba(0,0,0,0),rgba(20,14,4,.88) 15%,rgba(20,14,4,.88) 85%,rgba(0,0,0,0));padding:5px 36px;text-shadow:0 0 12px rgba(255,190,60,.7),0 2px 4px #000;animation:bannerIn .5s ease-out}
 #banner .s{margin-top:4px;font-size:clamp(11px,1.4vw,13px);font-weight:700;color:#fff;text-shadow:0 2px 4px #000}
@@ -324,7 +348,7 @@ button{font-family:inherit;cursor:pointer}
   <div id="marks"></div><div id="killIco"><div class="k"><b>✕</b><span class="t">HẠ GỤC</span></div><div class="s"></div></div><div id="banner" class="hidden"><div class="t"></div><div class="s"></div></div>
   <div id="shellHud" class="hidden"><div class="lb t"></div><div class="lb b"></div><span class="sk">CHẠM / NHẤN E ĐỂ BỎ QUA</span><span class="tx"></span></div>
   <div id="artBtns" class="hidden"><button id="artMapB">🗺 BẢN ĐỒ BẮN XA (M)</button><button class="x" id="artExitB">✕ RỜI PHÁO (E)</button></div>
-  <div id="supPanel" class="hidden"><div class="h"></div><div class="g"></div></div><button id="bSup" class="hidden">💥 CHI VIỆN<small></small></button>
+  <div id="rushFx"></div><div id="supPanel" class="hidden"><div class="h"></div><div class="g"></div></div><button id="bSup" class="hidden">💥 CHI VIỆN<small></small></button>
   <div id="artMap" class="hidden"><div class="hd" id="artHd">CHỌN ĐIỂM TRÊN BẢN ĐỒ ĐỂ NÃ PHÁO · địch không hiện — hãy phán đoán!</div><div id="supSel" class="hidden"><button data-t="phao">💥 PHÁO BINH <b></b></button><button data-t="air">✈ KHÔNG KÍCH <b></b></button></div><canvas id="artCv"></canvas><div id="artInfo" class="hd" style="color:#fff;font-size:13px"></div><button class="mbtn" id="artMapClose" style="text-align:center;width:auto;padding:8px 30px">ĐÓNG BẢN ĐỒ</button></div>
   <div id="touch" class="hidden">
     <div id="joyHint"></div>
@@ -364,7 +388,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.9</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.10</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -2690,7 +2714,7 @@ function updateAllies(dt){
         if(hy!==null){ faceYaw=hy; mx=g[0]*0.3; mz=g[1]*0.3; } else { mx=g[0]; mz=g[1]; spd=g[2]>8?5.2:3.8; if(a.speed>0.4) faceYaw=Math.atan2(a.vel.x,a.vel.z); } }
     }
     if(dp<1.3){ mx-=(player.pos.x-a.pos.x); mz-=(player.pos.z-a.pos.z); }
-    moveUnit(a, mx, mz, spd, dt, [...allies, ...hostages]);
+    moveUnit(a, mx, mz, spd*(a.rush?1.25:1), dt, [...allies, ...hostages]);
     if(!modeAI && dp>40 && player.alive){ a.pos.set(player.pos.x+rand(-1,1),0,player.pos.z+rand(-1,1)); collideCircle(a.pos,0.36); }
     a.yaw += angDiff(a.yaw,faceYaw)*Math.min(1,dt*7);
     m.group.position.set(a.pos.x,0,a.pos.z); m.group.rotation.y=a.yaw; animateSoldier(m, a.speed, dt, a.aimPitch);
@@ -3635,7 +3659,7 @@ function updateHUD(dt){
   const sp = w.melee?4:(4+ (w.spread*(1+player.bloom*0.9+moving*0.12)*(player.crouch?0.7:1)*(player.onGround?1:2.5))*innerHeight*0.9);
   const ch=$('cross').children; ch[0].style.top=(-sp-9)+'px'; ch[1].style.top=sp+'px'; ch[2].style.left=(-sp-9)+'px'; ch[3].style.left=sp+'px';
   if(hudT>0) return; hudT=0.1;
-  $('hp').textContent=Math.ceil(player.hp); $('hpBar').style.width=player.hp+'%'; $('ar').textContent=Math.ceil(player.armor); $('arBar').style.width=player.armor+'%';
+  $('hp').textContent=Math.ceil(player.hp); $('hpBar').style.width=Math.min(100,player.hp)+'%'; $('hpBar').classList.toggle('rush',(state.rushT||0)>0); $('ar').textContent=Math.ceil(player.armor); $('arBar').style.width=player.armor+'%';
   $('hp').style.color = player.hp<30?'#ff5a46':'';
   $('lowhp').style.opacity = player.alive && player.hp<35 ? (0.5+0.4*Math.sin(state.time*5))*(1-player.hp/35) : 0;
   updateWeaponHUD();
@@ -3722,8 +3746,27 @@ function updateRescue(dt){
   }
   if(state.reinf){ state.reinfT-=dt; if(state.reinfT<=0 && enemies.filter(e=>e.alive).length<10){ state.reinfT=rand(18,28); for(let i=0;i<2;i++) spawnEnemy(pick(['rifle','shotgun'])); } }
 }
+// v4.10: XUNG PHONG — khi quét sạch quân địch trên trận địa, toàn bộ bộ đội ta được +30% máu trong 20 giây
+const RUSH_T=20;
+function updateRush(dt){
+  if(state.mission!=='base' && state.mission!=='bunker') return;
+  const alive=enemies.filter(e=>e.alive).length; state.rushCD=Math.max(0,(state.rushCD||0)-dt);
+  if(alive>0) state.hadFoes=true;
+  if(alive===0 && state.hadFoes && !state.rushT && state.rushCD<=0 && (state.matchT||0)>8 && state.phase==='playing') startRush();
+  if(state.rushT>0){ state.rushT-=dt;
+    for(const a of allies) if(a.alive && Math.random()<dt*3) dustFx.emit(new V3(a.pos.x,0.15,a.pos.z),[rand(-1,1),rand(0.3,1),rand(-1,1)],0.6,[0.6,0.5,0.4]);
+    if(state.rushT<=0){ state.rushT=0; $('rushFx').classList.remove('on'); if(player.alive) player.hp=Math.min(player.hp,100); for(const a of allies) if(a.alive) a.hp=Math.min(a.hp,150); for(const a of allies) a.rush=false; feed('<span style="color:#ffd34a">Hết thời gian xung phong</span>'); } }
+}
+function startRush(){
+  state.rushT=RUSH_T; state.rushCD=75; state.hadFoes=false;
+  if(player.alive) player.hp=Math.max(player.hp,100)*1.3;
+  for(const a of allies){ if(!a.alive) continue; a.hp=Math.max(a.hp,150)*1.3; a.rush=true; if(state.mission==='base'||state.mission==='bunker'){ if(a.role!=='art' && a.role!=='escort') a.role= state.mission==='bunker'?'push':'attack'; a.goal=null; } }
+  $('rushFx').classList.add('on'); AU.play('win'); AU.play('wave');
+  banner('⚑ XUNG PHONG!!!', 'Đã quét sạch quân địch — toàn đội bộ đội +30% máu trong '+RUSH_T+' giây · tiến lên!', 4);
+  feed('<span style="color:#ffd34a">⚑ XUNG PHONG! Toàn đội +30% máu</span>');
+}
 function updateCampaign(dt){
-  state.matchT=(state.matchT||0)+dt;
+  state.matchT=(state.matchT||0)+dt; updateRush(dt);
   updateRespawns(dt); updateSupply(dt); updateArts(dt); updateStrikes(dt); if(((state.supBtnT=(state.supBtnT||0)+dt))>0.5){ state.supBtnT=0; updateSupBtn(); }
   if(state.mission==='rescue') return updateRescue(dt);
   if(state.mission==='base') return updateBase(dt);
@@ -3996,6 +4039,7 @@ async function startCampaign(){
   const mission = MD.bunker ? 'bunker' : (settings.mode==='rescue' && MD.grid.some(r=>r.includes('Q')) ? 'rescue' : 'base');
   state.defend = mission==='base' && settings.mode==='defend';
   clearWorld(); net.leave(); await loadMap(mapId, mission==='base'?'base':'orig');
+  state.rushT=0; state.rushCD=0; state.hadFoes=false; $('rushFx').classList.remove('on'); for(const a of allies) a.rush=false;
   state.support=[]; state.supN=0; for(const st of strikes) if(st.plane) scene.remove(st.plane); strikes.length=0; $('bSup').classList.add('hidden');
   state.mode='campaign'; state.mission=mission; Object.assign(state,{wave:0,waveT:0,queue:[],score:0,kills:0,hs:0,shots:0,hits:0,roundEnd:0,freed:0,reinf:false,reinfT:30});
   resetWeapons(); Object.assign(player,{hp:100,armor:25,alive:true,cur:2,prev:1,crouch:false,flash:false,invuln:0});
