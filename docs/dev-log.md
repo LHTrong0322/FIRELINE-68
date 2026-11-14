@@ -112,3 +112,10 @@
 ## 2026-11-13 — v4.9.1 / v4.10
 - v4.9.1: chữ vừa màn hình điện thoại ngang (media query `max-height:500px`): đoạn mở đầu lịch sử thu nhỏ + cuộn được, bảng tiếp tế, bản đồ chi viện, chọn phe, thông báo lớn, banner, dòng tin (feed) xuống dòng; nút CHI VIỆN trên cảm ứng chuyển sang trái dưới bản đồ nhỏ. Kiểm tra ở 844×390 và 740×360.
 - v4.10: **XUNG PHONG** (chỉ bộ đội VN, chiến dịch căn cứ/lô cốt/tử thủ): khi quét sạch quân địch trên trận địa → banner "XUNG PHONG!!!", toàn đội +30% máu (người chơi 130, đồng đội 195) trong 20 giây, đồng đội chạy nhanh hơn 25% và chuyển sang tấn công; viền màn hình ánh cam, thanh máu vàng. Hồi chiêu 75 giây. Test `tools/rushtest.py`.
+
+## 2026-11-14 — v4.11.1 (bot QA)
+- **LỖI online đấu đội: chọn sai máy chủ phòng (host chạy bot).** Tái hiện: `python3 tools/playtest.py` → khoảng 50% lần báo "đấu đội: chọn host sai" + "máy B không thấy bot" (người vào sau B lại thành host). Nguyên nhân: `net.hostId()` chọn id peer nhỏ nhất, mà id do worker sinh ngẫu nhiên (`crypto.randomUUID`) → host là ngẫu nhiên; tệ hơn, khi có người mới vào mang id nhỏ hơn thì host đổi giữa trận, toàn bộ bot bị xoá và sinh lại, điểm đội về 0.
+- **Cách sửa:** mỗi máy ghi thời điểm vào phòng `net.jt` (đặt ngay khi `startOnline` gọi `net.join`) và gửi trong presence (`jt`); `hostId()` chọn người vào phòng SỚM NHẤT (hoà thì so id). Máy bản cũ không có `jt` xếp sau cùng. Host chỉ đổi khi host rời phòng. Không đụng worker/sảnh `/rooms`.
+- Soi ảnh: combat/vũ khí/điện thoại/online không thấy đốm đen trắng, UI không chồng chéo đáng kể. Ghi chú: tên đồng đội đứng sát nhau vẫn chồng chữ (Sơn/Minh/Thắng) — để backlog.
+- Test: playtest ĐẠT (A host VN 4+4 bot, B phe Mỹ thấy 8 bot), check low ĐẠT, check high ĐẠT.
+- Backlog mới: gộp/ẩn bớt tên đồng đội khi đứng sát nhau; playtest chiến dịch vẫn 0 hạ (địch cách ~157m) — nên dịch người chơi tới gần địch để có giao tranh thật; hỗ trợ ngắm cho điện thoại (cố vấn đề xuất).

@@ -3836,7 +3836,7 @@ const net = {
     for(const k in this.dmg) if(!this.remotes.has(k)) delete this.dmg[k];
     const p={ n:settings.nick.slice(0,14), c:settings.color, p:[+player.pos.x.toFixed(2),+player.pos.y.toFixed(2),+player.pos.z.toFixed(2)], r:[+player.yaw.toFixed(3),+player.pitch.toFixed(3)],
       w:player.cur, a:player.alive?1:0, cr:player.crouch?1:0, sh:this.sh, d:this.d, kb:this.kb, k:this.k, rd:this.rd, dmg:this.dmg, rk:this.rk, ch:this.ch, mic:VOICE.talking?1:0, v:+Math.hypot(player.vel.x,player.vel.z).toFixed(1) };
-    if(this.tdm){ for(const id in this.botDmg) if(!this.puppets.has(id)) delete this.botDmg[id]; p.sd=this.side; p.bdm=this.botDmg; if(this.isHost()){ p.bots=this.snapBots(); p.ts=this.ts; p.hr=this.hr; p.tw=this.tw; p.bd=this.bdm; } else { p.bots=null; p.ts=null; p.bd=null; p.tw=null; } }
+    if(this.tdm){ for(const id in this.botDmg) if(!this.puppets.has(id)) delete this.botDmg[id]; p.sd=this.side; p.jt=this.jt; p.bdm=this.botDmg; if(this.isHost()){ p.bots=this.snapBots(); p.ts=this.ts; p.hr=this.hr; p.tw=this.tw; p.bd=this.bdm; } else { p.bots=null; p.ts=null; p.bd=null; p.tw=null; } }
     this.room.presence(p).catch(()=>{});
   },
   update(dt){
@@ -3893,7 +3893,9 @@ const net = {
   },
   humanModel(side, col){ if(side==='vn') return buildSoldier({side:'vn',uniform:0x56603a,gear:0x6f5a3a,accent:new THREE.Color(col).getHex(),gun:'ak'});
     const F=FACTIONS[MAPDEF.enemy]||FACTIONS.us; return buildSoldier({side:F.side, uniform:F.uniform, gear:F.gear, gun:'m16'}); },
-  hostId(){ if(!this.room) return null; let ids=[]; for(const pe of this.room.peers()){ if(pe.sameTab){ if(this.side) ids.push(this.my||pe.peer); continue; } const sd=pe.presence&&pe.presence.sd; if(sd) ids.push(pe.peer); } ids=ids.filter(Boolean).sort(); return ids[0]||this.my; },
+  // chủ phòng (chạy bot) = người vào phòng sớm nhất (jt), không phải id ngẫu nhiên nhỏ nhất — tránh đổi host làm bot biến mất khi có người mới vào
+  hostId(){ if(!this.room) return null; let ids=[]; for(const pe of this.room.peers()){ if(pe.sameTab){ if(this.side) ids.push([this.jt||9e15, this.my||pe.peer]); continue; } const pr=pe.presence||{}; if(pr.sd) ids.push([typeof pr.jt==='number'?pr.jt:9e15, pe.peer]); }
+    ids=ids.filter(x=>x[1]).sort((a,b)=>a[0]-b[0]||(a[1]<b[1]?-1:a[1]>b[1]?1:0)); return ids.length?ids[0][1]:this.my; },
   isHost(){ return !!this.my && this.hostId()===this.my; },
   snapBots(){ const out=[]; for(const a of allies) out.push([a.bid,0,Math.round(a.pos.x*10),Math.round(a.pos.z*10),Math.round(a.yaw*100),a.alive?1:0,a.shotSeq|0,Math.round((a.aimPitch||0)*100),0]);
     for(const e of enemies) out.push([e.bid,1,Math.round(e.pos.x*10),Math.round(e.pos.z*10),Math.round(e.yaw*100),e.alive?1:0,e.shotSeq|0,Math.round((e.aimPitch||0)*100),['rifle','shotgun','mg'].indexOf(e.type)]); return out; },
@@ -4159,7 +4161,7 @@ async function startOnline(key, joinTitle){
   else { title=($('roomCode').value||('Phòng của '+settings.nick)).trim().slice(0,30); code = (settings.netMode==='tdm'?'td-':'') + roomSlug(title) + (net.kind==='ws' ? '-'+Math.random().toString(36).slice(2,6) : ''); }
   const tdm = /^td-/.test(code);
   $('netStatus').textContent='Đang vào phòng…';
-  net.mapId=mapId; try{ await net.join(mapId+'-'+code, title); }catch(e){ $('netStatus').innerHTML='<span style="color:#ff7a66">Không vào được phòng. Thử lại sau giây lát.</span>'; return; }
+  net.mapId=mapId; net.jt=Date.now(); try{ await net.join(mapId+'-'+code, title); }catch(e){ $('netStatus').innerHTML='<span style="color:#ff7a66">Không vào được phòng. Thử lại sau giây lát.</span>'; return; }
   clearWorld(); await loadMap(net.mapId||'cuchi'); state.mode='online'; state.mission=tdm?'tdm':null; Object.assign(state,{score:0,kills:0,roundEnd:0});
   net.tdm=tdm; player.side='vn';
   if(tdm){ const side=await pickSide(); player.side=side; net.side=side; net.push(true); }
