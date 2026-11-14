@@ -1691,6 +1691,8 @@ function buildHowitzer(x,z){
 }
 // cỏ tranh lay theo gió (thẻ cỏ alpha, gió tính trong vertex shader)
 let grassMat=null; const windU={value:0};
+// mờ dần cỏ sát camera (dither/alpha-to-coverage kiểu foliage fade của Frostbite/UE): không che kín màn hình khi nằm bò, mép mịn ở tier có MSAA
+const grassFadeU={value:new THREE.Vector2(0.35,1.1)}, GRASS_A2C = Q.samples>0;
 function grassTexture(){ const c=document.createElement('canvas'); c.width=256; c.height=256; const x=c.getContext('2d');
   for(let i=0;i<70;i++){ const bx=rand(8,248), h=rand(110,250), lean=rand(-30,30), w=rand(2,5); const g=x.createLinearGradient(0,256,0,256-h);
     const dry=Math.random(); g.addColorStop(0, dry<.5?'#3d4a22':'#4a4426'); g.addColorStop(1, dry<.35?'#9aa05a':(dry<.7?'#7d8a3e':'#b0a060'));
@@ -1698,9 +1700,18 @@ function grassTexture(){ const c=document.createElement('canvas'); c.width=256; 
   const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.anisotropy=maxAniso; return t; }
 function buildGrass(){
   if(!grassMat){ grassMat=new THREE.MeshStandardMaterial({map:grassTexture(), alphaTest:0.45, side:THREE.DoubleSide, roughness:0.85, metalness:0});
-    grassMat.onBeforeCompile=sh=>{ sh.uniforms.uWind=windU; sh.vertexShader='uniform float uWind;\n'+sh.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
+    grassMat.alphaToCoverage=GRASS_A2C;
+    grassMat.onBeforeCompile=sh=>{ sh.uniforms.uWind=windU; sh.uniforms.uGFade=grassFadeU;
+      sh.fragmentShader='uniform vec2 uGFade;\n'+sh.fragmentShader.replace('#include <alphatest_fragment>',`{ float gf=smoothstep(uGFade.x,uGFade.y,length(vViewPosition));
+#ifdef GRASS_A2C
+        diffuseColor.a=smoothstep(0.45,0.45+max(fwidth(diffuseColor.a),1e-3),diffuseColor.a)*gf; if(diffuseColor.a<0.02) discard;
+#else
+        if(diffuseColor.a<0.45) discard; float ign=fract(52.9829189*fract(dot(gl_FragCoord.xy,vec2(0.06711056,0.00583715)))); if(gf<ign) discard;
+#endif
+      }`);
+      if(GRASS_A2C) sh.fragmentShader='#define GRASS_A2C\n'+sh.fragmentShader; sh.vertexShader='uniform float uWind;\n'+sh.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
       { vec4 wp=instanceMatrix*vec4(position,1.0); float k=uv.y*uv.y; transformed.x+=sin(uWind*1.7+wp.x*0.35+wp.z*0.2)*0.12*k; transformed.z+=cos(uWind*1.3+wp.z*0.3)*0.08*k; }`); };
-    grassMat.customProgramCacheKey=()=>'grass'; }
+    grassMat.customProgramCacheKey=()=>'grass'+(GRASS_A2C?'a':''); }
   const dense = MAPID==='khesanh' ? 7 : 3, lowK = settings.quality==='low'?0.5:1;
   const cells=[]; for(let z=1;z<ROWS-1;z++) for(let x=1;x<COLS-1;x++){ if(grid[z*COLS+x]) continue; const ch=chAt(x,z); if(ch==='R'||ch==='O'||ch==='L'||ch==='Z') continue; cells.push([x,z]); }
   const n=Math.floor(cells.length*dense*lowK); if(!n) return;
@@ -4341,6 +4352,7 @@ function frame(now){
   for(const L of [fxLight,fxLight2]){ if(L.userData.t>0){ L.userData.t-=dt; if(L.userData.t<=0) L.intensity=0; else L.intensity*=Math.pow(0.02,dt); } }
   if(dust){ dust.rotation.y=Math.sin(t*0.05)*0.002; dust.position.y=Math.sin(t*0.3)*0.1; }
   windU.value=t; if(rain) updateRain(dt);
+  { const pr=player.prone?1:0, fn=0.35+0.3*pr+0.25*player.ads*pr, ff=1.1+1.1*pr+0.6*player.ads*pr, gv=grassFadeU.value, k=Math.min(1,dt*6); gv.x+=(fn-gv.x)*k; gv.y+=(ff-gv.y)*k; }
   followSun(); assignLights(dt,t);
   if(finalPass){ const u=finalPass.uniforms; u.time.value=t; u.ads.value=player.ads; u.hurt.value=state.phase==='playing'&&player.alive?clamp((40-player.hp)/40,0,1)*0.8:(player.alive?0:0.9); }
   drs(dt);
