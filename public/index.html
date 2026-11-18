@@ -388,7 +388,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.10</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.12</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -1315,11 +1315,27 @@ const std = o => new THREE.MeshStandardMaterial(o);
 function mkCanvas(w,h){ const c=document.createElement('canvas'); c.width=w; c.height=h||w; return c; }
 const MACRO_GLSL = `
 varying vec3 vWP;
-uniform sampler2D bakeMap; uniform vec3 bakeXf; uniform float reflNorm;
+uniform sampler2D bakeMap; uniform vec3 bakeXf; uniform float reflNorm; uniform vec2 rainU;
 float mh(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
+#ifdef MACRO_FLOOR
+// v4.12: gợn sóng mưa trên vũng nước (Lagarde, "Water drop 2b – Dynamic rain and its effects", Remember Me 2013):
+// mỗi ô lưới có một giọt rơi ở vị trí/thời điểm ngẫu nhiên, vòng sóng lan ra và tắt dần; trả về gradient độ cao mặt nước
+vec2 rainRipple(vec2 p, float t){
+  vec2 g=vec2(0.0), ip=floor(p);
+  for(int j=-RIP_R;j<=RIP_R;j++) for(int i=-RIP_R;i<=RIP_R;i++){
+    vec2 c=ip+vec2(float(i),float(j)); float h=mh(c);
+    vec2 ctr=c+0.2+0.6*vec2(mh(c+3.1),mh(c+7.7));
+    float ph=fract(t*(0.8+0.4*h)+h*7.0);
+    vec2 d=p-ctr; float r=length(d)+1e-4; float x=r-ph*(RIP_R==0?0.3:0.95);
+    float env=smoothstep(0.22,0.0,abs(x))*(1.0-ph)*(1.0-ph);
+    g+= d/r * cos(x*38.0)*env;
+  }
+  return g;
+}
+#endif
 float mn(vec2 p){ vec2 i=floor(p), f=fract(p); vec2 u=f*f*(3.-2.*f); return mix(mix(mh(i),mh(i+vec2(1,0)),u.x),mix(mh(i+vec2(0,1)),mh(i+vec2(1,1)),u.x),u.y); }
 `;
-const BAKE_U={ bakeMap:{value:null}, bakeXf:{value:new THREE.Vector3(1,1,0)}, reflNorm:{value:0} };
+const BAKE_U={ bakeMap:{value:null}, bakeXf:{value:new THREE.Vector3(1,1,0)}, reflNorm:{value:0}, rainU:{value:new THREE.Vector2(0,0)} }; // rainU: x=mưa (0/1), y=thời gian
 // ---- TÍNH SẴN ÁNH SÁNG cho cả bản đồ (chạy 1 lần khi dựng map): AO góc tường + ánh sáng của mọi đèn/lửa có che khuất theo lưới
 function bakeLighting(){
   const R=4, W=COLS*R, H=ROWS*R, data=new Uint8Array(W*H*4), OUT=!!MAPDEF.outdoor;
@@ -1342,7 +1358,7 @@ function bakeLighting(){
   BAKE_U.bakeMap.value=t; BAKE_U.bakeXf.value.set(1/(COLS*CELL), 1/(ROWS*CELL), 2*(OUT?(MAPDEF.night?0.55:0.25):0.85)*(settings.quality==='low'?1.15:1));
 }
 function addMacro(mat, kind){
-  mat.defines = Object.assign(mat.defines||{}, {['MACRO_'+kind]:''});
+  mat.defines = Object.assign(mat.defines||{}, {['MACRO_'+kind]:'', RIP_R: settings.quality==='low'?0:1}); // tier thấp: 1 ô/lớp (rẻ), còn lại 3x3
   mat.customProgramCacheKey = () => 'macro_'+kind;
   mat.onBeforeCompile = (sh)=>{
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWP;')
@@ -1379,6 +1395,10 @@ function addMacro(mat, kind){
       .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
       #ifdef MACRO_FLOOR
         normal = normalize(mix(normal, nonPerturbedNormal, puddle));
+        { float rf = rainU.x*max(puddle,0.4*damp)*(1.0-smoothstep(7.0,20.0,length(vViewPosition)));
+          if(rf>0.002){ vec2 rg=rainRipple(vWP.xz*3.2, rainU.y)+rainRipple(vWP.xz*2.3+17.0, rainU.y*1.07+0.5)*0.7;
+            vec3 rn=normalize((viewMatrix*vec4(-rg.x*0.28, 1.0, -rg.y*0.28, 0.0)).xyz);
+            normal=normalize(mix(normal, rn, rf)); } }
       #endif`)
       .replace('#include <aomap_fragment>', `#include <aomap_fragment>
       { // ánh sáng tính sẵn: che khuất góc tường (AO) + ánh đèn/lửa xa toả lên tường, sàn
@@ -1890,7 +1910,7 @@ function applyMapEnv(){
   for(const m of [M.floor,M.trench]){ if(!(m.defines&&m.defines.MACRO_VAR)){ m.defines=Object.assign({},m.defines,{MACRO_VAR:1}); m.needsUpdate=true; } }
   const wet = !!(D_.outdoor && D_.night);
   M.floor.roughness = wet?0.42:1; M.trench.roughness = wet?0.62:1; M.concrete.roughness = wet?0.7:1; M.planks.roughness = wet?0.75:1; M.sandbag.roughness = wet?0.8:1;
-  AU.rain && AU.rain(wet);
+  AU.rain && AU.rain(wet); BAKE_U.rainU.value.x = wet?1:0;
   if(sun.castShadow) renderer.shadowMap.needsUpdate=true;
 }
 const sunOff=new V3(-60,55,35);
@@ -4351,7 +4371,7 @@ function frame(now){
   for(const tr of tracers){ if(tr.userData.t>0){ tr.userData.t-=dt; tr.material.opacity=Math.max(0,tr.userData.t/0.07)*0.9; if(tr.userData.t<=0) tr.visible=false; } }
   for(const L of [fxLight,fxLight2]){ if(L.userData.t>0){ L.userData.t-=dt; if(L.userData.t<=0) L.intensity=0; else L.intensity*=Math.pow(0.02,dt); } }
   if(dust){ dust.rotation.y=Math.sin(t*0.05)*0.002; dust.position.y=Math.sin(t*0.3)*0.1; }
-  windU.value=t; if(rain) updateRain(dt);
+  windU.value=t; BAKE_U.rainU.value.y=t; if(rain) updateRain(dt);
   { const pr=player.prone?1:0, fn=0.35+0.3*pr+0.25*player.ads*pr, ff=1.1+1.1*pr+0.6*player.ads*pr, gv=grassFadeU.value, k=Math.min(1,dt*6); gv.x+=(fn-gv.x)*k; gv.y+=(ff-gv.y)*k; }
   followSun(); assignLights(dt,t);
   if(finalPass){ const u=finalPass.uniforms; u.time.value=t; u.ads.value=player.ads; u.hurt.value=state.phase==='playing'&&player.alive?clamp((40-player.hp)/40,0,1)*0.8:(player.alive?0:0.9); }
@@ -4465,7 +4485,7 @@ async function refreshNet(){
   window.__gameReady=true; requestAnimationFrame(frame);
   net.probe().then(()=>{ netProbed=true; });
   // test hooks
-  window.__game={explode,net,pickSide,teamSupply,callSupport,openSupMap,playIntro,strikes,CELL,applyEnvMix,shellCam,shells,state,player,enemies,allies,hostages,hqs,arts,crates,capCells,damageEnemy,damageUnit,plantCharge,V3,supplyDrop,playerThrow,playerCharge,shopBuy,shopOpen,shopClose,toggleProne,mountArt,damageHQ,startCampaign,startOnline,net,spawnEnemy,switchWeapon,camera,renderer,Q,settings,loadMap,MAPS,get MAPID(){return MAPID;}};
+  window.__game={explode,net,pickSide,teamSupply,callSupport,openSupMap,playIntro,strikes,CELL,applyEnvMix,shellCam,shells,state,player,enemies,allies,hostages,hqs,arts,crates,capCells,damageEnemy,damageUnit,plantCharge,V3,supplyDrop,playerThrow,playerCharge,shopBuy,shopOpen,shopClose,toggleProne,BAKE_U,lightCells,mountArt,damageHQ,startCampaign,startOnline,net,spawnEnemy,switchWeapon,camera,renderer,Q,settings,loadMap,MAPS,get MAPID(){return MAPID;}};
 })();
 </script>
 </body>
