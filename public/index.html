@@ -2143,6 +2143,9 @@ async function loadVegGLB(){ try{ const gl=await new GLTFLoader().loadAsync('ass
     o.material.side=THREE.DoubleSide; if(o.material.map) o.material.map.anisotropy=4;
     (VEG[key]=VEG[key]||[]).push({geo:g, mat:o.material}); }); }catch(e){ console.warn('veg',e); VEG=null; } }
 function vegInst(key, mats){ const parts=VEG&&VEG[key]; if(!parts) return null; const out=parts.map(p=>{ const im=new THREE.InstancedMesh(p.geo,p.mat,mats.length); mats.forEach((m,i)=>im.setMatrixAt(i,m)); im.castShadow=key!=='fern'; im.receiveShadow=true; level.add(im); return im; }); return out; }
+// v4.13: trung liên RPD góc nhìn thứ nhất dựng Blender (tools/blender/build_rpd.py): vát cạnh + weighted normals, AO trong màu đỉnh
+let RPD_GLB=null;
+async function loadRpdGLB(){ try{ const gl=await new GLTFLoader().loadAsync('assets/models/rpd_vm.glb'); RPD_GLB=gl.scene; }catch(e){ console.warn('rpd',e); RPD_GLB=null; } }
 async function loadPropsGLB(){ try{ const gl=await new GLTFLoader().loadAsync('assets/models/sandbags.glb'); gl.scene.traverse(o=>{ if(o.isMesh && !BAG_GEO) BAG_GEO=o.geometry; }); }catch(e){ console.warn('sandbags',e); } }
 const SKM={ vn:{gun:[-0.055,1.219,0.2219], head:[1.533,0.035], torso:[0.90,0.8], scale:1.1},
             us:{gun:[-0.055,1.325,0.2234], head:[1.64,0.045], torso:[0.97,0.855], scale:1.04} };
@@ -2481,9 +2484,18 @@ function buildViewmodels(){
     add(rb(0.024,0.085,0.038,0.008),M.darkMetal,g,0,-0.07,-0.12,0.15); add(rb(0.024,0.075,0.038,0.008),M.darkMetal,g,0,-0.065,-0.32,0.15);
     add(rb(0.006,0.05,0.006,0.002),M.darkMetal,g,0.0,0.055,-0.38); add(rb(0.03,0.006,0.03,0.002),M.darkMetal,g,0,0.035,-0.38);
     arm(g,0,-0.11,-0.12, 0.06,-0.32,0.1); arm(g,0,-0.1,-0.32, -0.24,-0.32,-0.1);
-    g.position.set(0.14,-0.12,-0.2); g.rotation.set(0,0.03,0); g.userData.muzzle=new V3(0,0,-0.66); g.userData.ads=new V3(0,-0.08,-0.16); vmModels.push(g); }
+    // v4.13: trên điện thoại B40 hạ thấp + lệch phải khi không ngắm để không che giữa màn hình (báo cáo cố vấn 19/11)
+    if(IS_TOUCH) g.position.set(0.175,-0.15,-0.21); else g.position.set(0.14,-0.12,-0.2); g.rotation.set(0,0.03,0); g.userData.muzzle=new V3(0,0,-0.66); g.userData.ads=new V3(0,-0.08,-0.16); vmModels.push(g); }
   // RPD (trung liên, hộp đạn tròn 100 viên, chân chống gấp)
-  { const g=new THREE.Group();
+  if(RPD_GLB){ const g=new THREE.Group();
+    const vcMat=(m,o)=>{ const c=m.clone(); c.vertexColors=true; Object.assign(c,o); return c; };
+    // thép nhuộm đen bắt sáng môi trường mạnh hơn để cạnh vát (weighted normals) loé viền như súng FPS hiện đại
+    const RM={dark:vcMat(M.darkMetal,{metalness:0.72, envMapIntensity:1.6}), metal:vcMat(M.metal,{envMapIntensity:1.3}), wood:vcMat(M.gunWood,{envMapIntensity:0.8}), drum:vcMat(M.metal,{map:null, color:new THREE.Color(0x77796f), metalness:0.45, envMapIntensity:1.0})};
+    RPD_GLB.traverse(o=>{ if(!o.isMesh) return; const geo=o.geometry; if(!geo.attributes.color) geo.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(geo.attributes.position.count*3).fill(1),3));
+      const m=new THREE.Mesh(geo, RM[(o.material&&o.material.name||'').replace(/\..*/,'')]||RM.dark); m.position.copy(o.position); m.quaternion.copy(o.quaternion); m.scale.copy(o.scale); g.add(m); });
+    arm(g,0.005,-0.1,0.1, 0.08,-0.32,0.25); arm(g,-0.006,-0.05,-0.27, -0.32,-0.3,-0.3);
+    g.position.set(0.10,-0.075,-0.40); g.rotation.set(0.04,0.12,-0.12); g.userData.muzzle=new V3(0,0.014,-0.83); g.userData.ads=new V3(0,-0.052,-0.3); vmModels.push(g); }
+  else { const g=new THREE.Group();
     add(rb(0.046,0.066,0.3,0.006),M.darkMetal,g,0,0,-0.06); add(rb(0.04,0.024,0.26,0.008),M.metal,g,0,0.042,-0.07);
     add(rb(0.052,0.05,0.2,0.014),M.gunWood,g,0,-0.006,-0.3); add(cyl(0.0125,0.0125,0.56),M.darkMetal,g,0,0.014,-0.5); add(cyl(0.017,0.017,0.05),M.darkMetal,g,0,0.014,-0.79);
     add(cyl(0.006,0.006,0.32),M.metal,g,0,-0.012,-0.48); add(rb(0.006,0.05,0.008,0.001),M.darkMetal,g,0,0.045,-0.76);
@@ -4479,7 +4491,7 @@ async function refreshNet(){
   await bakeAll(); buildEnv(); buildMaterials(); await tick();
   parseMap('cuchi');
   setLoad(0.78,'ĐANG TẢI CHẤT LIỆU CHỤP THẬT…'); try{ window.__realTex = await loadRealTextures(); }catch(e){ window.__realTex=0; }
-  setLoad(0.82,'ĐANG BỐ TRÍ PHÒNG TUYẾN…'); buildFx(); buildLevel(); applyMapEnv(); initFlare(); buildSoldierGeo(); try{ window.__skel=await loadSoldierGLB(); await loadPropsGLB(); await loadVegGLB(); }catch(e){} buildViewmodels(); buildMiniBase(); resetWeapons(); await tick();
+  setLoad(0.82,'ĐANG BỐ TRÍ PHÒNG TUYẾN…'); buildFx(); buildLevel(); applyMapEnv(); initFlare(); buildSoldierGeo(); try{ window.__skel=await loadSoldierGLB(); await loadPropsGLB(); await loadVegGLB(); await loadRpdGLB(); }catch(e){} buildViewmodels(); buildMiniBase(); resetWeapons(); await tick();
   renderer.shadowMap.needsUpdate=true;
   setLoad(0.95,'ĐANG KHỞI ĐỘNG…');
   // warm up shaders with a sample soldier
