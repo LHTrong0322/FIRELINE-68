@@ -388,7 +388,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.12</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.12.1</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -2727,7 +2727,7 @@ const FOLLOW=[]; for(let i=0;i<10;i++){ const r=Math.floor(i/2); FOLLOW.push([(i
 function updateAllies(dt){
   const sy=Math.sin(player.yaw), cy=Math.cos(player.yaw); const modeAI = state.mission==='base'||state.mission==='bunker'||state.mission==='tdm'; const TD=isTdm();
   for(let i=allies.length-1;i>=0;i--){ const a=allies[i], m=a.model;
-    if(!a.alive){ deathAnim(a,dt);
+    if(!a.alive){ deathAnim(a,dt); m.group.visible=true;
       if(a.down){ a.downT-=dt; if(a.downT<=0){ a.down=false; a.respT = modeAI?RESPAWN_T:-1; feed(`<span style="color:#ff8a7a">Đồng đội ${esc(a.name)} hy sinh</span>`); } }
       else if(a.respT>0){ a.respT-=dt; if(a.respT<=0){ if(TD){ reviveUnit(a, pick(spawnP)); continue; } if(state.mission==='bunker'){ if(state.tickets<=0){ a.respT=-1; continue; } state.tickets--; } reviveUnit(a, respawnPointVN()); } }
       continue; }
@@ -2753,9 +2753,16 @@ function updateAllies(dt){
       else { const hy=state.mission==='base'?botHQAttack(a,'vn',dt):null; const g=goalMove(a,'vn',dt);
         if(hy!==null){ faceYaw=hy; mx=g[0]*0.3; mz=g[1]*0.3; } else { mx=g[0]; mz=g[1]; spd=g[2]>8?5.2:3.8; if(a.speed>0.4) faceYaw=Math.atan2(a.vel.x,a.vel.z); } }
     }
-    if(dp<1.3){ mx-=(player.pos.x-a.pos.x); mz-=(player.pos.z-a.pos.z); }
+    // khoảng riêng: đồng đội không chen vào camera người chơi (tách nhau + tránh nón nhìn phía trước)
+    if(player.alive && dp<4.5){ const rx=a.pos.x-player.pos.x, rz=a.pos.z-player.pos.z, along=-(rx*sy+rz*cy), side=rx*cy-rz*sy;
+      if(dp<1.9 && dp>0.001){ const k=(1.9-dp)*1.6; mx+=rx/dp*k; mz+=rz/dp*k; }
+      if(along>0 && along<4 && Math.abs(side)<1.1){ const s=(side!==0?Math.sign(side):(a.slot%2?1:-1))*(1-along/4)*1.2; mx+=cy*s; mz-=sy*s; } }
     moveUnit(a, mx, mz, spd*(a.rush?1.25:1), dt, [...allies, ...hostages]);
     if(!modeAI && dp>40 && player.alive){ a.pos.set(player.pos.x+rand(-1,1),0,player.pos.z+rand(-1,1)); collideCircle(a.pos,0.36); }
+    if(player.alive){ const rx=a.pos.x-player.pos.x, rz=a.pos.z-player.pos.z, d=Math.hypot(rx,rz);
+      if(d<0.8 && d>0.001){ a.pos.x=player.pos.x+rx/d*0.8; a.pos.z=player.pos.z+rz/d*0.8; collideCircle(a.pos,0.36); }
+      const along=-(rx*sy+rz*cy), side=rx*cy-rz*sy; m.group.visible = !(along>-0.4 && along<1.6 && Math.abs(side)<0.5+Math.max(0,along)*0.75); }
+    else m.group.visible=true;
     a.yaw += angDiff(a.yaw,faceYaw)*Math.min(1,dt*7);
     m.group.position.set(a.pos.x,0,a.pos.z); m.group.rotation.y=a.yaw; animateSoldier(m, a.speed, dt, a.aimPitch);
   }
@@ -4087,7 +4094,7 @@ async function startCampaign(){
   resetWeapons(); Object.assign(player,{hp:100,armor:25,alive:true,cur:2,prev:1,crouch:false,flash:false,invuln:0});
   startModeExtras(mission);
   placePlayer(mission==='rescue'?spawnP[0]:pick(spawnP)); spawnPickups();
-  const nAllies = mission==='rescue' ? (settings.quality==='low' ? 5 : 7) : 7; for(let i=0;i<nAllies;i++){ const a=spawnAlly(i); assignRole(a,'vn',i); const an=i/nAllies*6.283; a.pos.set(player.pos.x+Math.cos(an)*(2+i%3), 0, player.pos.z+Math.sin(an)*(2+i%3)); collideCircle(a.pos,0.36); a.model.group.position.set(a.pos.x,0,a.pos.z); }
+  const nAllies = mission==='rescue' ? (settings.quality==='low' ? 5 : 7) : 7; for(let i=0;i<nAllies;i++){ const a=spawnAlly(i); assignRole(a,'vn',i); const sy=Math.sin(player.yaw), cy=Math.cos(player.yaw), t=(nAllies>1?i/(nAllies-1)-0.5:0)*4.2, r=2.6+(i%3)*0.7, fx=Math.sin(t)*r, fz=Math.cos(t)*r; a.pos.set(player.pos.x+fx*cy+fz*sy, 0, player.pos.z-fx*sy+fz*cy); /* xuất phát sau lưng / hai bên, không đứng trước camera */ collideCircle(a.pos,0.36); a.model.group.position.set(a.pos.x,0,a.pos.z); }
   const ET=['rifle','rifle','rifle','shotgun','mg'];
   if(mission==='rescue'){
     hostCells.forEach((c,i)=>spawnHostage(c,i)); buildZone();

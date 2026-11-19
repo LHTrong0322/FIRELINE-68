@@ -11,7 +11,8 @@ URL='http://127.0.0.1:8799/'
 ARGS=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']
 AIMBOT="""(()=>{const g=window.__game,p=g.player; if(!p.alive) return 'dead'; const e=g.enemies.filter(e=>e.alive&&e.los)[0];
  if(e){ const dx=e.pos.x-p.pos.x, dz=e.pos.z-p.pos.z, dy=(e.pos.y+1.2)-(p.pos.y+p.eye); p.yaw=Math.atan2(-dx,-dz); p.pitch=Math.atan2(dy,Math.hypot(dx,dz)); p.fireHeld=true; } else p.fireHeld=false;
- return JSON.stringify({hp:Math.round(p.hp),wave:g.state.wave,kills:g.state.kills,alive:g.enemies.filter(e=>e.alive).length}); })()"""
+ const sy=Math.sin(p.yaw), cy=Math.cos(p.yaw); const cam=g.allies.filter(a=>a.alive&&a.model.group.visible&&(()=>{const rx=a.pos.x-p.pos.x, rz=a.pos.z-p.pos.z, al=-(rx*sy+rz*cy); return Math.hypot(rx,rz)<0.75 || (al>-0.2&&al<1.2&&Math.abs(rx*cy-rz*sy)<0.5);})()).length;
+ return JSON.stringify({cam,hp:Math.round(p.hp),wave:g.state.wave,kills:g.state.kills,alive:g.enemies.filter(e=>e.alive).length}); })()"""
 async def new_page(b, errs, tag, **kw):
     q=kw.pop('q','med'); ctx=await b.new_context(**kw); await ctx.add_init_script("try{localStorage.setItem('tl_quality4', JSON.stringify('%s'))}catch(e){}" % q)
     pg=await ctx.new_page(); pg.set_default_timeout(300000)
@@ -32,6 +33,9 @@ async def run():
             await pg.wait_for_timeout(2000); log.append(await pg.evaluate(AIMBOT))
             if i%5==4: await pg.screenshot(path=f'{shots}/playtest_combat_{i//5}.png')
         report['campaign']=log[-5:]
+        camhits=sum(1 for l in log if l!='dead' and json.loads(l)['cam']>0)
+        report['ally_in_camera_samples']=camhits
+        if camhits: errs.append(f'đồng đội chen vào camera ({camhits}/{len(log)} lần đo)')
         for w in range(4):
             await pg.evaluate(f"window.__game.switchWeapon({w})"); await pg.wait_for_timeout(1500)
         await pg.screenshot(path=f'{shots}/playtest_weapons.png')

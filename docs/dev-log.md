@@ -119,3 +119,11 @@
 - Soi ảnh: combat/vũ khí/điện thoại/online không thấy đốm đen trắng, UI không chồng chéo đáng kể. Ghi chú: tên đồng đội đứng sát nhau vẫn chồng chữ (Sơn/Minh/Thắng) — để backlog.
 - Test: playtest ĐẠT (A host VN 4+4 bot, B phe Mỹ thấy 8 bot), check low ĐẠT, check high ĐẠT.
 - Backlog mới: gộp/ẩn bớt tên đồng đội khi đứng sát nhau; playtest chiến dịch vẫn 0 hạ (địch cách ~157m) — nên dịch người chơi tới gần địch để có giao tranh thật; hỗ trợ ngắm cho điện thoại (cố vấn đề xuất).
+
+## 2026-11-19 — v4.12.1 (bot QA)
+- **LỖI hỏng hình: đồng đội chen vào camera người chơi** (cố vấn nhắc lần thứ 3). Tái hiện: `python3 tools/playtest.py` → ảnh `playtest_combat_0/1` có đồng đội đứng 0,5–1,5 m ngay trước/sát camera (mũ cối + thân người chiếm 1/3 màn hình), `playtest_mobile_play` có đồng đội che nửa phải màn hình điện thoại. Nguyên nhân: (1) đầu trận đồng đội được xếp thành vòng tròn 2–4 m quanh người chơi, gồm cả phía trước mặt; (2) ở chế độ căn cứ/lô cốt đồng đội đi theo nhiệm vụ nên đi xuyên qua người chơi, lực đẩy cũ chỉ có khi < 1,3 m và rất yếu.
+- **Cách sửa** (`updateAllies`, `startCampaign`): đầu trận đồng đội xuất phát sau lưng/hai bên (cung ±120° quanh hướng sau, 2,6–4 m); "khoảng riêng" — trong 1,9 m bị đẩy ra xa, trong nón 4 m phía trước camera bị lái sang ngang; khoảng cách tối thiểu cứng 0,8 m; đồng đội nào vẫn lọt vào nón sát camera (< 1,6 m phía trước) thì ẩn tạm, tự hiện lại khi tách ra (chết/gục luôn hiện). Không tốn hiệu năng.
+- **Test mới trong `playtest.py`**: mỗi lần đo đếm đồng đội đang hiện mà ở trong 0,75 m hoặc trong nón 1,2 m trước camera → có thì báo LỖI (`ally_in_camera_samples`).
+- Soi ảnh sau sửa: combat/vũ khí/điện thoại không còn đồng đội che camera; online đấu đội vẫn ổn. Ghi chú: tiêu đề bản đồ "ĐỊA ĐẠO CỦ CHI · 1968" còn trong mọi ảnh vì `state.msgT` đếm theo thời gian trong game (SwiftShader chậm) — không phải lỗi thật.
+- Test: playtest ĐẠT (0/20 lần đo có đồng đội chen camera; A host VN 4+4 bot, B phe Mỹ thấy 8 bot), check low ĐẠT, check high ĐẠT.
+- Backlog: playtest chiến dịch vẫn 0 hạ (địch cách ~156 m) — dịch người chơi tới gần địch; tổ trinh sát địch chạm trán sớm; hỗ trợ ngắm cảm ứng; "XE ĐỊCH …m" và tên đồng đội chồng lên HUD (khung an toàn); áp dụng khoảng riêng cho con tin đi theo; theo dõi vào phòng online lúc được lúc không (lần này 1/1 ĐẠT).
