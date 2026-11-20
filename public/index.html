@@ -389,7 +389,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.12.1</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.15</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -2146,6 +2146,8 @@ async function loadVegGLB(){ try{ const gl=await new GLTFLoader().loadAsync('ass
 function vegInst(key, mats){ const parts=VEG&&VEG[key]; if(!parts) return null; const out=parts.map(p=>{ const im=new THREE.InstancedMesh(p.geo,p.mat,mats.length); mats.forEach((m,i)=>im.setMatrixAt(i,m)); im.castShadow=key!=='fern'; im.receiveShadow=true; level.add(im); return im; }); return out; }
 // v4.13: trung liên RPD góc nhìn thứ nhất dựng Blender (tools/blender/build_rpd.py): vát cạnh + weighted normals, AO trong màu đỉnh
 let RPD_GLB=null;
+let HANDS_GLB=null; // v4.15: tay góc nhìn thứ nhất dựng Blender (tools/blender/build_hands.py)
+async function loadHandsGLB(){ try{ const gl=await new GLTFLoader().loadAsync('assets/models/hands_vm.glb'); const r={}; gl.scene.traverse(o=>{ if(o.isMesh){ const n=(o.material&&o.material.name||o.name).replace(/\..*/,''); r[n]=o.geometry; } }); HANDS_GLB=(r.skin&&r.sleeve)?r:null; }catch(e){ console.warn('hands',e); HANDS_GLB=null; } }
 async function loadRpdGLB(){ try{ const gl=await new GLTFLoader().loadAsync('assets/models/rpd_vm.glb'); RPD_GLB=gl.scene; }catch(e){ console.warn('rpd',e); RPD_GLB=null; } }
 async function loadPropsGLB(){ try{ const gl=await new GLTFLoader().loadAsync('assets/models/sandbags.glb'); gl.scene.traverse(o=>{ if(o.isMesh && !BAG_GEO) BAG_GEO=o.geometry; }); }catch(e){ console.warn('sandbags',e); } }
 const SKM={ vn:{gun:[-0.055,1.219,0.2219], head:[1.533,0.035], torso:[0.90,0.8], scale:1.1},
@@ -2435,8 +2437,12 @@ function buildViewmodels(){
       const tip=new THREE.Group(); tip.position.z=.042; tip.rotation.x=0.9; f.add(tip); add(fingerG,M.skin,tip,0,0,0).scale.set(.95,.95,.7); }
     const th=new THREE.Group(); th.position.set(.035,-.005,.0); th.rotation.set(.6,-.7,0); h.add(th); add(fingerG,M.skin,th,0,0,0).scale.set(1.15,1.15,1.1);
     return h; };
+  // v4.15: tay mid-poly (ngón có đốt, khớp gồ, ống tay áo có nếp + gấu xắn, AO đỉnh) — 2 lượt vẽ/cánh tay thay vì ~14 khối rời
+  const HV=HANDS_GLB && { skin:Object.assign(M.skin.clone(),{vertexColors:true}), sleeve:Object.assign(sleeve.clone(),{vertexColors:true}) };
   const arm=(parent, hx,hy,hz, ex,ey,ez)=>{
     const h=new V3(hx,hy,hz), e=new V3(ex,ey,ez), mid=h.clone().add(e).multiplyScalar(0.5), len=h.distanceTo(e);
+    if(HV){ const sl=new THREE.Mesh(HANDS_GLB.sleeve, HV.sleeve); sl.position.copy(e); sl.lookAt(h); sl.scale.set(1,1,len); parent.add(sl);
+      const hd=new THREE.Mesh(HANDS_GLB.skin, HV.skin); hd.position.copy(h); hd.lookAt(h.clone().add(h.clone().sub(e))); if(ex<hx-0.05) hd.scale.x=-1; parent.add(hd); return; }
     const f=new THREE.Mesh(new THREE.CylinderGeometry(0.037,0.047,len,16), sleeve); f.position.copy(mid); f.lookAt(h); f.rotateX(Math.PI/2); parent.add(f);
     const cuff=new THREE.Mesh(new THREE.CylinderGeometry(0.039,0.039,0.035,16), sleeve); cuff.position.copy(h.clone().lerp(e,0.2)); cuff.lookAt(h); cuff.rotateX(Math.PI/2); parent.add(cuff);
     const wrist=new THREE.Mesh(new THREE.CylinderGeometry(0.028,0.032,0.06,12), M.skin); wrist.position.copy(h.clone().lerp(e,0.09)); wrist.lookAt(h); wrist.rotateX(Math.PI/2); parent.add(wrist);
@@ -2486,7 +2492,7 @@ function buildViewmodels(){
     add(rb(0.006,0.05,0.006,0.002),M.darkMetal,g,0.0,0.055,-0.38); add(rb(0.03,0.006,0.03,0.002),M.darkMetal,g,0,0.035,-0.38);
     arm(g,0,-0.11,-0.12, 0.06,-0.32,0.1); arm(g,0,-0.1,-0.32, -0.24,-0.32,-0.1);
     // v4.13: trên điện thoại B40 hạ thấp + lệch phải khi không ngắm để không che giữa màn hình (báo cáo cố vấn 19/11)
-    if(IS_TOUCH) g.position.set(0.175,-0.15,-0.21); else g.position.set(0.14,-0.12,-0.2); g.rotation.set(0,0.03,0); g.userData.muzzle=new V3(0,0,-0.66); g.userData.ads=new V3(0,-0.08,-0.16); vmModels.push(g); }
+    if(IS_TOUCH){ g.position.set(0.2,-0.16,-0.22); g.rotation.set(0,-0.14,-0.05); } else { g.position.set(0.14,-0.12,-0.2); g.rotation.set(0,0.03,0); } g.userData.muzzle=new V3(0,0,-0.66); g.userData.ads=new V3(0,-0.08,-0.16); vmModels.push(g); }
   // RPD (trung liên, hộp đạn tròn 100 viên, chân chống gấp)
   if(RPD_GLB){ const g=new THREE.Group();
     const vcMat=(m,o)=>{ const c=m.clone(); c.vertexColors=true; Object.assign(c,o); return c; };
@@ -4518,7 +4524,7 @@ async function refreshNet(){
   await bakeAll(); buildEnv(); buildMaterials(); await tick();
   parseMap('cuchi');
   setLoad(0.78,'ĐANG TẢI CHẤT LIỆU CHỤP THẬT…'); try{ window.__realTex = await loadRealTextures(); }catch(e){ window.__realTex=0; }
-  setLoad(0.82,'ĐANG BỐ TRÍ PHÒNG TUYẾN…'); buildFx(); buildLevel(); applyMapEnv(); initFlare(); buildSoldierGeo(); try{ window.__skel=await loadSoldierGLB(); await loadPropsGLB(); await loadVegGLB(); await loadRpdGLB(); }catch(e){} buildViewmodels(); buildMiniBase(); resetWeapons(); await tick();
+  setLoad(0.82,'ĐANG BỐ TRÍ PHÒNG TUYẾN…'); buildFx(); buildLevel(); applyMapEnv(); initFlare(); buildSoldierGeo(); try{ window.__skel=await loadSoldierGLB(); await loadPropsGLB(); await loadVegGLB(); await loadRpdGLB(); await loadHandsGLB(); }catch(e){} buildViewmodels(); buildMiniBase(); resetWeapons(); await tick();
   renderer.shadowMap.needsUpdate=true;
   setLoad(0.95,'ĐANG KHỞI ĐỘNG…');
   // warm up shaders with a sample soldier

@@ -1,5 +1,6 @@
 """Chụp súng góc nhìn thứ nhất (AK, RPD, B40) ở tư thế thường và ngắm, ban ngày Khe Sanh.
-Chạy: python3 tools/guntest.py [low|high]  -> tools/shots/gun_<id>_<hip|ads>.png"""
+Chạy: python3 tools/guntest.py [low|high]  -> tools/shots/gun_<id>_<hip|ads>.png
+MOBILE=1: giả lập điện thoại xoay ngang (cảm ứng, 844x390) -> gun_<id>_<hip|ads>_m.png"""
 import asyncio, os, sys, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import check
@@ -9,7 +10,8 @@ async def run():
     shots=f'{check.ROOT}/tools/shots'; os.makedirs(shots, exist_ok=True); errs=[]
     async with async_playwright() as p:
         b=await p.chromium.launch(args=['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist'])
-        ctx=await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality4', JSON.stringify('{Q}'))}}catch(e){{}}")
+        MOB=os.environ.get('MOBILE')=='1'; SUF='_m' if MOB else ''
+        ctx=await b.new_context(viewport={'width':844,'height':390}, has_touch=True, is_mobile=True, device_scale_factor=2) if MOB else await b.new_context(viewport={'width':960,'height':540}); await ctx.add_init_script(f"try{{localStorage.setItem('tl_quality4', JSON.stringify('{Q}'))}}catch(e){{}}")
         pg=await ctx.new_page(); pg.set_default_timeout(240000)
         pg.on('pageerror', lambda e: errs.append('pageerror: '+str(e)))
         pg.on('console', lambda m: errs.append('console: '+m.text) if m.type=='error' and '404' not in m.text else None)
@@ -21,10 +23,10 @@ async def run():
         for idx,name in [x for x in ((4,'rpd'),(2,'ak'),(3,'b40')) if x[1] in os.environ.get('GUNS','rpd,ak,b40')]:
             await pg.evaluate(f"(()=>{{const g=window.__game; g.switchWeapon({idx}); g.player.swap=0; g.player.aimHeld=false;}})()")
             await pg.wait_for_function("window.__game.player.ads<0.02 && window.__game.player.swap<=0", timeout=120000)
-            await pg.wait_for_timeout(1500); await pg.screenshot(path=f'{shots}/gun_{name}_hip.png')
+            await pg.wait_for_timeout(1500); await pg.screenshot(path=f'{shots}/gun_{name}_hip{SUF}.png')
             await pg.evaluate("window.__game.player.aimHeld=true")
             await pg.wait_for_function("window.__game.player.ads>0.98", timeout=120000)
-            await pg.wait_for_timeout(800); await pg.screenshot(path=f'{shots}/gun_{name}_ads.png')
+            await pg.wait_for_timeout(800); await pg.screenshot(path=f'{shots}/gun_{name}_ads{SUF}.png')
             await pg.evaluate("window.__game.player.aimHeld=false")
         await b.close()
     return errs
