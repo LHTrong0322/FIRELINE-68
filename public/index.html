@@ -272,6 +272,7 @@ button{font-family:inherit;cursor:pointer}
  #mini{width:116px;height:90px}
  #msg{font-size:24px}
 }
+@media (max-width:640px){#obj{font-size:11px;letter-spacing:.3px;padding:3px 8px;white-space:normal;line-height:1.25;max-width:calc(100vw - 290px);min-width:150px}}
 @media (max-height:420px){.brand .sub{display:none}.brand h1{font-size:32px}#score .big{font-size:18px}}
 
 /* ===== bố cục cảm ứng gọn (v4.2) ===== */
@@ -395,7 +396,7 @@ button{font-family:inherit;cursor:pointer}
       <div id="pMain">
         <h2>BẢNG CHỈ HUY</h2>
         <button class="mbtn pri" id="mCampaign">▶ CHIẾN DỊCH<small>10 trận đánh lịch sử 1954–1984 · công phá căn cứ · tử thủ · chiếm lô cốt · giải cứu con tin</small></button>
-        <button class="mbtn" id="mOnline">⚔ ĐẤU ONLINE<small>Đấu súng với người chơi khác theo mã phòng</small></button>
+        <button class="mbtn" id="mOnline">⚔ ĐẤU ONLINE<small>Đấu đội VN – Mỹ cùng bạn bè, có bot lấp chỗ</small></button>
         <button class="mbtn" id="mSettings">⚙ CÀI ĐẶT</button>
         <button class="mbtn" id="mHelp">? HƯỚNG DẪN</button>
         <button class="mbtn" id="mFull">⛶ TOÀN MÀN HÌNH</button>
@@ -3773,6 +3774,17 @@ function drawMini(){
       x.restore(); } x.globalAlpha=1; }
   x.fillStyle='#e2b23c'; x.beginPath(); x.moveTo(W/2,H/2-9); x.lineTo(W/2-6,H/2+6); x.lineTo(W/2+6,H/2+6); x.fill();
 }
+// v4.14: "khung an toàn" — dấu chỉ đường không được đè lên bản đồ nhỏ, thanh nhiệm vụ, điểm, máu, số đạn, nút cảm ứng góc trên
+const SAFE_IDS=['mini','topbar','score','vitals','ammobox','bSwap','bPause','bSup','bBoard','bChat','bMic'];
+let safeRects=[], safeT=-1;
+function hudSafe(x,y,hw,hh){
+  if(state.time-safeT>0.5 || state.time<safeT){ safeT=state.time; safeRects=[];
+    for(const id of SAFE_IDS){ const e=$(id); if(!e || !e.offsetParent || e.classList.contains('hidden')) continue; const r=e.getBoundingClientRect(); if(r.width>0 && r.height>0) safeRects.push(r); } }
+  for(let it=0;it<3;it++){ let moved=false;
+    for(const r of safeRects){ if(x+hw<r.left-4 || x-hw>r.right+4 || y+hh<r.top-4 || y-hh>r.bottom+4) continue;
+      const up=(r.top+r.bottom)/2<innerHeight/2; y = up ? r.bottom+hh+6 : r.top-hh-6; moved=true; }
+    if(!moved) break; }
+  return [x, clamp(y, hh+4, innerHeight-hh-4)]; }
 function updateObjMarker(){
   const el=$('objMark'); if(state.phase!=='playing' || state.mode!=='campaign'){ el.classList.add('hidden'); return; }
   let tgt=null, label='';
@@ -3783,7 +3795,7 @@ function updateObjMarker(){
   if(!tgt){ el.classList.add('hidden'); return; }
   const d=Math.hypot(tgt.x-player.pos.x,tgt.z-player.pos.z); const v=tgt.clone().project(camera); let x=(v.x*0.5+0.5)*innerWidth, y=(-v.y*0.5+0.5)*innerHeight;
   if(v.z>1){ x=innerWidth-x; y=innerHeight*0.85; } x=clamp(x,90,innerWidth-90); y=clamp(y,70,innerHeight-70);
-  y-=22; el.style.left=x+'px'; el.style.top=y+'px'; el.lastChild.textContent=label+' '+Math.round(d)+'m'; el.classList.remove('hidden');
+  y-=22; [x,y]=hudSafe(x,y,48,16); el.style.left=x+'px'; el.style.top=y+'px'; el.lastChild.textContent=label+' '+Math.round(d)+'m'; el.classList.remove('hidden');
   el.classList.toggle('near', Math.hypot(x-innerWidth/2, y-innerHeight/2) < Math.min(innerWidth,innerHeight)*0.22);
 }
 function showBoard(on){
@@ -3967,7 +3979,10 @@ const net = {
     let hv=player.side==='vn'?1:0, hu=player.side==='us'?1:0; for(const r of this.remotes.values()){ if(r.side==='us') hu++; else hv++; }
     const size=Math.max(5,hv,hu), wantV=size-hv, wantU=size-hu;
     while(allies.length>wantV){ const a=allies.pop(); scene.remove(a.model.group); }
-    while(allies.length<wantV){ const a=spawnAlly(allies.length); a.bid='v'+(++this.botSeq); a.role='hunt'; const s=pick(spawnP); a.pos.set(s.x+rand(-1,1),0,s.z+rand(-1,1)); collideCircle(a.pos,0.36); }
+    while(allies.length<wantV){ const i=allies.length, a=spawnAlly(i); a.bid='v'+(++this.botSeq); a.role='hunt'; const s=pick(spawnP); a.pos.set(s.x+rand(-1,1),0,s.z+rand(-1,1));
+      /* gần người chơi: xuất phát sau lưng / hai bên như chiến dịch (v4.12.1), không đứng trước camera */
+      if(player.alive && Math.hypot(a.pos.x-player.pos.x,a.pos.z-player.pos.z)<8){ const sy=Math.sin(player.yaw), cy=Math.cos(player.yaw), t=((i%5)/4-0.5)*4.2, r=2.6+(i%3)*0.7, fx=Math.sin(t)*r, fz=Math.cos(t)*r; a.pos.set(player.pos.x+fx*cy+fz*sy, 0, player.pos.z-fx*sy+fz*cy); }
+      collideCircle(a.pos,0.36); a.model.group.position.set(a.pos.x,0,a.pos.z); }
     const aliveU=enemies.filter(e=>e.alive).length; while(enemies.filter(e=>e.alive).length>wantU){ const e=enemies.find(x=>x.alive); removeEnemy(e); enemies.splice(enemies.indexOf(e),1); }
     if(aliveU+this.tdQ.length<wantU) this.tdQ.push(enemies.length<wantU?0.2:RESPAWN_T);
     for(let i=this.tdQ.length-1;i>=0;i--){ this.tdQ[i]-=dt; if(this.tdQ[i]<=0){ this.tdQ.splice(i,1); const c=pick(spawnE); const e=spawnEnemy(pick(['rifle','rifle','rifle','shotgun','mg']), {x:c.x+rand(-1,1),z:c.z+rand(-1,1)}, true); e.bid='u'+(++this.botSeq); e.role='hunt'; } }
@@ -4012,7 +4027,7 @@ const net = {
     const mz=o.clone().addScaledVector(d,0.8); addTracer(mz,end); impactFx(end,w2.n);
     fxLight2.position.copy(mz); fxLight2.intensity=6; fxLight2.userData.t=0.05; AU.play(wpn.snd,o);
   },
-  hud(){ if(this.tdm){ const me=player.side==='vn'?0:1; $('obj').textContent=`ĐẤU ĐỘI · TA ${this.ts[me]} – ${this.ts[1-me]} ĐỊCH · ĐẠT ${TEAM_LIMIT} ĐỂ THẮNG`; $('scoreV').textContent=this.k; $('scoreL').textContent=`HẠ · ${this.d} LẦN HY SINH`; return; }
+  hud(){ if(this.tdm){ const me=player.side==='vn'?0:1; $('obj').textContent=innerWidth<640?`TA ${this.ts[me]} – ${this.ts[1-me]} ĐỊCH · ${TEAM_LIMIT} ĐỂ THẮNG`:`ĐẤU ĐỘI · TA ${this.ts[me]} – ${this.ts[1-me]} ĐỊCH · ĐẠT ${TEAM_LIMIT} ĐỂ THẮNG`; $('scoreV').textContent=this.k; $('scoreL').textContent=`HẠ · ${this.d} LẦN HY SINH`; return; }
     $('obj').textContent=`PHÒNG "${this.code.toUpperCase()}" · ${this.remotes.size+1} NGƯỜI · ĐẠT ${KILL_LIMIT} MẠNG ĐỂ THẮNG`; $('scoreV').textContent=this.k; $('scoreL').textContent=`HẠ · ${this.d} LẦN HY SINH`; },
   boardHTML(){ if(this.tdm){ const L=[{name:settings.nick+' (bạn)',k:this.k,d:this.d,me:1,side:player.side}, ...[...this.remotes.values()].map(r=>({name:r.name,k:r.k|0,d:r.d,side:r.side}))];
       const tb=sd=>`<h3 style="color:${sd==='vn'?'#ff6a50':'#7aa0ff'}">${sd==='vn'?'VIỆT NAM':(FACTIONS[MAPDEF.enemy]||FACTIONS.us).label.toUpperCase()} · ${this.ts[sd==='vn'?0:1]} điểm</h3><table>${L.filter(x=>x.side===sd).sort((a,b)=>b.k-a.k).map(r=>`<tr class="${r.me?'me':''}"><td>${esc(r.name)}</td><td>${r.k}</td><td>${r.d}</td></tr>`).join('')||'<tr><td style="color:var(--dim)">(chỉ có bot)</td></tr>'}</table>`;
@@ -4115,13 +4130,25 @@ async function startCampaign(){
     for(const hc of hostCells){ spawnEnemy('rifle',{x:hc.x+rand(-1.5,1.5),z:hc.z+rand(-1.5,1.5)},false); }
   } else {
     const pts=[...spawnE]; for(let i=0;i<state.enMax;i++){ const c=mission==='bunker'?pts[i%pts.length]:pick(pts); const e=spawnEnemy(pick(ET), {x:c.x+rand(-1,1), z:c.z+rand(-1,1)}, true); e.cap=c.cap; assignRole(e,'en',i); }
+    spawnScouts();
   }
   assignArtGunners();
   await playIntro(mapId, mission);
   enterPlay();
+  if(state.scoutMsg){ state.scoutMsg=false; setTimeout(()=>{ if(state.mode==='campaign' && state.phase==='playing') feed('<b style="color:#ffb347">⚠ Trinh sát báo: tổ tuần tiễu địch đang tiến về phía ta!</b>'); },5000); }
   const F=FACTIONS[MAPDEF.enemy];
   showMsg(MAPDEF.name.toUpperCase()+' · '+MAPDEF.year, mission==='base' && state.defend ? 'TỬ THỦ: giữ xe chỉ huy 5 phút trước '+F.label : mission==='base' ? 'Phá huỷ xe chỉ huy của '+F.label+' · bảo vệ xe của ta' : mission==='bunker' ? 'Đánh chiếm lần lượt '+capCells.length+' lô cốt của '+F.label : 'Giải cứu '+hostCells.length+' đồng chí bị bắt, đưa về điểm sơ tán', 4.5);
 }
+// ---- v4.14: tổ trinh sát địch (2–3 lính) xuất phát khoảng 1/3 đường giữa người chơi và địch -> chạm trán trong ~20 giây đầu, không phải đi bộ 150m mới thấy địch
+function spawnScouts(){
+  const f=flowTo(player.pos.x, player.pos.z); let D=1e9; for(const e of spawnE){ const v=f[e.cz*COLS+e.cx]; if(v>0 && v<D) D=v; } if(D>=1e9) return 0;
+  if(D<12) return 0; const lo=Math.max(7, Math.round(D*0.3)), hi=Math.max(lo+2, Math.round(D*0.45));
+  const eye=new V3(player.pos.x, 1.6, player.pos.z), cands=[];
+  for(let k=0;k<ROWS*COLS;k++){ const v=f[k]; if(v<lo||v>hi||reserved.has(k)) continue; const x=(k%COLS+0.5)*CELL, z=(((k/COLS)|0)+0.5)*CELL; if(openAt(x,z)) cands.push({x,z,hid:!losClear(new V3(x,1.6,z),eye)}); }
+  if(!cands.length) return 0; const hid=cands.filter(c=>c.hid), c=pick(hid.length?hid:cands);
+  const n=settings.diff>0?3:2, T=['rifle','rifle','mg'];
+  for(let i=0;i<n;i++){ const p={x:c.x+rand(-1.2,1.2), z:c.z+rand(-1.2,1.2)}; if(!openAt(p.x,p.z)){ p.x=c.x; p.z=c.z; } const e=spawnEnemy(T[i], p, true); collideCircle(e.pos,0.36); e.model.group.position.copy(e.pos); e.role='hunt'; e.scout=true; e.cap=0; }
+  state.scoutMsg=true; return n; }
 // ---- v4.8: đoạn mở đầu lịch sử trước mỗi trận
 const MAP_INTRO={
   cuchi:{when:'MẬU THÂN · 1968', lines:[
@@ -4504,7 +4531,7 @@ async function refreshNet(){
   window.__gameReady=true; requestAnimationFrame(frame);
   net.probe().then(()=>{ netProbed=true; });
   // test hooks
-  window.__game={explode,net,pickSide,teamSupply,callSupport,openSupMap,playIntro,strikes,CELL,applyEnvMix,shellCam,shells,state,player,enemies,allies,hostages,hqs,arts,crates,capCells,damageEnemy,damageUnit,plantCharge,V3,supplyDrop,playerThrow,playerCharge,shopBuy,shopOpen,shopClose,toggleProne,BAKE_U,lightCells,mountArt,damageHQ,startCampaign,startOnline,net,spawnEnemy,switchWeapon,camera,renderer,Q,settings,loadMap,MAPS,get MAPID(){return MAPID;}};
+  window.__game={explode,net,pickSide,teamSupply,callSupport,openSupMap,playIntro,strikes,CELL,applyEnvMix,shellCam,shells,state,player,enemies,allies,hostages,hqs,arts,crates,capCells,damageEnemy,damageUnit,plantCharge,V3,supplyDrop,playerThrow,playerCharge,shopBuy,shopOpen,shopClose,toggleProne,BAKE_U,lightCells,mountArt,damageHQ,startCampaign,startOnline,net,spawnEnemy,openAt,losClear,spawnScouts,switchWeapon,camera,renderer,Q,settings,loadMap,MAPS,get MAPID(){return MAPID;}};
 })();
 </script>
 </body>

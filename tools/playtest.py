@@ -36,6 +36,23 @@ async def run():
         camhits=sum(1 for l in log if l!='dead' and json.loads(l)['cam']>0)
         report['ally_in_camera_samples']=camhits
         if camhits: errs.append(f'đồng đội chen vào camera ({camhits}/{len(log)} lần đo)')
+        # 1b) giao tranh thật: đưa 2 lính địch còn sống tới cách ~13 m trước mặt (chỗ trống, thấy nhau) rồi tự ngắm bắn
+        stage=await pg.evaluate("""(()=>{const g=window.__game,p=g.player; const sy=Math.sin(p.yaw), cy=Math.cos(p.yaw); let best=null;
+          for(let k=0;k<24 && !best;k++){ const a=p.yaw+((k%2)?1:-1)*Math.floor((k+1)/2)*0.26; for(const d of [13,11,9,15,7]){ const x=p.pos.x-Math.sin(a)*d, z=p.pos.z-Math.cos(a)*d;
+            if(g.openAt(x,z) && g.losClear(new g.V3(p.pos.x,1.5,p.pos.z), new g.V3(x,1.3,z))){ best={x,z,a}; break; } } }
+          if(!best) return null; p.yaw=best.a; const es=g.enemies.filter(e=>e.alive).sort((a,b)=>a.pos.distanceTo(p.pos)-b.pos.distanceTo(p.pos)).slice(0,2);
+          es.forEach((e,i)=>{ e.pos.set(best.x+(i?0.9:0), 0, best.z+(i?0.6:0)); e.model.group.position.copy(e.pos); e.alert=true; });
+          return {d:Math.round(Math.hypot(best.x-p.pos.x,best.z-p.pos.z)), n:es.length, k0:g.state.kills}; })()""")
+        report['combat_stage']=stage; clog=[]
+        if stage:
+            for i in range(15):
+                await pg.wait_for_timeout(2000); clog.append(await pg.evaluate(AIMBOT))
+                if i==6: await pg.screenshot(path=f'{shots}/playtest_firefight.png')
+            fin=await pg.evaluate("(()=>{const g=window.__game; return {kills:g.state.kills, shots:g.state.shots, hits:g.state.hits, hp:Math.round(g.player.hp), alive:g.player.alive, t:+g.state.time.toFixed(1)}})()")
+            report['firefight']=fin
+            if fin['shots']>0 and fin['hits']==0: errs.append(f'giao tranh: bắn {fin["shots"]} viên không trúng viên nào')
+            if fin['kills']<=stage['k0']: errs.append(f'giao tranh: không hạ được địch nào ở cự ly {stage["d"]} m ({fin})')
+        else: errs.append('giao tranh: không tìm được chỗ đặt địch trước mặt')
         for w in range(4):
             await pg.evaluate(f"window.__game.switchWeapon({w})"); await pg.wait_for_timeout(1500)
         await pg.screenshot(path=f'{shots}/playtest_weapons.png')
@@ -73,6 +90,9 @@ async def run():
             report['tdm_A']=await a.evaluate("(()=>{const g=window.__game,n=g.net; return {tdm:n.tdm, host:n.isHost(), side:g.player.side, allies:g.allies.length, enemies:g.enemies.filter(e=>e.alive).length, ts:n.ts}})()")
             report['tdm_B']=await c.evaluate("(()=>{const g=window.__game,n=g.net; return {tdm:n.tdm, host:n.isHost(), side:g.player.side, puppets:n.puppets.size, ts:n.ts}})()")
             if report['tdm_B']['puppets']>=6: break
+        CAMCHK="""(()=>{const g=window.__game,p=g.player; const sy=Math.sin(p.yaw), cy=Math.cos(p.yaw); return g.allies.filter(a=>a.alive&&a.model.group.visible&&(()=>{const rx=a.pos.x-p.pos.x, rz=a.pos.z-p.pos.z, al=-(rx*sy+rz*cy); return Math.hypot(rx,rz)<0.75 || (al>-0.2&&al<1.2&&Math.abs(rx*cy-rz*sy)<0.5);})()).length})()"""
+        report['online_ally_in_camera']=await a.evaluate(CAMCHK)
+        if report['online_ally_in_camera']: errs.append(f"online: {report['online_ally_in_camera']} bot đồng đội chen vào camera máy A")
         await a.screenshot(path=f'{shots}/playtest_online.png'); await c.screenshot(path=f'{shots}/playtest_online_B.png')
         if report['online_peers_A']<1 or report['online_peers_B']<1: errs.append('online: 2 người chơi không thấy nhau')
         if not report['tdm_A']['host'] or report['tdm_B']['host']: errs.append('đấu đội: chọn host sai')
