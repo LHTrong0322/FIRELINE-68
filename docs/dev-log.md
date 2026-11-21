@@ -137,3 +137,16 @@
 - Ghi chú: SwiftShader ở 844×390 chỉ chạy ~0,07 giây game/giây thật, nên tổ trinh sát chưa kịp chạm trán trong lúc test (đo được 47 m Củ Chi, 53 m Khe Sanh, 21–27 m Him Lam lúc đầu trận) — không phải lỗi.
 - Test: playtest ĐẠT (0 đồng đội chen camera chiến dịch + online, giao tranh hạ 1, A host VN 4+4 bot, B phe Mỹ thấy 8 bot), check low ĐẠT (độ sáng 30,1), check high ĐẠT (23,4).
 - Backlog: hỗ trợ ngắm cảm ứng (cố vấn việc 2, nhắc 3 lần — cần Trọng trả lời chỉ chiến dịch hay cả online; mặc định chỉ chiến dịch); tên đồng đội chỉ hiện trong 15 m/gần tâm (còn đè tiêu đề trận); làm tròn tiền lẻ "689.999đ"; dòng tin hạ địch đè số điểm; modetest đo thời điểm chạm trán tổ trinh sát.
+
+## 2026-11-21 — v4.16 (bot QA)
+- **LỖI hỏng hình (online): máy người chơi thứ hai có bot cùng phe đứng sát camera** (cố vấn 20/11, lỗi 1). Tái hiện: `python3 tools/playtest.py` → `playtest_online_B.png` (bản cũ có lúc lính Mỹ che góc trái máy B). Nguyên nhân: `net.hostSim` sinh bot phe Mỹ ở `pick(spawnE)` ±1 m — đúng chỗ người chơi phe Mỹ xuất phát; phần xếp sau lưng (v4.14) chỉ xét `player` của máy chủ.
+  - Sửa 1 (máy chủ): hàm mới `net.behindHuman(pos,i)` — bot (cả hai phe) sinh trong 8 m quanh BẤT KỲ người chơi thật nào (máy chủ + `remotes`) thì xếp ra sau lưng/hai bên người đó 2,6–4 m.
+  - Sửa 2 (mọi máy): `animPuppets` ẩn tạm bot cùng phe đang trong 0,8 m hoặc trong nón 1,6 m phía trước camera máy đó (như đồng đội chiến dịch v4.12.1); bot chết luôn hiện lại. Chỉ là phép tính khoảng cách, không tốn hiệu năng.
+  - Playtest thêm `online_ally_in_camera_B` (đếm bot cùng phe trong nón camera máy B) → báo LỖI nếu > 0.
+- **LỖI HUD: dòng tin hạ địch đè ô điểm góc trên phải** (cố vấn lỗi 2, còn từ v4.14). Nguyên nhân: CSS `#score{top:60px!important}` (để chừa nút góc trên) trùng `#feed{top:60px}`. Sửa: `#feed` xuống 110 px (màn thấp ≤500 px: 104 px).
+- **LỖI HUD: tên đồng đội chồng nhau và đè tiêu đề trận** (cố vấn lỗi 5; ảnh `playtest_mobile_play` có "Thắng/Hải" đè nhau và đè dòng "Phá huỷ xe chỉ huy…"). Sửa trong `updateUnitMarks`: tên chỉ hiện trong 14 m; ẩn khi đang hiện tiêu đề trận (`state.msgT>0`); hai tên cách nhau < 64×22 px trên màn hình thì chỉ giữ tên gần tâm ngắm hơn. Mũi tên xanh vẫn hiện đủ.
+- Số phiên bản menu: v4.16.
+- Tiền lẻ "689.999đ" (cố vấn lỗi 4): KHÔNG phải lỗi game — do `modetest.py` tự đặt `money=999999` rồi mua RPD/lựu đạn/đồng đội. Đổi test thành 1.000.000 cho số tròn.
+- Soi ảnh bản cũ (trước sửa): combat/firefight/mobile/online không có đốm đen trắng, không lỗi JS; B40 điện thoại vẫn chiếm giữa màn (việc của bot đồ hoạ).
+- Test: playtest ĐẠT (0 lỗi JS; 0 đồng đội chen camera chiến dịch; giao tranh trúng 2, hạ 1; online A host VN 4+4 bot, B phe Mỹ thấy 8 bot, `online_ally_in_camera` A=0, B=0), check low ĐẠT (độ sáng 29,6), check high ĐẠT (22,4). Ảnh sau sửa: tên đồng đội không còn đè tiêu đề trận (`playtest_mobile_play`, `playtest_combat_*`), máy B online không có lính che camera.
+- Backlog: hỗ trợ ngắm cảm ứng (cố vấn việc 1, nhắc lần 4 — mặc định chỉ chiến dịch); test địch bắn trả 10 s game và đo máu mất (cố vấn việc 3); kiểm tra khung chữ nhật feed/ô điểm không chồng nhau trong playtest; B40 điện thoại vẫn che giữa màn (bot đồ hoạ).

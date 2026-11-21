@@ -17,7 +17,7 @@ async def run():
             await pg.wait_for_function("window.__game.state.phase==='playing'", timeout=300000)
             await pg.wait_for_timeout(3000)
             await pg.screenshot(path=f'{shots}/mode_{mp}_1.png')
-            await pg.evaluate("""(()=>{ const g=window.__game; g.state.money=999999; g.shopBuy('rpd'); g.shopBuy('nade'); g.shopBuy('ally'); g.playerThrow(); g.toggleProne(); g.supplyDrop(); })()""")
+            await pg.evaluate("""(()=>{ const g=window.__game; g.state.money=1000000; g.shopBuy('rpd'); g.shopBuy('nade'); g.shopBuy('ally'); g.playerThrow(); g.toggleProne(); g.supplyDrop(); })()""")
             await pg.wait_for_timeout(3500)
             await pg.screenshot(path=f'{shots}/mode_{mp}_2.png')
             rep[mp]=await pg.evaluate("""(()=>{ const g=window.__game, s=g.state; return {mission:s.mission, phase:s.phase, money:s.money, enemies:g.enemies.filter(e=>e.alive).length, allies:g.allies.length, hqs:g.hqs.map(h=>h.side+':'+Math.round(h.hp)), arts:g.arts.length, crates:g.crates.length, caps:g.capCells.length, cur:g.player.cur, prone:g.player.prone, kVN:s.kVN, kEN:s.kEN, roles:[...new Set(g.allies.map(a=>a.role))].join(',')}; })()""")

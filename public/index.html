@@ -40,7 +40,7 @@ button{font-family:inherit;cursor:pointer}
 #obj{font-size:15px;font-weight:700;letter-spacing:1px;color:var(--acc);background:rgba(0,0,0,.45);padding:4px 14px;border:1px solid var(--line);border-radius:3px;white-space:nowrap}
 #score{position:absolute;top:calc(10px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right));text-align:right;font-weight:700;text-shadow:0 2px 4px #000}
 #score .big{font-size:22px;color:var(--acc)}
-#feed{position:absolute;top:calc(60px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right));display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+#feed{position:absolute;top:calc(110px + env(safe-area-inset-top));right:calc(14px + env(safe-area-inset-right));display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 #feed div{background:rgba(0,0,0,.5);padding:3px 10px;font-size:13px;border-right:3px solid var(--red);animation:fin .2s}
 @keyframes fin{from{transform:translateX(30px);opacity:0}}
 #msg{position:absolute;top:30%;left:0;right:0;text-align:center;font-size:34px;font-weight:700;letter-spacing:3px;color:var(--ink);text-shadow:0 0 18px rgba(226,178,60,.6),0 3px 6px #000;opacity:0;transition:opacity .4s}
@@ -186,7 +186,7 @@ button{font-family:inherit;cursor:pointer}
   #msg{font-size:20px!important} #msg small{font-size:11px!important}
   #banner .t{font-size:13px;padding:4px 20px} #banner .s{font-size:10px}
   #segMode button,#segNetMode button{font-size:11px;padding:6px 3px;line-height:1.2}
-  #feed{top:calc(84px + env(safe-area-inset-top));max-width:46vw} #feed div{font-size:11px;padding:2px 8px;line-height:1.3;text-align:right}
+  #feed{top:calc(104px + env(safe-area-inset-top));max-width:46vw} #feed div{font-size:11px;padding:2px 8px;line-height:1.3;text-align:right}
 }
 @media (pointer:coarse){ #bSup{right:auto;left:calc(10px + env(safe-area-inset-left));top:calc(132px + env(safe-area-inset-top));font-size:11px;padding:5px 9px} }
 /* v4.10: xung phong */
@@ -389,7 +389,7 @@ button{font-family:inherit;cursor:pointer}
       <h1>FIRELINE <span>'68</span></h1>
       <div class="sub">TUYẾN LỬA · CĂN CỨ NGẦM · FPS 3D</div>
       <p>Cùng tiểu đội bộ đội công phá căn cứ địch, đánh chiếm lô cốt chiến hào, giải cứu đồng chí bị bắt — hoặc vào phòng online để đấu với bạn bè.</p>
-      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.15</span></div>
+      <div class="credit">Agent build by @Trong0322 · <span id="ver">v4.16</span></div>
       <div class="note" id="installHint" style="display:none;max-width:420px"></div>
     </div>
     <div class="card">
@@ -3371,8 +3371,12 @@ let markTick=0;
 function updateUnitMarks(){ if((markTick++)&1) return; markN=0;
   if(state.phase==='playing' && state.mode==='campaign'){
     const P=player.pos;
+    /* v4.16: tên đồng đội — chỉ trong 14 m, ẩn khi đang hiện tiêu đề trận, hai tên sát nhau trên màn hình thì giữ tên gần tâm ngắm hơn */
+    const named=new Set(); if(!(state.msgT>0)){ const W2=innerWidth/2, H2=innerHeight/2, cand=[];
+      for(const a of allies){ if(!a.alive) continue; const d=Math.hypot(a.pos.x-P.x,a.pos.z-P.z); if(d>=14) continue; const v=new V3(a.pos.x,2.05*(a.model.group.scale.y||1),a.pos.z).project(camera); if(v.z>1) continue; const sx=v.x*W2, sy=-v.y*H2; cand.push({a,sx,sy,c:Math.hypot(sx,sy)}); }
+      cand.sort((p,q)=>p.c-q.c); const ok=[]; for(const c of cand){ if(ok.some(o=>Math.abs(o.sx-c.sx)<64 && Math.abs(o.sy-c.sy)<22)) continue; ok.push(c); named.add(c.a); } }
     for(const a of allies){ const d=Math.hypot(a.pos.x-P.x,a.pos.z-P.z); if(d>70) continue;
-      if(a.alive) mark('', `<svg width="16" height="11" viewBox="0 0 16 11"><path d="M1 1h14L8 10z" fill="#57e08a" stroke="#0b2" stroke-width="1"/></svg>${d<14?`<div style="color:#bff5cf">${esc(a.name)}</div>`:''}`, new V3(a.pos.x,2.05*(a.model.group.scale.y||1),a.pos.z));
+      if(a.alive) mark('', `<svg width="16" height="11" viewBox="0 0 16 11"><path d="M1 1h14L8 10z" fill="#57e08a" stroke="#0b2" stroke-width="1"/></svg>${named.has(a)?`<div style="color:#bff5cf">${esc(a.name)}</div>`:''}`, new V3(a.pos.x,2.05*(a.model.group.scale.y||1),a.pos.z));
       else if(a.down) mark('', `<div style="background:#fff;color:#d4201a;font-size:18px;line-height:18px;width:20px;border-radius:3px">✚</div><div style="color:#ffd34a">${Math.ceil(a.downT)}s</div>`, new V3(a.pos.x,0.9,a.pos.z)); }
     for(const e of enemies){ if(!e.alive || !e.los) continue; const d=Math.hypot(e.pos.x-P.x,e.pos.z-P.z); if(d>45) continue;
       mark('', '<svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 1l5 5-5 5-5-5z" fill="#ff3a2a" stroke="#600" stroke-width="1"/></svg>', new V3(e.pos.x,2.1,e.pos.z)); }
@@ -3979,6 +3983,9 @@ const net = {
     this.animPuppets(dt);
   },
   showWin(side){ const me=side===player.side; showMsg(me?'ĐỘI TA THẮNG!':'ĐỘI BẠN THUA', me?'Vinh quang thuộc về những người lính giữ nước!':'Củng cố đội hình — vòng mới bắt đầu sau ít giây',6); AU.play(me?'win':'wave'); },
+  /* v4.16: bot sinh gần BẤT KỲ người chơi thật nào (chủ phòng hoặc máy khác) thì xếp ra sau lưng / hai bên người đó 2,6–4 m */
+  behindHuman(pos, i){ const hs=[]; if(player.alive) hs.push({x:player.pos.x,z:player.pos.z,yaw:player.yaw}); for(const r of this.remotes.values()) if(r.pos && r.alive!==false) hs.push({x:r.pos.x,z:r.pos.z,yaw:r.tyaw??r.yaw??0});
+    for(const h of hs){ if(Math.hypot(pos.x-h.x,pos.z-h.z)>=8) continue; const sy=Math.sin(h.yaw), cy=Math.cos(h.yaw), t=((i%5)/4-0.5)*4.2, r=2.6+(i%3)*0.7, fx=Math.sin(t)*r, fz=Math.cos(t)*r; pos.set(h.x+fx*cy+fz*sy, 0, h.z-fx*sy+fz*cy); return; } },
   hostSim(dt){
     state.mission='tdm';
     // quân số mỗi bên = max(5, số người thật bên đông nhất); bot lấp chỗ trống
@@ -3987,11 +3994,11 @@ const net = {
     while(allies.length>wantV){ const a=allies.pop(); scene.remove(a.model.group); }
     while(allies.length<wantV){ const i=allies.length, a=spawnAlly(i); a.bid='v'+(++this.botSeq); a.role='hunt'; const s=pick(spawnP); a.pos.set(s.x+rand(-1,1),0,s.z+rand(-1,1));
       /* gần người chơi: xuất phát sau lưng / hai bên như chiến dịch (v4.12.1), không đứng trước camera */
-      if(player.alive && Math.hypot(a.pos.x-player.pos.x,a.pos.z-player.pos.z)<8){ const sy=Math.sin(player.yaw), cy=Math.cos(player.yaw), t=((i%5)/4-0.5)*4.2, r=2.6+(i%3)*0.7, fx=Math.sin(t)*r, fz=Math.cos(t)*r; a.pos.set(player.pos.x+fx*cy+fz*sy, 0, player.pos.z-fx*sy+fz*cy); }
+      this.behindHuman(a.pos, i);
       collideCircle(a.pos,0.36); a.model.group.position.set(a.pos.x,0,a.pos.z); }
     const aliveU=enemies.filter(e=>e.alive).length; while(enemies.filter(e=>e.alive).length>wantU){ const e=enemies.find(x=>x.alive); removeEnemy(e); enemies.splice(enemies.indexOf(e),1); }
     if(aliveU+this.tdQ.length<wantU) this.tdQ.push(enemies.length<wantU?0.2:RESPAWN_T);
-    for(let i=this.tdQ.length-1;i>=0;i--){ this.tdQ[i]-=dt; if(this.tdQ[i]<=0){ this.tdQ.splice(i,1); const c=pick(spawnE); const e=spawnEnemy(pick(['rifle','rifle','rifle','shotgun','mg']), {x:c.x+rand(-1,1),z:c.z+rand(-1,1)}, true); e.bid='u'+(++this.botSeq); e.role='hunt'; } }
+    for(let i=this.tdQ.length-1;i>=0;i--){ this.tdQ[i]-=dt; if(this.tdQ[i]<=0){ this.tdQ.splice(i,1); const c=pick(spawnE); const at=new V3(c.x+rand(-1,1),0,c.z+rand(-1,1)); this.behindHuman(at, this.botSeq); const e=spawnEnemy(pick(['rifle','rifle','rifle','shotgun','mg']), {x:at.x,z:at.z}, true); collideCircle(e.pos,0.36); e.model.group.position.set(e.pos.x,0,e.pos.z); e.bid='u'+(++this.botSeq); e.role='hunt'; } }
     // sát thương người chơi khác gây ra cho bot
     for(const r of this.remotes.values()){ const pe=this.room.peers().find(x=>x.peer===r.peer); const bm=pe&&pe.presence&&pe.presence.bdm; if(!bm) continue; const seen=this.seenB[r.peer]||(this.seenB[r.peer]={});
       for(const id in bm){ const tot=bm[id]|0, dm=tot-(seen[id]|0); if(dm<=0){ seen[id]=tot; continue; } seen[id]=tot; const b=allies.find(a=>a.bid===id)||enemies.find(e=>e.bid===id); if(!b||!b.alive) continue;
@@ -4019,10 +4026,12 @@ const net = {
     const cp=Math.cos(p.pitch); const d=new V3(Math.sin(p.yaw)*cp, Math.sin(p.pitch), Math.cos(p.yaw)*cp);
     const w=raycast(o.x,o.y,o.z,d.x,d.y,d.z,150); const end=o.clone().addScaledVector(d,Math.min(w.t,60)); addTracer(o,end); if(w.t<60) impactFx(end,w.n); AU.play(p.snd,o); },
   animPuppets(dt){ for(const p of this.puppets.values()){ const m=p.model;
-      if(!p.alive){ deathAnim(p,dt); continue; }
+      if(!p.alive){ m.group.visible=true; deathAnim(p,dt); continue; }
       const ox=p.pos.x, oz=p.pos.z; p.pos.lerp(p.tpos, Math.min(1,dt*8)); if(p.pos.distanceTo(p.tpos)>6) p.pos.copy(p.tpos);
       p.speed=Math.hypot(p.pos.x-ox,p.pos.z-oz)/Math.max(dt,1e-4); p.yaw+=angDiff(p.yaw,p.tyaw)*Math.min(1,dt*10);
-      m.group.position.set(p.pos.x,0,p.pos.z); m.group.rotation.y=p.yaw; animateSoldier(m, p.speed, dt, p.pitch); } },
+      m.group.position.set(p.pos.x,0,p.pos.z); m.group.rotation.y=p.yaw; animateSoldier(m, p.speed, dt, p.pitch);
+      /* v4.16: bot cùng phe lọt vào nón sát camera máy này (< 1,6 m phía trước) thì ẩn tạm, như đồng đội chiến dịch v4.12.1 */
+      if(p.side===player.side && player.alive){ const rx=p.pos.x-player.pos.x, rz=p.pos.z-player.pos.z, sy=Math.sin(player.yaw), cy=Math.cos(player.yaw), al=-(rx*sy+rz*cy), lat=Math.abs(rx*cy-rz*sy); m.group.visible=!(Math.hypot(rx,rz)<0.8 || (al>-0.2 && al<1.6 && lat<0.65)); } else m.group.visible=true; } },
   remoteShot(r,w){
     soldierShot(r.model);
     const wpn=WEAPONS[w]||WEAPONS[2]; if(wpn.melee){ AU.play('knife',r.pos); return; }

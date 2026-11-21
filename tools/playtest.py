@@ -93,6 +93,9 @@ async def run():
         CAMCHK="""(()=>{const g=window.__game,p=g.player; const sy=Math.sin(p.yaw), cy=Math.cos(p.yaw); return g.allies.filter(a=>a.alive&&a.model.group.visible&&(()=>{const rx=a.pos.x-p.pos.x, rz=a.pos.z-p.pos.z, al=-(rx*sy+rz*cy); return Math.hypot(rx,rz)<0.75 || (al>-0.2&&al<1.2&&Math.abs(rx*cy-rz*sy)<0.5);})()).length})()"""
         report['online_ally_in_camera']=await a.evaluate(CAMCHK)
         if report['online_ally_in_camera']: errs.append(f"online: {report['online_ally_in_camera']} bot đồng đội chen vào camera máy A")
+        CAMB="""(()=>{const g=window.__game,p=g.player; const sy=Math.sin(p.yaw), cy=Math.cos(p.yaw); return [...g.net.puppets.values()].filter(b=>b.alive&&b.side===p.side&&b.model.group.visible&&(()=>{const rx=b.pos.x-p.pos.x, rz=b.pos.z-p.pos.z, al=-(rx*sy+rz*cy); return Math.hypot(rx,rz)<0.75 || (al>-0.2&&al<1.2&&Math.abs(rx*cy-rz*sy)<0.5);})()).length})()"""
+        report['online_ally_in_camera_B']=await c.evaluate(CAMB)
+        if report['online_ally_in_camera_B']: errs.append(f"online: {report['online_ally_in_camera_B']} bot đồng đội chen vào camera máy B")
         await a.screenshot(path=f'{shots}/playtest_online.png'); await c.screenshot(path=f'{shots}/playtest_online_B.png')
         if report['online_peers_A']<1 or report['online_peers_B']<1: errs.append('online: 2 người chơi không thấy nhau')
         if not report['tdm_A']['host'] or report['tdm_B']['host']: errs.append('đấu đội: chọn host sai')
